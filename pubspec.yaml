@@ -92,12 +92,6 @@ dependencies:
   qr_flutter: ^4.1.0
   app_settings: ^7.0.0
 
-# Fix build release issue: Error unsupported class file major version 59
-# https://stackoverflow.com/questions/72506950/flutter-error-could-not-resolve-all-artifacts-for-configuration-image-picker
-dependency_overrides:
-  file: 6.1.4
-  frontend_server_client: ^4.0.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
