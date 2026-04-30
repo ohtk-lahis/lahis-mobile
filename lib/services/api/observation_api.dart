@@ -59,7 +59,7 @@ class ObservationApi extends GraphQlBaseApi {
   Future<SubjectRecordQueryResult> fetchSubjectRecords(int definitionId,
       {limit = 20, offset = 0, String? q}) async {
     const query = r'''
-      query observationSubjects($limit: Int, $offset: Int, $definitionId: String, $q: String) {
+      query observationSubjects($limit: Int, $offset: Int, $definitionId: ID, $q: String) {
         observationSubjects(
           limit: $limit, 
           offset: $offset, 
@@ -331,7 +331,7 @@ class ObservationApi extends GraphQlBaseApi {
   fetchSubjectRecordsInBounded(int definitionId, double topLeftX,
       double topLeftY, double bottomRightX, double bottomRightY) {
     const query = r'''
-      query observationSubjectsInBounded($definitionId: Int, $topLeftX: Float, $topLeftY: Float, $bottomRightX: Float, $bottomRightY: Float) {
+      query observationSubjectsInBounded($definitionId: Int!, $topLeftX: Float!, $topLeftY: Float!, $bottomRightX: Float!, $bottomRightY: Float!) {
         observationSubjectsInBounded(definitionId: $definitionId, topLeftX: $topLeftX, topLeftY: $topLeftY, bottomRightX: $bottomRightX, bottomRightY: $bottomRightY) {
           id
           definitionId

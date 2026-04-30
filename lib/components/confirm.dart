@@ -12,7 +12,13 @@ Future<bool> confirm(
 }) async {
   final bool? isConfirm = await showDialog<bool>(
     context: context,
-    builder: (_) => WillPopScope(
+    builder: (dialogContext) => PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          Navigator.pop(dialogContext, false);
+        }
+      },
       child: AlertDialog(
         title: title,
         content: content ??
@@ -37,12 +43,37 @@ Future<bool> confirm(
           )
         ],
       ),
-      onWillPop: () async {
-        Navigator.pop(context, false);
-        return true;
-      },
     ),
   );
 
   return isConfirm ?? false;
+}
+
+class ConfirmPopScope extends StatelessWidget {
+  final Widget child;
+  final Future<bool> Function() onWillPop;
+
+  const ConfirmPopScope({
+    Key? key,
+    required this.child,
+    required this.onWillPop,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          return;
+        }
+
+        final shouldPop = await onWillPop();
+        if (shouldPop && context.mounted) {
+          Navigator.pop(context);
+        }
+      },
+      child: child,
+    );
+  }
 }

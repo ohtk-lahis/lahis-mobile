@@ -12,6 +12,6 @@ class InvitationCodeSuccess extends InvitationCodeResult {
 }
 
 class InvitationCodeFailure extends OperationExceptionFailure
-    with InvitationCodeResult {
+    implements InvitationCodeResult {
   InvitationCodeFailure(e) : super(e);
 }

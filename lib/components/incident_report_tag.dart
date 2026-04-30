@@ -25,7 +25,7 @@ class IncidentReportTestTag extends StatelessWidget {
         style: TextStyle(
           color: appTheme.bg1,
         ),
-        textScaleFactor: 0.8,
+        textScaler: const TextScaler.linear(0.8),
       ),
     );
   }

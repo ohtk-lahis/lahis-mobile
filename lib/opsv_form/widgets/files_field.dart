@@ -108,14 +108,17 @@ class _FormFilesFieldState extends State<FormFilesField> {
 
   Future<ReportFile?> _pickFile() async {
     ReportFile? reportFile;
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.pickFiles();
 
     if (result != null) {
       var path = result.files.first.path;
+      if (path == null) {
+        return null;
+      }
       var name = result.files.first.name;
       var extension = result.files.first.extension ?? '';
 
-      var mimeType = lookupMimeType(path!) ?? '';
+      var mimeType = lookupMimeType(path) ?? '';
       var cacheFile = File(path);
       var fileBytes = await cacheFile.readAsBytes();
       var uuid = const Uuid().v4();

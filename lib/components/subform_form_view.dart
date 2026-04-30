@@ -28,10 +28,8 @@ class SubformFormView extends StatelessWidget {
         if (!viewModel.isReady) {
           return const Center(child: CircularProgressIndicator());
         }
-        return WillPopScope(
-          onWillPop: () async {
-            return _onWillpPop(context);
-          },
+        return ConfirmPopScope(
+          onWillPop: () => _onWillpPop(context),
           child: GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Scaffold(

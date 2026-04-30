@@ -9,6 +9,6 @@ class FcmTokenRegisterSuccess extends FcmTokenRegisterResult {
 }
 
 class FcmTokenRegisterFailure extends OperationExceptionFailure
-    with FcmTokenRegisterResult {
+    implements FcmTokenRegisterResult {
   FcmTokenRegisterFailure(e) : super(e);
 }

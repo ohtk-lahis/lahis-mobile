@@ -14,7 +14,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class InvalidRefreshTokenError extends http.DioError {
+class InvalidRefreshTokenError extends http.DioException {
   InvalidRefreshTokenError(requestOptions)
       : super(requestOptions: requestOptions);
 }
@@ -40,12 +40,13 @@ class GqlService {
   overrideDioSelfSignCertificateHandling() {
     IOHttpClientAdapter httpClient =
         _dio.httpClientAdapter as IOHttpClientAdapter;
-    httpClient.onHttpClientCreate = (HttpClient client) {
+    httpClient.createHttpClient = () {
+      final client = HttpClient();
       client.badCertificateCallback =
           (X509Certificate cert, String host, int port) {
         return true;
       };
-      return null;
+      return client;
     };
   }
 
@@ -120,9 +121,12 @@ class GqlService {
         'variables': {'refreshToken': refreshToken}
       });
 
+      final refreshResult = response.data['data']['refreshToken'];
+      await _secureStorage.set('token', refreshResult['token']);
+      await _secureStorage.set('refreshToken', refreshResult['refreshToken']);
       await _secureStorage.set(
-        'token',
-        response.data['data']['refreshToken']['token'],
+        'refreshExpiresIn',
+        refreshResult['refreshExpiresIn'].toString(),
       );
       return true;
     } on InvalidRefreshTokenError {

@@ -139,7 +139,7 @@ class ReportApi extends GraphQlBaseApi {
     ''';
     final connectivityResult = await (Connectivity().checkConnectivity());
     var fetchPolicy = FetchPolicy.cacheAndNetwork;
-    if (connectivityResult == ConnectivityResult.none) {
+    if (connectivityResult.contains(ConnectivityResult.none)) {
       fetchPolicy = FetchPolicy.cacheOnly;
     }
 
@@ -247,7 +247,7 @@ class ReportApi extends GraphQlBaseApi {
     ''';
     final connectivityResult = await (Connectivity().checkConnectivity());
     var fetchPolicy = FetchPolicy.cacheAndNetwork;
-    if (connectivityResult == ConnectivityResult.none) {
+    if (connectivityResult.contains(ConnectivityResult.none)) {
       fetchPolicy = FetchPolicy.cacheOnly;
     }
     return runGqlQuery<IncidentReportQueryResult>(

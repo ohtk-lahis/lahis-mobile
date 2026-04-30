@@ -34,7 +34,9 @@ class _FormLocationFieldState extends State<FormLocationField> {
       }
     } on LocationServiceDisabledException catch (e) {
       _logger.e(e);
-      showLocationServiceAlert(context);
+      if (mounted) {
+        showLocationServiceAlert(context);
+      }
     } on PermissionDeniedException catch (e) {
       _logger.e(e);
       LocationPermission permission = await Geolocator.requestPermission();

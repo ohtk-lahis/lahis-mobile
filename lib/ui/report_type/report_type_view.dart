@@ -230,7 +230,7 @@ class _ZeroReport extends StackedHookView<ReportTypeViewModel> {
                       return Text(
                         AppLocalizations.of(context)!
                             .zeroReportLastReportedMessage(dateTimeString),
-                        textScaleFactor: 0.8,
+                        textScaler: const TextScaler.linear(0.8),
                         style: TextStyle(color: appTheme.warn),
                       );
                     } else {

@@ -9,7 +9,7 @@ class RegisterSuccess extends RegisterResult {
   RegisterSuccess({required this.loginSuccess});
 }
 
-class RegisterFailure extends OperationExceptionFailure with RegisterResult {
+class RegisterFailure extends OperationExceptionFailure implements RegisterResult {
   RegisterFailure(e) : super(e);
 }
 

@@ -57,7 +57,7 @@ class _FormSingleChoicesFieldState extends State<FormSingleChoicesField> {
                 padding: const EdgeInsets.only(left: 8.0, bottom: 0, top: 0),
                 child: Text(
                   widget.field.label!,
-                  textScaleFactor: 1.1,
+                  textScaler: const TextScaler.linear(1.1),
                   style: TextStyle(
                     color: Colors.grey.shade700,
                   ),

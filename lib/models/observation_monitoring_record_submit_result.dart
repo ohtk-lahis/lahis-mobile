@@ -12,7 +12,7 @@ class MonitoringRecordSubmitSuccess extends MonitoringRecordSubmitResult {
 }
 
 class MonitoringRecordSubmitFailure extends OperationExceptionFailure
-    with MonitoringRecordSubmitResult {
+    implements MonitoringRecordSubmitResult {
   MonitoringRecordSubmitFailure(e) : super(e);
 }
 

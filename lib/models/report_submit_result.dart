@@ -12,7 +12,7 @@ class ReportSubmitSuccess extends ReportSubmitResult {
 }
 
 class ReportSubmitFailure extends OperationExceptionFailure
-    with ReportSubmitResult {
+    implements ReportSubmitResult {
   ReportSubmitFailure(e) : super(e);
 }
 

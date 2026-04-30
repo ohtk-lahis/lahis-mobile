@@ -12,6 +12,6 @@ class FollowupSubmitSuccess extends FollowupSubmitResult {
 }
 
 class FollowupSubmitFailure extends OperationExceptionFailure
-    with FollowupSubmitResult {
+    implements FollowupSubmitResult {
   FollowupSubmitFailure(e) : super(e);
 }

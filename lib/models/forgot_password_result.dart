@@ -10,7 +10,7 @@ class ForgotPasswordSuccess extends ForgotPasswordResult {
 }
 
 class ForgotPasswordFailure extends OperationExceptionFailure
-    with ForgotPasswordResult {
+    implements ForgotPasswordResult {
   ForgotPasswordFailure(e) : super(e);
 }
 

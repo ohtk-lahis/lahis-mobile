@@ -12,6 +12,6 @@ class FileSubmitSuccess extends FileSubmitResult {
 }
 
 class FileSubmitFailure extends OperationExceptionFailure
-    with FileSubmitResult {
+    implements FileSubmitResult {
   FileSubmitFailure(e) : super(e);
 }

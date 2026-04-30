@@ -12,6 +12,6 @@ class ImageSubmitSuccess extends ImageSubmitResult {
 }
 
 class ImageSubmitFailure extends OperationExceptionFailure
-    with ImageSubmitResult {
+    implements ImageSubmitResult {
   ImageSubmitFailure(e) : super(e);
 }

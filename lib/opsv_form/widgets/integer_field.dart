@@ -42,12 +42,8 @@ class _FormIntegerFieldState extends State<FormIntegerField> {
         decoration: InputDecoration(
           border: const OutlineInputBorder(),
           labelText: widget.field.label,
-          suffixText: widget.field.suffixLabel != null
-              ? widget.field.suffixLabel!
-              : null,
-          helperText: widget.field.description != null
-              ? widget.field.description!
-              : null,
+          suffixText: widget.field.suffixLabel,
+          helperText: widget.field.description,
           errorText: widget.field.invalidMessage,
         ),
         onChanged: (val) {

@@ -144,7 +144,7 @@ class HomeView extends HookWidget {
   static int _calculateSelectedIndex(
       BuildContext context, HomeViewModel viewModel) {
     try {
-      final String location = GoRouterState.of(context).location;
+      final String location = GoRouterState.of(context).uri.path;
       if (location.startsWith('/reports')) {
         return 0;
       }

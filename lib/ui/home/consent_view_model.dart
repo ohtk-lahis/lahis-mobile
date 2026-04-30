@@ -27,7 +27,7 @@ class ConsentViewModel extends BaseViewModel {
   getConsentConfiguration() async {
     // check if we are in offline mode?
     final connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
+    if (connectivityResult.contains(ConnectivityResult.none)) {
       consentNotFound = true;
       logger.w("No internet connection");
       setBusy(false);

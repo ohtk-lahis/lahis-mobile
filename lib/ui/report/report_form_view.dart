@@ -31,10 +31,8 @@ class ReportFormView extends StatelessWidget {
         if (!viewModel.isReady) {
           return const Center(child: CircularProgressIndicator());
         }
-        return WillPopScope(
-          onWillPop: () async {
-            return _onWillpPop(context, viewModel);
-          },
+        return ConfirmPopScope(
+          onWillPop: () => _onWillpPop(context, viewModel),
           child: GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Scaffold(

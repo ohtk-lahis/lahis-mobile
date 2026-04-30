@@ -16,7 +16,7 @@ import 'package:podd_app/services/report_service.dart';
 import 'package:stacked/stacked.dart';
 
 class ReSubmitViewModel extends ReactiveViewModel {
-  late StreamSubscription _connectionChangeStream;
+  late StreamSubscription<List<ConnectivityResult>> _connectionChangeStream;
 
   final _logger = locator<Logger>();
   final IReportService _reportService = locator<IReportService>();
@@ -34,8 +34,8 @@ class ReSubmitViewModel extends ReactiveViewModel {
         Connectivity().onConnectivityChanged.listen(connectionChanged);
   }
 
-  void connectionChanged(ConnectivityResult result) async {
-    if (result != ConnectivityResult.none) {
+  void connectionChanged(List<ConnectivityResult> result) async {
+    if (!result.contains(ConnectivityResult.none)) {
       try {
         final result = await InternetAddress.lookup("ohtk.org");
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {

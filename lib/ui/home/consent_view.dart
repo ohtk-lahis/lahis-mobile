@@ -49,10 +49,8 @@ class ConsentView extends HookWidget {
 class _ConsentDetail extends StackedHookView<ConsentViewModel> {
   @override
   Widget builder(BuildContext context, ConsentViewModel viewModel) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+    return PopScope(
+      canPop: false,
       child: Material(
         color: Colors.white,
         child: SingleChildScrollView(

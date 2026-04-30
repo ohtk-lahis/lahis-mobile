@@ -126,7 +126,7 @@ class _CommentList extends StackedHookView<ReportCommentViewModel> {
               child: Text(
                 comment.user.username,
                 overflow: TextOverflow.ellipsis,
-                textScaleFactor: .9,
+                textScaler: const TextScaler.linear(.9),
                 maxLines: 2,
                 style: Theme.of(context)
                     .textTheme

@@ -35,14 +35,13 @@ class _AllReportsViewState extends State<AllReportsView>
 class _ReportList extends StackedHookView<AllReportsViewModel> {
   @override
   Widget builder(BuildContext context, AllReportsViewModel viewModel) {
-    final isMounted = useIsMounted();
     useEffect(() {
-      if (isMounted()) {
-        // use future.delayed to avoid  widget cannot be marked as needing to build because the framework is already in the process of building widgets
-        Future.delayed(Duration.zero, () {
+      // use future.delayed to avoid widget cannot be marked as needing to build because the framework is already in the process of building widgets
+      Future.delayed(Duration.zero, () {
+        if (context.mounted) {
           viewModel.refetchIncidentReports();
-        });
-      }
+        }
+      });
       return null;
     }, []);
     return RefreshIndicator(

@@ -12,7 +12,7 @@ class SubjectRecordSubmitSuccess extends SubjectRecordSubmitResult {
 }
 
 class SubjectRecordSubmitFailure extends OperationExceptionFailure
-    with SubjectRecordSubmitResult {
+    implements SubjectRecordSubmitResult {
   SubjectRecordSubmitFailure(e) : super(e);
 }
 

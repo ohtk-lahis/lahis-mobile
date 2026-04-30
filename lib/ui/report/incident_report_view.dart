@@ -35,10 +35,8 @@ class IncidentReportView extends HookWidget {
     return ViewModelBuilder<IncidentReportViewModel>.nonReactive(
       viewModelBuilder: () => IncidentReportViewModel(id),
       builder: (context, viewModel, child) {
-        return WillPopScope(
-          onWillPop: () async {
-            return viewModel.mapRenderedComplete;
-          },
+        return PopScope(
+          canPop: viewModel.mapRenderedComplete,
           child: Scaffold(
             appBar: AppBar(
               leading: const BackAppBarAction(),
@@ -111,7 +109,7 @@ class _TabView extends StackedHookView<IncidentReportViewModel> {
                 opacity: 0.4,
                 child: Text(
                   'Test Report',
-                  textScaleFactor: 4,
+                  textScaler: TextScaler.linear(4),
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
                     color: Colors.black54,

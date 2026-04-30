@@ -72,15 +72,15 @@ class FlatButton extends StatelessWidget {
 
     return TextButton(
         style: ButtonStyle(
-          padding: MaterialStateProperty.all<EdgeInsets>(
+          padding: WidgetStateProperty.all<EdgeInsets>(
             padding,
           ),
           overlayColor: overlayColor != null
-              ? MaterialStateProperty.all<Color>(overlayColor!)
+              ? WidgetStateProperty.all<Color>(overlayColor!)
               : null,
-          foregroundColor: MaterialStateProperty.all<Color>(forgroundColor),
-          backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          foregroundColor: WidgetStateProperty.all<Color>(forgroundColor),
+          backgroundColor: WidgetStateProperty.all<Color>(backgroundColor),
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(borderRadius),
               side: BorderSide(color: borderColor),

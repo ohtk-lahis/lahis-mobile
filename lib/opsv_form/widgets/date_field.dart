@@ -62,7 +62,7 @@ class _DateTimeDropdown extends StatelessWidget {
             const Text(
               ": ",
               style: TextStyle(fontWeight: FontWeight.bold),
-              textScaleFactor: 1.2,
+              textScaler: TextScaler.linear(1.2),
             ),
           if (field.withTime) Expanded(child: _hourDropdown(field)),
           if (field.withTime) Expanded(child: _minuteDropdown(field)),
@@ -248,9 +248,9 @@ class _DateTimePicker extends StatelessWidget {
       }
 
       final buttonStyle = ButtonStyle(
-        foregroundColor: MaterialStateProperty.all(
+        foregroundColor: WidgetStateProperty.all(
             datetime != null ? Colors.grey.shade700 : Colors.black54),
-        padding: MaterialStateProperty.all(
+        padding: WidgetStateProperty.all(
           const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
         ),
       );

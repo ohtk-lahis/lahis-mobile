@@ -57,7 +57,7 @@ class OhtkRouter {
       redirect: (BuildContext context, GoRouterState state) {
         // if the user is not logged in, they need to login
         final bool loggedIn = authService.isLogin ?? false;
-        final bool loggingIn = state.location == '/login';
+        final bool loggingIn = state.matchedLocation == '/login';
         if (!loggedIn) {
           return '/login';
         }
@@ -134,7 +134,7 @@ class OhtkRouter {
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) {
                     var reportTypeId = state.pathParameters['reportTypeId'];
-                    var testFlag = state.queryParameters['test'] == '1';
+                    var testFlag = state.uri.queryParameters['test'] == '1';
                     return ReportFormView(testFlag, reportTypeId!);
                   },
                 ),

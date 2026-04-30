@@ -16,10 +16,8 @@ class ResetPasswordRequestView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<ResetPasswordRequestViewModel>.reactive(
       viewModelBuilder: () => ResetPasswordRequestViewModel(),
-      builder: (context, viewModel, child) => WillPopScope(
-        onWillPop: () async {
-          return _willPop(context);
-        },
+      builder: (context, viewModel, child) => ConfirmPopScope(
+        onWillPop: () => _willPop(context),
         child: Scaffold(
           appBar: AppBar(
             title: Text(AppLocalizations.of(context)!.forgotPasswordTitle),

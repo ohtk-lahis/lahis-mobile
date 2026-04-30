@@ -219,10 +219,11 @@ class _DownloadLoginQrCodeButton extends StackedHookView<ProfileViewModel> {
         : SizedBox(
             width: double.infinity,
             child: TextButton(
-              onPressed: () {
-                viewModel.downloadLoginQrCode().then((token) {
+              onPressed: () async {
+                final token = await viewModel.downloadLoginQrCode();
+                if (context.mounted) {
                   showQrCodeDialog(context, token);
-                });
+                }
               },
               child: Text(AppLocalizations.of(context)!.getLoginQrcodeButton),
             ),

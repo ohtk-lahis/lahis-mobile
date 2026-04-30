@@ -25,7 +25,7 @@ class ScannerWaitingProgress extends StatelessWidget {
             SizedBox(height: 16),
             Text(
               "Please wait...",
-              textScaleFactor: 1.3,
+              textScaler: TextScaler.linear(1.3),
               style: TextStyle(
                 color: Colors.white,
               ),

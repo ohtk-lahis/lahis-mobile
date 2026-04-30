@@ -20,6 +20,6 @@ class CommentSubmitProblem extends CommentSubmitResult {
 }
 
 class CommentSubmitFailure extends OperationExceptionFailure
-    with CommentSubmitResult {
+    implements CommentSubmitResult {
   CommentSubmitFailure(e) : super(e);
 }

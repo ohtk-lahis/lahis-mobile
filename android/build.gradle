@@ -1,14 +1,14 @@
 buildscript {
-    ext.kotlin_version = '1.8.21'
+    ext.kotlin_version = '2.1.0'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:8.6.1'
         // START: FlutterFire Configuration
-        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.gms:google-services:4.4.2'
         // END: FlutterFire Configuration
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -18,6 +18,29 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+subprojects { subproject ->
+    if (subproject.name != 'app') {
+        subproject.ext.flutter = [
+            compileSdkVersion: 36,
+        ]
+    }
+}
+
+subprojects { subproject ->
+    subproject.plugins.withId('com.android.library') {
+        def androidExtension = subproject.extensions.getByName('android')
+        if (androidExtension.namespace == null) {
+            def manifestFile = subproject.file('src/main/AndroidManifest.xml')
+            if (manifestFile.exists()) {
+                def manifestPackage = new XmlSlurper(false, false).parse(manifestFile).@package.text()
+                if (manifestPackage) {
+                    androidExtension.namespace = manifestPackage
+                }
+            }
+        }
     }
 }
 

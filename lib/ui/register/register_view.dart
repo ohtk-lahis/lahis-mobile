@@ -22,10 +22,8 @@ class RegisterView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<RegisterViewModel>.reactive(
       viewModelBuilder: () => RegisterViewModel(),
-      builder: (context, viewModel, child) => WillPopScope(
-        onWillPop: () async {
-          return _willPop(context);
-        },
+      builder: (context, viewModel, child) => ConfirmPopScope(
+        onWillPop: () => _willPop(context),
         child: Scaffold(
           appBar: AppBar(
             title: Text(AppLocalizations.of(context)!.signupTitle),

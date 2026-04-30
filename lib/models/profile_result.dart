@@ -16,7 +16,7 @@ class ProfileUploadSuccess extends ProfileResult {
   ProfileUploadSuccess({required this.success, this.message, this.avatarUrl});
 }
 
-class ProfileFailure extends OperationExceptionFailure with ProfileResult {
+class ProfileFailure extends OperationExceptionFailure implements ProfileResult {
   ProfileFailure(e) : super(e);
 }
 

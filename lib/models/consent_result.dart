@@ -7,6 +7,6 @@ class ConsentSubmitSuccess extends ConsentSubmitResult {
 }
 
 class ConsentSubmitFailure extends OperationExceptionFailure
-    with ConsentSubmitResult {
+    implements ConsentSubmitResult {
   ConsentSubmitFailure(e) : super(e);
 }

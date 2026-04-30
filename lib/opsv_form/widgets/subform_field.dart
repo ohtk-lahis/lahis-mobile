@@ -111,7 +111,7 @@ class _ItemList extends StatelessObserverWidget {
         radius: 10,
         child: Text(
           (index + 1).toString(),
-          textScaleFactor: .8,
+          textScaler: const TextScaler.linear(.8),
         ),
       );
 
@@ -199,7 +199,7 @@ class _LabelState extends State<_Label> {
             widget.field.label ?? '',
             overflow: TextOverflow.ellipsis,
             style: TextStyle(color: appTheme.sub2),
-            textScaleFactor: .9,
+            textScaler: const TextScaler.linear(.9),
           ),
         ),
         SizedBox.square(

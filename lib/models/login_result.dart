@@ -15,6 +15,6 @@ class AuthSuccess extends AuthResult {
   });
 }
 
-class AuthFailure extends OperationExceptionFailure with AuthResult {
+class AuthFailure extends OperationExceptionFailure implements AuthResult {
   AuthFailure(e) : super(e);
 }
