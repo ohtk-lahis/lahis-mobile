@@ -18,9 +18,10 @@ class _FormLocationFieldState extends State<FormLocationField> {
     widget.field.clearError();
     try {
       var position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        forceAndroidLocationManager: true,
-        timeLimit: const Duration(seconds: 7),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 7),
+        ),
       );
       widget.field.value = "${position.longitude},${position.latitude}";
     } on TimeoutException catch (e) {
