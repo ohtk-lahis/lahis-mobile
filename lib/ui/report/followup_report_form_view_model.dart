@@ -33,7 +33,7 @@ class FollowupReportFormViewModel extends FormBaseViewModel {
   init() async {
     reportType = await _reportTypeService.getReportType(reportTypeId);
     if (reportType != null) {
-      final String timezone = await FlutterTimezone.getLocalTimezone();
+      final timezone = (await FlutterTimezone.getLocalTimezone()).identifier;
       _reportId = _uuid.v4();
       final definition = reportType!.followupDefinition != null
           ? json.decode(reportType!.followupDefinition!)
