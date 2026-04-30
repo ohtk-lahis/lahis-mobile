@@ -107,7 +107,7 @@ class NotificationService extends INotificationService {
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage? message) {
-      _logger.v("Open terminated app via notification message");
+      _logger.t("Open terminated app via notification message");
 
       if (message != null) {
         final userMessageId = message.data["user_message_id"];
@@ -121,7 +121,7 @@ class NotificationService extends INotificationService {
 
     // app is in background (unterminated) and has been opened via notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _logger.v("Open background app via notification message");
+      _logger.t("Open background app via notification message");
 
       final userMessageId = message.data["user_message_id"];
       _logger.d("Data: user message id: ${message.data["user_message_id"]}");
@@ -135,7 +135,7 @@ class NotificationService extends INotificationService {
 
     // app is already in foreground
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _logger.v("Notification message received whilst in the foreground");
+      _logger.t("Notification message received whilst in the foreground");
 
       final userMessageId = message.data["user_message_id"];
       _logger.d("Data: user message id: ${message.data["user_message_id"]}");

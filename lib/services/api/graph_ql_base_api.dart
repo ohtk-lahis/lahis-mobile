@@ -80,7 +80,7 @@ abstract class GraphQlBaseApi {
       fetchPolicy = FetchPolicy.networkOnly}) async {
     final functionIdentity = actionName ?? query;
     if (await (ensureAuthCookieIsSet())) {
-      baseLogger?.v('REQUEST:$actionName - query:$query');
+      baseLogger?.t('REQUEST:$actionName - query:$query');
       var response = await resolveClient().query(
         QueryOptions(
           document: gql(query),
@@ -90,7 +90,7 @@ abstract class GraphQlBaseApi {
         ),
       );
       onRawResponse?.call(response);
-      baseLogger?.v(
+      baseLogger?.t(
           'RESPONSE:$actionName - hasData: ${response.data != null} ${logResponseData ? "data:${response.data}" : ''}');
 
       if (!response.hasException) {
@@ -142,11 +142,11 @@ abstract class GraphQlBaseApi {
         fetchPolicy: FetchPolicy.noCache,
       );
 
-      baseLogger?.v('REQUEST:$actionName - mutation:$mutation');
+      baseLogger?.t('REQUEST:$actionName - mutation:$mutation');
       final QueryResult response = await resolveClient().mutate(options);
       onRawResponse?.call(response);
 
-      baseLogger?.v(
+      baseLogger?.t(
           'RESPONSE:$actionName - hasData: ${response.data != null} ${logResponseData ? "data:${response.data}" : ''}');
 
       /*

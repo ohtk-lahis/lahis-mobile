@@ -164,7 +164,8 @@ class ReportService extends IReportService {
                 .add(submitImageResult.image as IncidentReportImage);
           }
           if (submitImageResult is ImageSubmitFailure) {
-            _logger.e("Failed to submit image", submitImageResult.exception);
+            _logger.e("Failed to submit image",
+                error: submitImageResult.exception);
           }
         }
 
@@ -178,7 +179,8 @@ class ReportService extends IReportService {
                 .add(submitFileResult.file as IncidentReportFile);
           }
           if (submitFileResult is FileSubmitFailure) {
-            _logger.e("Failed to submit file", submitFileResult.exception);
+            _logger.e("Failed to submit file",
+                error: submitFileResult.exception);
           }
         }
 
@@ -233,7 +235,8 @@ class ReportService extends IReportService {
                 .add(submitFileResult.file as IncidentReportFile);
           }
           if (submitFileResult is FileSubmitFailure) {
-            _logger.e("Failed to submit file", submitFileResult.exception);
+            _logger.e("Failed to submit file",
+                error: submitFileResult.exception);
           }
         }
 
