@@ -24,7 +24,7 @@ class PlayableReportFileView extends HookWidget {
           body: GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Container(
-              color: appTheme.bg1.withOpacity(0),
+              color: appTheme.bg1.withValues(alpha: 0),
               constraints: BoxConstraints.expand(
                 height: MediaQuery.of(context).size.height,
               ),

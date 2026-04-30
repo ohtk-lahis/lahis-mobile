@@ -13,7 +13,7 @@ import 'package:podd_app/ui/report_type/form_simulator_view_model.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 class FormSimulatorView extends StatelessWidget {
   final ReportType reportType;

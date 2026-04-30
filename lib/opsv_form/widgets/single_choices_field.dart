@@ -102,11 +102,13 @@ class _RadioOption extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Radio<String>(
+                RadioGroup<String>(
                   groupValue: field.value,
-                  activeColor: apptheme.primary,
-                  value: option.value,
                   onChanged: onSelect,
+                  child: Radio<String>(
+                    activeColor: apptheme.primary,
+                    value: option.value,
+                  ),
                 ),
                 Expanded(
                   child: Column(

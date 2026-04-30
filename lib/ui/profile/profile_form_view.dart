@@ -8,7 +8,7 @@ import 'package:podd_app/models/profile_result.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 import 'profile_view_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 class ProfileFormView extends StatelessWidget {
   static const String route = '/register';

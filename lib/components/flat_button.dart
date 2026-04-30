@@ -61,7 +61,7 @@ class FlatButton extends StatelessWidget {
       forgroundColor: apptheme.primary,
       borderColor: apptheme.primary,
       borderRadius: apptheme.borderRadius,
-      overlayColor: apptheme.primary.withOpacity(0.1),
+      overlayColor: apptheme.primary.withValues(alpha: 0.1),
       child: child,
     );
   }

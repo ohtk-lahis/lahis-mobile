@@ -8,7 +8,7 @@ import 'package:podd_app/components/waiting_screen.dart';
 import 'package:podd_app/constants.dart';
 import 'package:podd_app/locator.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

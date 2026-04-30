@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:podd_app/components/flat_button.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 /// credit to https://github.com/gtgalone/confirm_dialog
 Future<bool> confirm(

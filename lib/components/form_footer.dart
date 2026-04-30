@@ -6,7 +6,7 @@ import 'package:podd_app/components/flat_button.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/ui/report/form_base_view_model.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 typedef OnLastSectionValid = void Function();
 

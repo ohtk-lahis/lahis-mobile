@@ -3,7 +3,7 @@ import 'package:podd_app/models/inviation_code_result.dart';
 import 'package:podd_app/models/register_result.dart';
 import 'package:podd_app/services/register_service.dart';
 import 'package:stacked/stacked.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 enum RegisterState { invitation, detail }
 

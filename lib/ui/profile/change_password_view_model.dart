@@ -2,7 +2,7 @@ import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/profile_result.dart';
 import 'package:podd_app/services/profile_service.dart';
 import 'package:stacked/stacked.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 class ChangePasswordViewModel extends BaseViewModel {
   IProfileService profileService = locator<IProfileService>();

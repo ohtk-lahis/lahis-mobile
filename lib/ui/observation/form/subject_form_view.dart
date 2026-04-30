@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' hide Form;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/components/confirm.dart';
 import 'package:podd_app/components/form_confirm.dart';
 import 'package:podd_app/components/form_input.dart';

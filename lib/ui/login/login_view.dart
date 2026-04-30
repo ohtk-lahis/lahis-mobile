@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:podd_app/app_theme.dart';
@@ -301,7 +301,7 @@ class _LoginForm extends StackedHookView<LoginViewModel> {
         labelText: AppLocalizations.of(context)!.serverLabel,
       ),
       hint: const Text("Server"),
-      value: viewModel.subDomain,
+      initialValue: viewModel.subDomain,
       onChanged: (String? value) async {
         if (value == null) {
           return;

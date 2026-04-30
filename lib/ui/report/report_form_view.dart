@@ -14,7 +14,7 @@ import 'package:podd_app/ui/report/form_base_view_model.dart';
 import 'package:podd_app/ui/report/report_form_view_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 class ReportFormView extends StatelessWidget {
   final AppTheme apptheme = locator<AppTheme>();
@@ -152,7 +152,7 @@ class _RadioOption extends StatelessWidget {
   final String title;
   final bool? value;
   final bool? groupValue;
-  final ValueChanged<bool?>? onChanged;
+  final ValueChanged<bool?> onChanged;
   final AppTheme appTheme = locator<AppTheme>();
 
   _RadioOption({
@@ -167,17 +167,19 @@ class _RadioOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        RadioListTile<bool?>(
+        RadioGroup<bool?>(
           groupValue: groupValue,
-          title: Text(
-            title,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          contentPadding: const EdgeInsets.all(0),
-          activeColor: apptheme.primary,
-          value: value,
           onChanged: onChanged,
-          visualDensity: VisualDensity.standard,
+          child: RadioListTile<bool?>(
+            title: Text(
+              title,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            contentPadding: const EdgeInsets.all(0),
+            activeColor: apptheme.primary,
+            value: value,
+            visualDensity: VisualDensity.standard,
+          ),
         ),
         CustomPaint(
           painter: DashedLinePainter(backgroundColor: apptheme.primary),

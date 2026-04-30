@@ -35,7 +35,7 @@ import 'package:podd_app/services/secure_storage_service.dart';
 import 'package:podd_app/app_theme.dart';
 import 'package:podd_app/ui/home/all_reports_view_model.dart';
 import 'package:podd_app/ui/home/my_reports_view_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final locator = GetIt.instance;

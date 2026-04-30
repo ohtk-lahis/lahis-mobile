@@ -55,7 +55,7 @@ class OpenableReportFile<T extends BaseReportFile> extends StatelessWidget {
       context,
       PageRouteBuilder(
         opaque: false,
-        barrierColor: Colors.white.withOpacity(0),
+        barrierColor: Colors.white.withValues(alpha: 0),
         pageBuilder: (BuildContext context, _, __) {
           return PlayableReportFileView(
             type: file.fileType,

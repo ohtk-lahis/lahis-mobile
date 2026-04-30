@@ -9,7 +9,7 @@ import 'package:mime/mime.dart';
 import 'package:mobx/mobx.dart';
 import 'package:logger/logger.dart';
 import 'package:decimal/decimal.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:podd_app/locator.dart';
 

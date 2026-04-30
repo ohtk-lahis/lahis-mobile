@@ -109,7 +109,7 @@ class _DateTimeDropdown extends StatelessWidget {
         border: InputBorder.none,
       ),
       hint: const Text("D"),
-      value: field.day,
+      initialValue: field.day,
       onChanged: (int? value) {
         field.day = value;
       },
@@ -151,7 +151,7 @@ class _DateTimeDropdown extends StatelessWidget {
       decoration: const InputDecoration(
         border: InputBorder.none,
       ),
-      value: field.month,
+      initialValue: field.month,
       onChanged: (int? value) {
         field.month = value;
       },
@@ -181,7 +181,7 @@ class _DateTimeDropdown extends StatelessWidget {
       decoration: const InputDecoration(
         border: InputBorder.none,
       ),
-      value: field.year,
+      initialValue: field.year,
       onChanged: (int? value) {
         field.year = value;
       },
@@ -203,7 +203,7 @@ class _DateTimeDropdown extends StatelessWidget {
       decoration: const InputDecoration(
         border: InputBorder.none,
       ),
-      value: field.hour,
+      initialValue: field.hour,
       onChanged: (int? value) {
         field.hour = value;
       },
@@ -225,7 +225,7 @@ class _DateTimeDropdown extends StatelessWidget {
       decoration: const InputDecoration(
         border: InputBorder.none,
       ),
-      value: field.minute,
+      initialValue: field.minute,
       onChanged: (int? value) {
         field.minute = value;
       },

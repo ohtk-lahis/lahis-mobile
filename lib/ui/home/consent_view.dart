@@ -7,7 +7,7 @@ import 'package:podd_app/ui/home/consent_view_model.dart';
 import 'package:podd_app/components/progress_indicator.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 class ConsentView extends HookWidget {
   const ConsentView({Key? key}) : super(key: key);

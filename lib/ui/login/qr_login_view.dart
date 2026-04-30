@@ -5,9 +5,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:podd_app/components/flat_button.dart';
 import 'package:podd_app/components/qr_scanner_parts.dart';
 import 'package:podd_app/ui/login/qr_login_view_model.dart';
-import 'package:scan/scan.dart';
 import 'package:stacked/stacked.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 class QrLoginView extends StatelessWidget {
   const QrLoginView({Key? key}) : super(key: key);
@@ -21,6 +20,19 @@ class QrLoginView extends StatelessWidget {
       debugPrint("$e");
     }
     return null;
+  }
+
+  Future<String?> _readQrCode(String path) async {
+    final controller = MobileScannerController();
+    try {
+      final capture = await controller.analyzeImage(
+        path,
+        formats: const [BarcodeFormat.qrCode],
+      );
+      return capture?.barcodes.firstOrNull?.rawValue;
+    } finally {
+      await controller.dispose();
+    }
   }
 
   @override
@@ -70,7 +82,7 @@ class QrLoginView extends StatelessWidget {
         onPressed: () async {
           final image = await _pickImage(ImageSource.gallery);
           if (image != null) {
-            String? data = await Scan.parse(image.path);
+            String? data = await _readQrCode(image.path);
             String? error;
             if (data != null) {
               error = await viewModel.authenticate(data);

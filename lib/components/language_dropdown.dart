@@ -53,7 +53,7 @@ class LanguageDropdown extends StatelessWidget {
               ),
             ),
             hint: const Text("Language"),
-            value: value,
+            initialValue: value,
             onChanged: onChanged,
             selectedItemBuilder: (context) {
               return languages

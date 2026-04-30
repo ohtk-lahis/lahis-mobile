@@ -1,0 +1,417 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Lao (`lo`).
+class AppLocalizationsLo extends AppLocalizations {
+  AppLocalizationsLo([String locale = 'lo']) : super(locale);
+
+  @override
+  String get appName => 'OHTK Mobile';
+
+  @override
+  String get loginTitle => 'ເຂົ້າສູ່ລະບົບບັນຊີຂອງທ່ານ.';
+
+  @override
+  String get signupTitle => 'ລົງ​ທະ​ບຽນ';
+
+  @override
+  String get signupSubTitle => 'ກະລຸນາໃສ່ລະຫັດເຊີນ\nສຳລັບການລົງທະບຽນ';
+
+  @override
+  String get forgotPasswordTitle => 'ລືມລະຫັດຜ່ານ';
+
+  @override
+  String get forgotPasswordSubTitle => 'ກະລຸນາໃສ່ທີ່ຢູ່ອີເມວຂອງທ່ານ';
+
+  @override
+  String get changePasswordTitle => 'ປ່ຽນ​ລະ​ຫັດ​ຜ່ານ';
+
+  @override
+  String get incidentsTabTitle => 'ເຫດການ';
+
+  @override
+  String get observationsTabTitle => 'Observations';
+
+  @override
+  String get profileTabTitle => 'ຜູ້ໃຊ້';
+
+  @override
+  String get caseTag => 'ກໍລະນີ';
+
+  @override
+  String get reportTitle => 'ລາຍງານ';
+
+  @override
+  String get reportTypeTitle => 'ປະເພດລາຍງານ';
+
+  @override
+  String get reportDetailTitle => 'ລາຍລະອຽດລາຍງານ';
+
+  @override
+  String get followupTitle => 'ຕິດຕາມ';
+
+  @override
+  String get followupDetailTitle => 'ລາຍລະອຽດຕິດຕາມ';
+
+  @override
+  String get profileTitle => 'ໂປຣໄຟລ໌';
+
+  @override
+  String get loginButton => 'ເຂົ້າ​ສູ່​ລະ​ບົບ';
+
+  @override
+  String get qrCodeLoginButton => 'QRCode LOGIN';
+
+  @override
+  String get pickQrcodeImageButton => 'Choose QRCode image';
+
+  @override
+  String get getLoginQrcodeButton => 'my QR login';
+
+  @override
+  String get logoutButton => 'ອອກ​ຈາກ​ລະ​ບົບ';
+
+  @override
+  String get registerButton => 'ລົງທະບຽນ';
+
+  @override
+  String get forgotPasswordButton => 'ລືມລະຫັດຜ່ານ';
+
+  @override
+  String get messagesPageTitle => 'ຂໍ້ຄວາມ';
+
+  @override
+  String get messagePageTitle => 'ຂໍ້ຄວາມ';
+
+  @override
+  String get formPageLabel => 'ຫນ້າ';
+
+  @override
+  String get backButton => 'Back';
+
+  @override
+  String get formBackButton => 'ເລົ່າຄືນ';
+
+  @override
+  String get nextButton => 'ຕໍ່ໄປ';
+
+  @override
+  String get formNextButton => 'ຕໍ່ໄປ';
+
+  @override
+  String get submitButton => 'ບັນທຶກ';
+
+  @override
+  String get confirmButton => 'ຢືນຢັນ';
+
+  @override
+  String get confirmRegisterButton => 'ຢືນຢັນການລົງທະບຽນ';
+
+  @override
+  String get sendButton => 'ສົ່ງ';
+
+  @override
+  String get updateProfileButton => 'ແກ້ໄຂໂປຣໄຟລ໌';
+
+  @override
+  String get confirmUpdate => 'ຢືນຢັນແກ້ໄຂ';
+
+  @override
+  String get profileUpdateSuccess => 'ສຳເລັດການອັບເດດໂປຣໄຟລ໌';
+
+  @override
+  String get passwordUpdatedSuccess =>
+      'Your password has been successfully changed!';
+
+  @override
+  String get changePasswordButton => 'ແກ້ໄຂລະຫັດຜ່ານ';
+
+  @override
+  String get laguageLabel => 'ພາສາ';
+
+  @override
+  String get serverLabel => 'ເຊີບເວີ';
+
+  @override
+  String get usernameLabel => 'ຊື່ຜູ້ໃຊ້';
+
+  @override
+  String get passwordLabel => 'ລະຫັດຜ່ານ';
+
+  @override
+  String get newPasswordLabel => 'ລະຫັດຜ່ານ';
+
+  @override
+  String get confirmPasswordLabel => 'ຢືນ​ຢັນ​ລະ​ຫັດ​ຜ່ານ';
+
+  @override
+  String get invitationCodeLabel => 'ລະ​ຫັດ​ການ​ຈົດ​ທະ​ບຽນ';
+
+  @override
+  String get firstNameLabel => 'ຊື່​ແທ້';
+
+  @override
+  String get lastNameLabel => 'ນາມ​ສະ​ກຸນ';
+
+  @override
+  String get emailLabel => 'ອີເມວ';
+
+  @override
+  String get emailHint => 'tester@gmail.com';
+
+  @override
+  String get telephoneLabel => 'ເບີ​ໂທລະ​ສັບ';
+
+  @override
+  String get addressLabel => 'ທີ່ຢູ່';
+
+  @override
+  String get allReportTabLabel => 'ລາຍງານທັງໝົດ';
+
+  @override
+  String get myReportTabLabel => 'ລາຍງານຂອງຂ້ອຍ';
+
+  @override
+  String get detailTabLabel => 'ລາຍລະອຽດ';
+
+  @override
+  String get commentTabLabel => 'ຄໍາເຫັນ';
+
+  @override
+  String get followupTabLabel => 'ຕິດຕາມ';
+
+  @override
+  String get authorityNameLabel => 'ອົງການ';
+
+  @override
+  String get noFollowupReport => 'ບໍ່ມີລາຍງານການຕິດຕາມ';
+
+  @override
+  String get noComment => 'ບໍ່ມີຄວາມຄິດເຫັນ';
+
+  @override
+  String get noGpsProvided => 'ບໍ່ໄດ້ລະບຸສະຖານທີ່ gps';
+
+  @override
+  String get zeroReportLabel => 'ບົດ​ລາຍ​ງານ​ບໍ່​ໄດ້​ພົບ​ເຫັນ​ຄວາມ​ຜິດ​ປົກກະຕິ';
+
+  @override
+  String zeroReportLastReportedMessage(String datetime) {
+    return 'ລາຍງານຫຼ້າສຸດກ່ຽວກັບ $datetime';
+  }
+
+  @override
+  String get zeroReportSubmitSuccess =>
+      'ສົ່ງບົດ​ລາຍ​ງານ​ບໍ່​ໄດ້​ພົບ​ເຫັນ​ຄວາມ​ຜິດ​ປົກກະຕິສຳເລັດ';
+
+  @override
+  String get fieldUndefinedLocation => 'ພິກັດຍັງບໍ່ໄດ້ລະບຸເທື່ອ';
+
+  @override
+  String get fieldUseCurrentLocation => 'ໃຊ້ສະຖານທີ່ປະຈຸບັນ';
+
+  @override
+  String get authorityLabel => 'ອົງການ';
+
+  @override
+  String get incidentDate => 'ວັນທີເກີດເຫດ';
+
+  @override
+  String get invalidQrcode => 'Invalid qrcode';
+
+  @override
+  String get invalidReportTypeQrcode => 'ບໍ່ເຂົ້າໃຈ qrcode';
+
+  @override
+  String get invalidFormValue => 'ຄ່າແບບຟອມບໍ່ຖືກຕ້ອງ';
+
+  @override
+  String get simulateReportTitle => 'ການຈໍາລອງລາຍງານ';
+
+  @override
+  String get closeSimulateReportButton => 'ປິດການຈໍາລອງລາຍງານ';
+
+  @override
+  String get consentButton => 'I agree';
+
+  @override
+  String get observationSubjectViewTitle => 'Subject';
+
+  @override
+  String get observationSubjectDetailTabLabel => 'Detail';
+
+  @override
+  String get observationSubjectMonitoringTabLabel => 'Monitoring';
+
+  @override
+  String get observationSubjectMonitoringViewTitle => 'Subject monitoring';
+
+  @override
+  String get validateRequiredMsg => 'ຈະຕ້ອງມີຄ່າ';
+
+  @override
+  String dateFieldMaxErrorMsg(String max) {
+    return 'ຈະຕ້ອງຫນ້ອຍກວ່າ $max';
+  }
+
+  @override
+  String dateFieldMinErrorMsg(String min) {
+    return 'ຈະຕ້ອງຫຼາຍ​ກວ່າ $min';
+  }
+
+  @override
+  String integerFieldMaxErrorMsg(String max) {
+    return 'ຈະຕ້ອງຫນ້ອຍກວ່ ຫຼື ເທົ່າ​ທຽມ​ກັນ $max';
+  }
+
+  @override
+  String integerFieldMinErrorMsg(String min) {
+    return 'ຈະຕ້ອງຫຼາຍ​ກວ່າ ຫຼື ເທົ່າ​ທຽມ​ກັນ $min';
+  }
+
+  @override
+  String textFieldMaxErrorMsg(String max) {
+    return 'ຈະຕ້ອງຫນ້ອຍກວ່ ຫຼື ເທົ່າ​ທຽມ​ກັນ $max ຕົວອັກສອນ';
+  }
+
+  @override
+  String textFieldMinErrorMsg(String min) {
+    return 'ຈະຕ້ອງຫຼາຍ​ກວ່າ ຫຼື ເທົ່າ​ທຽມ​ກັນ $min ຕົວອັກສອນ';
+  }
+
+  @override
+  String filesFieldMaxErrorMsg(String max) {
+    return 'ຈຳນວນໄຟລ໌ຕ້ອງເທົ່າກັບ ຫຼືໜ້ອຍກວ່າ $max';
+  }
+
+  @override
+  String filesFieldMinErrorMsg(String min) {
+    return 'ຈຳນວນໄຟລ໌ຕ້ອງເທົ່າກັບ ຫຼືຫຼາຍກວ່າ $min';
+  }
+
+  @override
+  String filesFieldMaxSizeErrorMsg(String index, String maxSize) {
+    return 'Size of file: #$index must be equal or less than $maxSize bytes';
+  }
+
+  @override
+  String filesFieldSupportedTypeErrorMsg(String index) {
+    return 'Type of file: #$index are not supported';
+  }
+
+  @override
+  String get testFlag => 'ທົດສອບ';
+
+  @override
+  String get confirm => 'ທ່ານແນ່ໃຈບໍ່ວ່າຈະສືບຕໍ່';
+
+  @override
+  String get confirmCheckReport =>
+      'ບົດລາຍງານທີ່ສົ່ງມາບໍ່ສາມາດຖືກແກ້ໄຂໄດ້ອີກ. ກະລຸນາກວດສອບຄວາມຖືກຕ້ອງຂອງຂໍ້ມູນກ່ອນທີ່ຈະສົ່ງ.';
+
+  @override
+  String get submitReportMessage =>
+      'Press the submit button to submit your report';
+
+  @override
+  String get reportDataSummary => 'Report data summary';
+
+  @override
+  String get reportDataSummaryNotFound =>
+      'No content of summary is defined for this report type';
+
+  @override
+  String get confirmExit => 'ທ່ານແນ່ໃຈບໍ່ວ່າຈະສືບຕໍ່';
+
+  @override
+  String get incidentInAuthority => 'ພື້ນທີ່ເກີດເຫດຢູ່ໃນອົງການຂອງເຈົ້າບໍ?';
+
+  @override
+  String get yesAsAccept => 'ແມ່ນແລ້ວ';
+
+  @override
+  String get noAsReject => 'ບໍ່​ແມ່ນ';
+
+  @override
+  String get ok => 'ຕົກ​ລົງ';
+
+  @override
+  String get cancel => 'ຍົກເລີກ';
+
+  @override
+  String get yes => 'ແມ່ນແລ້ວ';
+
+  @override
+  String get no => 'ບໍ່​ແມ່ນ';
+
+  @override
+  String get testModeOn => 'ໂໝດທົດສອບເປີດຢູ່';
+
+  @override
+  String get loading => 'ກຳລັງໂຫຼດ...';
+
+  @override
+  String get fieldRequired => 'ລະບຸ';
+
+  @override
+  String get passwordMismatch => 'ລະຫັດຜ່ານບໍ່ກົງກັນ';
+
+  @override
+  String get restartApp => 'ແອັບພລິເຄຊັນຕ້ອງປິດເປີດຄືນໃໝ່.';
+
+  @override
+  String numberOfPendingSubmissions(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString ລາຍການທີ່ຍັງບໍ່ໄດ້ສົ່ງ, ກົດເພື່ອສົ່ງ';
+  }
+
+  @override
+  String get pendingReportsTitle => 'ລາຍງານ';
+
+  @override
+  String get pendingSubjectsTitle => 'ທະບຽນ';
+
+  @override
+  String get pendingMonitoringsTitle => 'ເຫດຜົນ';
+
+  @override
+  String get pendingImagesTitle => 'ຮູບ';
+
+  @override
+  String get pendingFilesTitle => 'ໄຟລ໌';
+
+  @override
+  String get pendingAppLabel => 'ຂໍ້ມູນຄ້າງສົ່ງ';
+
+  @override
+  String get invitationCodeIsRequired => 'ກະລຸນາລະບຸລະຫັດເຊີນ';
+
+  @override
+  String get pickFromGallery => 'ເລືອກຈາກຄັງຮູບ';
+
+  @override
+  String get takeAPhoto => 'ຖ່າຍ​ຮູບ';
+
+  @override
+  String get offlineWarning =>
+      'ບໍ່ມີການເຊື່ອມຕໍ່ອິນເຕີເນັດ, ກະລຸນາກວດເບິ່ງການເຊື່ອມຕໍ່ອິນເຕີເນັດຂອງທ່ານ';
+
+  @override
+  String get resubmit => 'ສົ່ງຂໍ້ມູນອີກຄັ້ງ';
+
+  @override
+  String get noPendingSubmissions => 'ບໍ່ມີຂໍ້ມູນຄ້າງສົ່ງ';
+
+  @override
+  String get locationServiceIsDisabled =>
+      'Location service is disabled, you need to turn it on.';
+
+  @override
+  String get loadMore => 'ເບິ່ງເພີ່ມເຕີມ';
+}

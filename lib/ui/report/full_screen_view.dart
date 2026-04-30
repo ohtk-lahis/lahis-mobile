@@ -28,7 +28,7 @@ class FullScreenWidget extends StatelessWidget {
             PageRouteBuilder(
                 opaque: false,
                 barrierColor: backgroundIsTransparent
-                    ? Colors.white.withOpacity(0)
+                    ? Colors.white.withValues(alpha: 0)
                     : backgroundColor,
                 pageBuilder: (BuildContext context, _, __) {
                   return FullScreenPage(
@@ -157,7 +157,7 @@ class FullScreenPageState extends State<FullScreenPage> {
         onVerticalDragEnd: (details) => _endVerticalDrag(details),
         onTap: () => Navigator.of(context).pop(),
         child: Container(
-          color: widget.backgroundColor.withOpacity(opacity),
+          color: widget.backgroundColor.withValues(alpha: opacity),
           constraints: BoxConstraints.expand(
             height: MediaQuery.of(context).size.height,
           ),

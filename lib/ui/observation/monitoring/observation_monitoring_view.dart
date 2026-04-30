@@ -1,6 +1,6 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/app_theme.dart';
 import 'package:podd_app/components/back_appbar_action.dart';
 import 'package:podd_app/components/report_file_grid_view.dart';

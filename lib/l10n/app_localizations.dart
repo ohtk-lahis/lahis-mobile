@@ -1,0 +1,904 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_km.dart';
+import 'app_localizations_lo.dart';
+import 'app_localizations_my.dart';
+import 'app_localizations_th.dart';
+
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'l10n/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
+
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
+
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('km'),
+    Locale('lo'),
+    Locale('my'),
+    Locale('th')
+  ];
+
+  /// No description provided for @appName.
+  ///
+  /// In en, this message translates to:
+  /// **'OHTK Mobile'**
+  String get appName;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Login to Your Account'**
+  String get loginTitle;
+
+  /// No description provided for @signupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signupTitle;
+
+  /// No description provided for @signupSubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter Invitation Code\nfor registration'**
+  String get signupSubTitle;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordSubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email address and we will send you a password reset link'**
+  String get forgotPasswordSubTitle;
+
+  /// No description provided for @changePasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get changePasswordTitle;
+
+  /// No description provided for @incidentsTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Incidents'**
+  String get incidentsTabTitle;
+
+  /// No description provided for @observationsTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Observations'**
+  String get observationsTabTitle;
+
+  /// No description provided for @profileTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTabTitle;
+
+  /// No description provided for @caseTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Case'**
+  String get caseTag;
+
+  /// No description provided for @reportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get reportTitle;
+
+  /// No description provided for @reportTypeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report type'**
+  String get reportTypeTitle;
+
+  /// No description provided for @reportDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report detail'**
+  String get reportDetailTitle;
+
+  /// No description provided for @followupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Followup'**
+  String get followupTitle;
+
+  /// No description provided for @followupDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Followup detail'**
+  String get followupDetailTitle;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// No description provided for @loginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginButton;
+
+  /// No description provided for @qrCodeLoginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'QRCode LOGIN'**
+  String get qrCodeLoginButton;
+
+  /// No description provided for @pickQrcodeImageButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose QRCode image'**
+  String get pickQrcodeImageButton;
+
+  /// No description provided for @getLoginQrcodeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'my QR login'**
+  String get getLoginQrcodeButton;
+
+  /// No description provided for @logoutButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logoutButton;
+
+  /// No description provided for @registerButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get registerButton;
+
+  /// No description provided for @forgotPasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password'**
+  String get forgotPasswordButton;
+
+  /// No description provided for @messagesPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get messagesPageTitle;
+
+  /// No description provided for @messagePageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get messagePageTitle;
+
+  /// No description provided for @formPageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get formPageLabel;
+
+  /// No description provided for @backButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get backButton;
+
+  /// No description provided for @formBackButton.
+  ///
+  /// In en, this message translates to:
+  /// **'back'**
+  String get formBackButton;
+
+  /// No description provided for @nextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextButton;
+
+  /// No description provided for @formNextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'next'**
+  String get formNextButton;
+
+  /// No description provided for @submitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submitButton;
+
+  /// No description provided for @confirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmButton;
+
+  /// No description provided for @confirmRegisterButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Register'**
+  String get confirmRegisterButton;
+
+  /// No description provided for @sendButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get sendButton;
+
+  /// No description provided for @updateProfileButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Profile'**
+  String get updateProfileButton;
+
+  /// No description provided for @confirmUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Update'**
+  String get confirmUpdate;
+
+  /// No description provided for @profileUpdateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Updated'**
+  String get profileUpdateSuccess;
+
+  /// No description provided for @passwordUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been successfully changed!'**
+  String get passwordUpdatedSuccess;
+
+  /// No description provided for @changePasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePasswordButton;
+
+  /// No description provided for @laguageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get laguageLabel;
+
+  /// No description provided for @serverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Server'**
+  String get serverLabel;
+
+  /// No description provided for @usernameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get usernameLabel;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// No description provided for @newPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPasswordLabel;
+
+  /// No description provided for @confirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPasswordLabel;
+
+  /// No description provided for @invitationCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation Code'**
+  String get invitationCodeLabel;
+
+  /// No description provided for @firstNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get firstNameLabel;
+
+  /// No description provided for @lastNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name'**
+  String get lastNameLabel;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @emailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'tester@gmail.com'**
+  String get emailHint;
+
+  /// No description provided for @telephoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Telephone'**
+  String get telephoneLabel;
+
+  /// No description provided for @addressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get addressLabel;
+
+  /// No description provided for @allReportTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'All Reports'**
+  String get allReportTabLabel;
+
+  /// No description provided for @myReportTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'My Reports'**
+  String get myReportTabLabel;
+
+  /// No description provided for @detailTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Detail'**
+  String get detailTabLabel;
+
+  /// No description provided for @commentTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get commentTabLabel;
+
+  /// No description provided for @followupTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Followup'**
+  String get followupTabLabel;
+
+  /// No description provided for @authorityNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Authority Name'**
+  String get authorityNameLabel;
+
+  /// No description provided for @noFollowupReport.
+  ///
+  /// In en, this message translates to:
+  /// **'No followup report'**
+  String get noFollowupReport;
+
+  /// No description provided for @noComment.
+  ///
+  /// In en, this message translates to:
+  /// **'No comment'**
+  String get noComment;
+
+  /// No description provided for @noGpsProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No gps location provided'**
+  String get noGpsProvided;
+
+  /// No description provided for @zeroReportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Zero report'**
+  String get zeroReportLabel;
+
+  /// No description provided for @zeroReportLastReportedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Last reported at {datetime}'**
+  String zeroReportLastReportedMessage(String datetime);
+
+  /// No description provided for @zeroReportSubmitSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Zero report submitted'**
+  String get zeroReportSubmitSuccess;
+
+  /// No description provided for @fieldUndefinedLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'No location selected'**
+  String get fieldUndefinedLocation;
+
+  /// No description provided for @fieldUseCurrentLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use current location'**
+  String get fieldUseCurrentLocation;
+
+  /// No description provided for @authorityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Authority'**
+  String get authorityLabel;
+
+  /// No description provided for @incidentDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Incident Date'**
+  String get incidentDate;
+
+  /// No description provided for @invalidQrcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid qrcode'**
+  String get invalidQrcode;
+
+  /// No description provided for @invalidReportTypeQrcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid report type qrcode'**
+  String get invalidReportTypeQrcode;
+
+  /// No description provided for @invalidFormValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid form value'**
+  String get invalidFormValue;
+
+  /// No description provided for @simulateReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate report'**
+  String get simulateReportTitle;
+
+  /// No description provided for @closeSimulateReportButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Close report simulation'**
+  String get closeSimulateReportButton;
+
+  /// No description provided for @consentButton.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree'**
+  String get consentButton;
+
+  /// No description provided for @observationSubjectViewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get observationSubjectViewTitle;
+
+  /// No description provided for @observationSubjectDetailTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Detail'**
+  String get observationSubjectDetailTabLabel;
+
+  /// No description provided for @observationSubjectMonitoringTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitoring'**
+  String get observationSubjectMonitoringTabLabel;
+
+  /// No description provided for @observationSubjectMonitoringViewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject monitoring'**
+  String get observationSubjectMonitoringViewTitle;
+
+  /// No description provided for @validateRequiredMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get validateRequiredMsg;
+
+  /// No description provided for @dateFieldMaxErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'must be equal or less than {max}'**
+  String dateFieldMaxErrorMsg(String max);
+
+  /// No description provided for @dateFieldMinErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'must be equal or more than {min}'**
+  String dateFieldMinErrorMsg(String min);
+
+  /// No description provided for @integerFieldMaxErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'must be equal or less than {max}'**
+  String integerFieldMaxErrorMsg(String max);
+
+  /// No description provided for @integerFieldMinErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'must be equal or more than {min}'**
+  String integerFieldMinErrorMsg(String min);
+
+  /// No description provided for @textFieldMaxErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'must be equal or less than {max} letters'**
+  String textFieldMaxErrorMsg(String max);
+
+  /// No description provided for @textFieldMinErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'must be equal or more than {min} letters'**
+  String textFieldMinErrorMsg(String min);
+
+  /// No description provided for @filesFieldMaxErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of files must be equal or less than {max}'**
+  String filesFieldMaxErrorMsg(String max);
+
+  /// No description provided for @filesFieldMinErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of files must be equal or more than {min}'**
+  String filesFieldMinErrorMsg(String min);
+
+  /// No description provided for @filesFieldMaxSizeErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Size of file: #{index} must be equal or less than {maxSize} bytes'**
+  String filesFieldMaxSizeErrorMsg(String index, String maxSize);
+
+  /// No description provided for @filesFieldSupportedTypeErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Type of file: #{index} are not supported'**
+  String filesFieldSupportedTypeErrorMsg(String index);
+
+  /// No description provided for @testFlag.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get testFlag;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure to continue?'**
+  String get confirm;
+
+  /// No description provided for @confirmCheckReport.
+  ///
+  /// In en, this message translates to:
+  /// **'This report data cannot be changed once it was submitted. Please make sure everything is correct.'**
+  String get confirmCheckReport;
+
+  /// No description provided for @submitReportMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Press the submit button to submit your report'**
+  String get submitReportMessage;
+
+  /// No description provided for @reportDataSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Report data summary'**
+  String get reportDataSummary;
+
+  /// No description provided for @reportDataSummaryNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No content of summary is defined for this report type'**
+  String get reportDataSummaryNotFound;
+
+  /// No description provided for @confirmExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure to continue?'**
+  String get confirmExit;
+
+  /// No description provided for @incidentInAuthority.
+  ///
+  /// In en, this message translates to:
+  /// **'Did this incident occur in your own authority?'**
+  String get incidentInAuthority;
+
+  /// No description provided for @yesAsAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yesAsAccept;
+
+  /// No description provided for @noAsReject.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get noAsReject;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @testModeOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Test mode is on'**
+  String get testModeOn;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'field is required.'**
+  String get fieldRequired;
+
+  /// No description provided for @passwordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Password does not match confirm password'**
+  String get passwordMismatch;
+
+  /// No description provided for @restartApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Application needs to be restarted.'**
+  String get restartApp;
+
+  /// No description provided for @numberOfPendingSubmissions.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pending {count, plural, =1{submission} other{submissions}}, tap here to re-submit'**
+  String numberOfPendingSubmissions(int count);
+
+  /// No description provided for @pendingReportsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get pendingReportsTitle;
+
+  /// No description provided for @pendingSubjectsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Observation records'**
+  String get pendingSubjectsTitle;
+
+  /// No description provided for @pendingMonitoringsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Observation monitorings'**
+  String get pendingMonitoringsTitle;
+
+  /// No description provided for @pendingImagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get pendingImagesTitle;
+
+  /// No description provided for @pendingFilesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Files'**
+  String get pendingFilesTitle;
+
+  /// No description provided for @pendingAppLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending submissions'**
+  String get pendingAppLabel;
+
+  /// No description provided for @invitationCodeIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation code is required'**
+  String get invitationCodeIsRequired;
+
+  /// No description provided for @pickFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from Gallery'**
+  String get pickFromGallery;
+
+  /// No description provided for @takeAPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a Photo'**
+  String get takeAPhoto;
+
+  /// No description provided for @offlineWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'You are offline, please check your internet connection'**
+  String get offlineWarning;
+
+  /// No description provided for @resubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Resubmit'**
+  String get resubmit;
+
+  /// No description provided for @noPendingSubmissions.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no pending submissions.'**
+  String get noPendingSubmissions;
+
+  /// No description provided for @locationServiceIsDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Location service is disabled, you need to turn it on.'**
+  String get locationServiceIsDisabled;
+
+  /// No description provided for @loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get loadMore;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) => <String>[
+        'en',
+        'es',
+        'fr',
+        'km',
+        'lo',
+        'my',
+        'th'
+      ].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
+    case 'km':
+      return AppLocalizationsKm();
+    case 'lo':
+      return AppLocalizationsLo();
+    case 'my':
+      return AppLocalizationsMy();
+    case 'th':
+      return AppLocalizationsTh();
+  }
+
+  throw FlutterError(
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
+}

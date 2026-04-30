@@ -2,7 +2,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/opsv_form/opsv_form.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 
 Map<String, dynamic> jsonTemplate(Map<String, dynamic> field) {
   return {
