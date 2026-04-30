@@ -63,7 +63,7 @@ dependencies:
   decimal: ^3.2.4
   flutter_html: ^3.0.0-beta.2 # TODO เปลี่ยนดีกว่า เพราะลาก dependency มาเยอะมาก
   google_maps_flutter: ^2.10.1
-  geolocator: ^13.0.4
+  geolocator: ^14.0.2
   cross_file: ^0.3.3+4
   image_picker: ^1.1.2
   date_field: ^6.0.3+1
