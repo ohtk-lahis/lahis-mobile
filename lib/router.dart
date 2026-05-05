@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:podd_app/services/auth_service.dart';
+import 'package:podd_app/ui/census/census_view.dart';
 import 'package:podd_app/ui/home/home_view.dart';
 import 'package:podd_app/ui/home/observation/observation_home_view.dart';
 import 'package:podd_app/ui/home/report_home_view.dart';
@@ -34,6 +35,7 @@ class OhtkRouter {
   static const observationSubjectDetail = 'observationSubjectDetail';
   static const observationMonitoringForm = 'observationMonitoringForm';
   static const observationMonitoringDetail = 'observationMonitoringDetail';
+  static const census = 'census';
 
   final GlobalKey<NavigatorState> _rootNavigatorKey =
       GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -152,6 +154,13 @@ class OhtkRouter {
                   },
                 ),
               ],
+            ),
+            GoRoute(
+              name: census,
+              path: '/census',
+              pageBuilder: (context, state) => const NoTransitionPage<void>(
+                child: CensusView(),
+              ),
             ),
             GoRoute(
               path: '/observations',

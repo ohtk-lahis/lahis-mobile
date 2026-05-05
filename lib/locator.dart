@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:podd_app/constants.dart';
 import 'package:podd_app/services/api/auth_api.dart';
+import 'package:podd_app/services/api/census_api.dart';
 import 'package:podd_app/services/api/comment_api.dart';
 import 'package:podd_app/services/api/configuration_api.dart';
 import 'package:podd_app/services/api/file_api.dart';
@@ -17,6 +18,7 @@ import 'package:podd_app/services/api/register_api.dart';
 import 'package:podd_app/services/api/report_api.dart';
 import 'package:podd_app/services/api/report_type_api.dart';
 import 'package:podd_app/services/auth_service.dart';
+import 'package:podd_app/services/census_service.dart';
 import 'package:podd_app/services/comment_service.dart';
 import 'package:podd_app/services/config_service.dart';
 import 'package:podd_app/services/db_service.dart';
@@ -252,6 +254,16 @@ StreamController<String> setupLocator(String environment) {
     ForgotPasswordApi,
   ]);
 
+  if (locator.isRegistered<ICensusService>()) {
+    locator.unregister<ICensusService>();
+  }
+  locator.registerSingletonAsync<ICensusService>(() async {
+    controller.add("init census service");
+    return CensusService();
+  }, dependsOn: [
+    CensusApi,
+  ]);
+
   if (locator.isRegistered<IProfileService>()) {
     locator.unregister<IProfileService>();
   }
@@ -331,6 +343,15 @@ registerApiLocators(StreamController<String> controller) {
     var gqlService = locator<GqlService>();
     controller.add("init profile api");
     return ProfileApi(gqlService.resolveClientFunction);
+  }, dependsOn: [GqlService]);
+
+  if (locator.isRegistered<CensusApi>()) {
+    locator.unregister<CensusApi>();
+  }
+  locator.registerSingletonAsync<CensusApi>(() async {
+    var gqlService = locator<GqlService>();
+    controller.add("init census api");
+    return CensusApi(gqlService.resolveClientFunction);
   }, dependsOn: [GqlService]);
 
   if (locator.isRegistered<ReportTypeApi>()) {
