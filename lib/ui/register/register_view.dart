@@ -116,6 +116,14 @@ class _DetailCodeForm extends StackedHookView<RegisterViewModel> {
                 value: viewModel.authorityName,
                 crossAxisAlignment: CrossAxisAlignment.center,
               ),
+              if (viewModel.hasVillages) ...[
+                const SizedBox(height: 12),
+                DisplayField(
+                  label: 'Villages',
+                  value: viewModel.villageNames,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                ),
+              ],
             ],
           ),
           Divider(

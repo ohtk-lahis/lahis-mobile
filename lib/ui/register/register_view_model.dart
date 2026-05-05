@@ -1,6 +1,7 @@
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/inviation_code_result.dart';
 import 'package:podd_app/models/register_result.dart';
+import 'package:podd_app/models/village.dart';
 import 'package:podd_app/services/register_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
@@ -15,6 +16,7 @@ class RegisterViewModel extends BaseViewModel {
 
   String? invitationCode;
   String? authorityName;
+  List<Village> villages = [];
 
   String? username;
   String? firstName;
@@ -39,6 +41,7 @@ class RegisterViewModel extends BaseViewModel {
     if (result is InvitationCodeSuccess) {
       state = RegisterState.detail;
       authorityName = result.authorityName;
+      villages = result.villages;
       username = result.generatedUsername;
       email = result.generatedEmail;
       notifyListeners();
@@ -48,6 +51,11 @@ class RegisterViewModel extends BaseViewModel {
 
     setBusy(false);
   }
+
+  bool get hasVillages => villages.isNotEmpty;
+
+  String get villageNames =>
+      villages.map((village) => village.displayName).join(', ');
 
   _clearErrorForKey(String key) {
     if (hasErrorForKey(key)) {

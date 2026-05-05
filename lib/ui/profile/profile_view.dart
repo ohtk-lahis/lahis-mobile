@@ -60,6 +60,32 @@ class ProfileView extends StatelessWidget {
                                 value: viewModel.authorityName,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                               ),
+                              if (viewModel.assignedVillageNames != null) ...[
+                                const SizedBox(height: 12),
+                                DisplayField(
+                                  label: 'Villages',
+                                  value: viewModel.assignedVillageNames,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                ),
+                              ],
+                              if (viewModel.hasMultipleAssignedVillages) ...[
+                                const SizedBox(height: 12),
+                                DropdownButtonFormField<int>(
+                                  initialValue: viewModel.selectedVillageId,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Active village',
+                                  ),
+                                  items: viewModel.assignedVillages
+                                      .map(
+                                        (village) => DropdownMenuItem<int>(
+                                          value: village.id,
+                                          child: Text(village.displayName),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: viewModel.selectVillage,
+                                ),
+                              ],
                             ],
                           ),
                           Divider(
