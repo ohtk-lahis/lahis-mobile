@@ -80,11 +80,18 @@ class CensusViewModel extends BaseViewModel {
     }
 
     setBusyForObject('submit', true);
-    final result = await censusService.submitVillageCensusSnapshot(
-      villageId: selectedVillage!.id,
-      censusDate: DateTime.now(),
-      facts: facts,
-    );
+    VillageCensusSubmitResult? result;
+    try {
+      result = await censusService.submitVillageCensusSnapshot(
+        villageId: selectedVillage!.id,
+        censusDate: DateTime.now(),
+        facts: facts,
+      );
+    } catch (e) {
+      setErrorForObject('submit', e.toString());
+    } finally {
+      setBusyForObject('submit', false);
+    }
 
     if (result is VillageCensusSubmitSuccess) {
       latestCensus = result.snapshot;
@@ -95,7 +102,6 @@ class CensusViewModel extends BaseViewModel {
       setErrorForObject('submit', result.messages.join(', '));
     }
 
-    setBusyForObject('submit', false);
     notifyListeners();
     return result;
   }
