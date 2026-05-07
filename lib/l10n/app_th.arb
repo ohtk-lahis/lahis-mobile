@@ -114,5 +114,11 @@
   "welcomeContinueButton": "ดำเนินการต่อ",
   "welcomeSavingLabel": "กำลังบันทึก…",
   "welcomeNoServersText": "ไม่มีเซิร์ฟเวอร์ให้เลือก",
-  "welcomeCannotLoadServers": "โหลดข้อมูลเซิร์ฟเวอร์ไม่สำเร็จ"
+  "welcomeCannotLoadServers": "โหลดข้อมูลเซิร์ฟเวอร์ไม่สำเร็จ",
+  "signInRegisterCta": "ลงทะเบียนเป็นผู้รายงาน",
+  "signInButton": "เข้าสู่ระบบ",
+  "signInQrCodeButton": "เข้าระบบด้วย QRCode",
+  "signInReturningEyebrow": "ผู้รายงานเดิม",
+  "signInServerLabel": "เซิร์ฟเวอร์",
+  "signInChangeServerButton": "เปลี่ยน"
 }

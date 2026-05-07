@@ -448,4 +448,22 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get welcomeCannotLoadServers => 'Cannot load servers';
+
+  @override
+  String get signInRegisterCta => 'Register as reporter';
+
+  @override
+  String get signInButton => 'Sign in';
+
+  @override
+  String get signInQrCodeButton => 'QRCode Sign In';
+
+  @override
+  String get signInReturningEyebrow => 'Returning reporter';
+
+  @override
+  String get signInServerLabel => 'Server';
+
+  @override
+  String get signInChangeServerButton => 'Change';
 }

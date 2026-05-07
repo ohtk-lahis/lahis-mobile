@@ -129,5 +129,11 @@
   "welcomeContinueButton": "ສືບຕໍ່",
   "welcomeSavingLabel": "ກຳລັງບັນທຶກ…",
   "welcomeNoServersText": "ບໍ່ມີເຊີບເວີໃຫ້ເລືອກ",
-  "welcomeCannotLoadServers": "ໂຫລດຂໍ້ມູນເຊີບເວີບໍ່ສຳເລັດ"
+  "welcomeCannotLoadServers": "ໂຫລດຂໍ້ມູນເຊີບເວີບໍ່ສຳເລັດ",
+  "signInRegisterCta": "ລົງທະບຽນເປັນຜູ້ລາຍງານ",
+  "signInButton": "ເຂົ້າສູ່ລະບົບ",
+  "signInQrCodeButton": "ເຂົ້າສູ່ລະບົບດ້ວຍ QRCode",
+  "signInReturningEyebrow": "ຜູ້ລາຍງານເດີມ",
+  "signInServerLabel": "ເຊີບເວີ",
+  "signInChangeServerButton": "ປ່ຽນ"
 }

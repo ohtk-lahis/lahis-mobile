@@ -445,4 +445,22 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get welcomeCannotLoadServers => 'โหลดข้อมูลเซิร์ฟเวอร์ไม่สำเร็จ';
+
+  @override
+  String get signInRegisterCta => 'ลงทะเบียนเป็นผู้รายงาน';
+
+  @override
+  String get signInButton => 'เข้าสู่ระบบ';
+
+  @override
+  String get signInQrCodeButton => 'เข้าระบบด้วย QRCode';
+
+  @override
+  String get signInReturningEyebrow => 'ผู้รายงานเดิม';
+
+  @override
+  String get signInServerLabel => 'เซิร์ฟเวอร์';
+
+  @override
+  String get signInChangeServerButton => 'เปลี่ยน';
 }

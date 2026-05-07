@@ -899,6 +899,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cannot load servers'**
   String get welcomeCannotLoadServers;
+
+  /// No description provided for @signInRegisterCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Register as reporter'**
+  String get signInRegisterCta;
+
+  /// No description provided for @signInButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signInButton;
+
+  /// No description provided for @signInQrCodeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'QRCode Sign In'**
+  String get signInQrCodeButton;
+
+  /// No description provided for @signInReturningEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Returning reporter'**
+  String get signInReturningEyebrow;
+
+  /// No description provided for @signInServerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Server'**
+  String get signInServerLabel;
+
+  /// No description provided for @signInChangeServerButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get signInChangeServerButton;
 }
 
 class _AppLocalizationsDelegate

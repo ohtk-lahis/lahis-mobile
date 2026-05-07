@@ -27,30 +27,28 @@ class LoginViewV2 extends StackedView<LoginViewModel> {
   Widget builder(
       BuildContext context, LoginViewModel viewModel, Widget? child) {
     return Scaffold(
-      backgroundColor: _tealDeep,
+      backgroundColor: _sand,
       resizeToAvoidBottomInset: true,
       body: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top -
-                  MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
+        child: Column(
+          children: [
+            _Hero(viewModel: viewModel),
+            Expanded(
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  _Hero(viewModel: viewModel),
-                  Transform.translate(
-                    offset: const Offset(0, -16),
+                  Positioned(
+                    top: -16,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
                     child: _ReturningSheet(),
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -209,7 +207,7 @@ class _RegisterCta extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                l10n.registerButton,
+                l10n.signInRegisterCta,
                 style: const TextStyle(
                   fontFamily: _fontFamily,
                   color: _tealDeep,
@@ -247,8 +245,9 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
           ),
         ],
       ),
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-      child: Column(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Center(
@@ -262,9 +261,9 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
             ),
           ),
           const SizedBox(height: 12),
-          const Text(
-            'RETURNING REPORTER',
-            style: TextStyle(
+          Text(
+            l10n.signInReturningEyebrow.toUpperCase(),
+            style: const TextStyle(
               fontFamily: _fontFamily,
               color: _muted,
               fontSize: 11,
@@ -326,6 +325,7 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
           const SizedBox(height: 16),
           _ServerFooter(viewModel: viewModel),
         ],
+        ),
       ),
     );
   }
@@ -461,7 +461,7 @@ class _SignInButton extends StatelessWidget {
                 ),
               )
             : Text(
-                l10n.loginButton,
+                l10n.signInButton,
                 style: const TextStyle(
                   fontFamily: _fontFamily,
                   fontSize: 15,
@@ -517,7 +517,7 @@ class _QrSignInButton extends StatelessWidget {
                 const Icon(Icons.qr_code_scanner, color: _tealHero, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  l10n.qrCodeLoginButton,
+                  l10n.signInQrCodeButton,
                   style: const TextStyle(
                     fontFamily: _fontFamily,
                     color: _ink,
@@ -548,6 +548,7 @@ class _ServerFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.only(top: 12),
       decoration: const BoxDecoration(
@@ -566,7 +567,7 @@ class _ServerFooter extends StatelessWidget {
                   fontSize: 11,
                 ),
                 children: [
-                  const TextSpan(text: 'Server: '),
+                  TextSpan(text: '${l10n.signInServerLabel}: '),
                   TextSpan(
                     text: _serverLabel(),
                     style: const TextStyle(
@@ -587,11 +588,11 @@ class _ServerFooter extends StatelessWidget {
               onTap: () {
                 // TODO: open server bottom sheet (next commit)
               },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 child: Text(
-                  'Change ›',
-                  style: TextStyle(
+                  '${l10n.signInChangeServerButton} ›',
+                  style: const TextStyle(
                     fontFamily: _fontFamily,
                     color: _tealHero,
                     fontSize: 11,

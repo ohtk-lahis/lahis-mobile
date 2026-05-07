@@ -231,5 +231,11 @@
   "welcomeContinueButton": "Continue",
   "welcomeSavingLabel": "Saving…",
   "welcomeNoServersText": "No servers available",
-  "welcomeCannotLoadServers": "Cannot load servers"
+  "welcomeCannotLoadServers": "Cannot load servers",
+  "signInRegisterCta": "Register as reporter",
+  "signInButton": "Sign in",
+  "signInQrCodeButton": "QRCode Sign In",
+  "signInReturningEyebrow": "Returning reporter",
+  "signInServerLabel": "Server",
+  "signInChangeServerButton": "Change"
 }

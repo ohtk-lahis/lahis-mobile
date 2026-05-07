@@ -114,5 +114,11 @@
   "welcomeContinueButton": "បន្ត",
   "welcomeSavingLabel": "កំពុងរក្សាទុក…",
   "welcomeNoServersText": "មិនមានម៉ាស៊ីនមេដែលអាចប្រើបាន",
-  "welcomeCannotLoadServers": "មិនអាចផ្ទុកម៉ាស៊ីនមេបានទេ"
+  "welcomeCannotLoadServers": "មិនអាចផ្ទុកម៉ាស៊ីនមេបានទេ",
+  "signInRegisterCta": "ចុះឈ្មោះជាអ្នករាយការណ៍",
+  "signInButton": "ចូលប្រើប្រាស់",
+  "signInQrCodeButton": "ចូលប្រើប្រាស់ដោយ QRCode",
+  "signInReturningEyebrow": "អ្នករាយការណ៍ចាស់",
+  "signInServerLabel": "ម៉ាស៊ីនមេ",
+  "signInChangeServerButton": "ប្ដូរ"
 }

@@ -446,4 +446,22 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get welcomeCannotLoadServers => 'មិនអាចផ្ទុកម៉ាស៊ីនមេបានទេ';
+
+  @override
+  String get signInRegisterCta => 'ចុះឈ្មោះជាអ្នករាយការណ៍';
+
+  @override
+  String get signInButton => 'ចូលប្រើប្រាស់';
+
+  @override
+  String get signInQrCodeButton => 'ចូលប្រើប្រាស់ដោយ QRCode';
+
+  @override
+  String get signInReturningEyebrow => 'អ្នករាយការណ៍ចាស់';
+
+  @override
+  String get signInServerLabel => 'ម៉ាស៊ីនមេ';
+
+  @override
+  String get signInChangeServerButton => 'ប្ដូរ';
 }

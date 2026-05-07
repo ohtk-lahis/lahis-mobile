@@ -438,4 +438,22 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get welcomeCannotLoadServers => 'ໂຫລດຂໍ້ມູນເຊີບເວີບໍ່ສຳເລັດ';
+
+  @override
+  String get signInRegisterCta => 'ລົງທະບຽນເປັນຜູ້ລາຍງານ';
+
+  @override
+  String get signInButton => 'ເຂົ້າສູ່ລະບົບ';
+
+  @override
+  String get signInQrCodeButton => 'ເຂົ້າສູ່ລະບົບດ້ວຍ QRCode';
+
+  @override
+  String get signInReturningEyebrow => 'ຜູ້ລາຍງານເດີມ';
+
+  @override
+  String get signInServerLabel => 'ເຊີບເວີ';
+
+  @override
+  String get signInChangeServerButton => 'ປ່ຽນ';
 }
