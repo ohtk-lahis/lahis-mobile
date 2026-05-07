@@ -241,46 +241,32 @@ class _LoginForm extends StackedHookView<LoginViewModel> {
                                 ),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 20),
                       _qrcodeLogin(context),
-                      const SizedBox(height: 36),
-                      Center(
-                        child: InkWell(
-                          onTap: () {
+                      const SizedBox(height: 40),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FlatButton.outline(
+                          backgroundColor: appTheme.bg2,
+                          onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => const RegisterView(),
                               ),
                             );
                           },
-                          borderRadius: BorderRadius.circular(4),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 6),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  "Don't have an account?",
-                                  style: TextStyle(
-                                    fontFamily: appTheme.font,
-                                    fontSize: 13.sp,
-                                    color: appTheme.sub2,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
+                                Icon(Icons.grid_view_outlined, size: 16.w),
+                                const SizedBox(width: 4),
                                 Text(
                                   AppLocalizations.of(context)!.registerButton,
                                   style: TextStyle(
-                                    fontFamily: appTheme.font,
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: appTheme.primary,
+                                    fontSize: 15.sp,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
+                              ]),
                         ),
                       ),
                     ])
