@@ -106,5 +106,15 @@
   "passwordMismatch": "Password does not match confirm password",
   "restartApp": "Application needs to be restarted.",
   "locationServiceIsDisabled": "Location service is disabled, you need to turn it on.",
-  "loadMore": "Load more"
+  "loadMore": "Load more",
+  "welcomeTitle": "សូមស្វាគមន៍",
+  "welcomeSubtitle": "Set up before signing in · ตั้งค่าก่อนเริ่ม",
+  "welcomeLanguageTitle": "Language",
+  "welcomeLanguageSub": "ภาษา",
+  "welcomeServerTitle": "Server",
+  "welcomeServerSub": "เซิร์ฟเวอร์",
+  "welcomeContinueButton": "បន្ត",
+  "welcomeSavingLabel": "កំពុងរក្សាទុក…",
+  "welcomeNoServersText": "មិនមានម៉ាស៊ីនមេដែលអាចប្រើបាន",
+  "welcomeCannotLoadServers": "មិនអាចផ្ទុកម៉ាស៊ីនមេបានទេ"
 }

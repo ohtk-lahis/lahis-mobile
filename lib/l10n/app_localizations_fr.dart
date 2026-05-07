@@ -423,4 +423,34 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loadMore => 'Load more';
+
+  @override
+  String get welcomeTitle => 'Welcome';
+
+  @override
+  String get welcomeSubtitle => 'Set up before signing in · ตั้งค่าก่อนเริ่ม';
+
+  @override
+  String get welcomeLanguageTitle => 'Language';
+
+  @override
+  String get welcomeLanguageSub => 'ภาษา';
+
+  @override
+  String get welcomeServerTitle => 'Server';
+
+  @override
+  String get welcomeServerSub => 'เซิร์ฟเวอร์';
+
+  @override
+  String get welcomeContinueButton => 'Continue';
+
+  @override
+  String get welcomeSavingLabel => 'Saving…';
+
+  @override
+  String get welcomeNoServersText => 'No servers available';
+
+  @override
+  String get welcomeCannotLoadServers => 'Cannot load servers';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/ui/welcome/welcome_view_model.dart';
 import 'package:stacked/stacked.dart';
 
@@ -14,6 +15,7 @@ const _footerBg = Color(0x26000000); // 15% black
 const _footerBorder = Color(0x1AFFFFFF); // 10% white
 const _disabledBg = Color(0x26FFFFFF); // 15% white
 const _disabledFg = Color(0x66FFFFFF); // 40% white
+const _fontFamily = 'NotoSansThai';
 
 const _languages = [
   _LanguageOption(code: 'th', label: 'ไทย', sub: 'Thai'),
@@ -34,13 +36,14 @@ class WelcomeView extends StackedView<WelcomeViewModel> {
   @override
   Widget builder(
       BuildContext context, WelcomeViewModel viewModel, Widget? child) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: _tealDeep,
       body: SafeArea(
         child: Column(
           children: [
             _BrandStrip(),
-            const _TitleBlock(),
+            _TitleBlock(l10n: l10n),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
@@ -49,16 +52,16 @@ class WelcomeView extends StackedView<WelcomeViewModel> {
                   children: [
                     _Section(
                       number: '1',
-                      title: 'Language',
-                      sub: 'ภาษา',
+                      title: l10n.welcomeLanguageTitle,
+                      sub: l10n.welcomeLanguageSub,
                       child: _LanguageGrid(viewModel: viewModel),
                     ),
                     const SizedBox(height: 18),
                     _Section(
                       number: '2',
-                      title: 'Server',
-                      sub: 'เซิร์ฟเวอร์',
-                      child: _ServerList(viewModel: viewModel),
+                      title: l10n.welcomeServerTitle,
+                      sub: l10n.welcomeServerSub,
+                      child: _ServerList(viewModel: viewModel, l10n: l10n),
                     ),
                   ],
                 ),
@@ -66,6 +69,7 @@ class WelcomeView extends StackedView<WelcomeViewModel> {
             ),
             _ContinueFooter(
               viewModel: viewModel,
+              l10n: l10n,
               onContinue: onContinue,
             ),
           ],
@@ -92,17 +96,20 @@ class _BrandStrip extends StatelessWidget {
 }
 
 class _TitleBlock extends StatelessWidget {
-  const _TitleBlock();
+  final AppLocalizations l10n;
+
+  const _TitleBlock({required this.l10n});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 14),
       child: Column(
-        children: const [
+        children: [
           Text(
-            'Welcome',
-            style: TextStyle(
+            l10n.welcomeTitle,
+            style: const TextStyle(
+              fontFamily: _fontFamily,
               color: _onDark,
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -110,11 +117,12 @@ class _TitleBlock extends StatelessWidget {
               height: 1.2,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
-            'Set up before signing in · ตั้งค่าก่อนเริ่ม',
+            l10n.welcomeSubtitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
+              fontFamily: _fontFamily,
               color: _onDarkMuted,
               fontSize: 13,
               fontWeight: FontWeight.w400,
@@ -159,6 +167,7 @@ class _Section extends StatelessWidget {
                 child: Text(
                   number,
                   style: const TextStyle(
+                    fontFamily: _fontFamily,
                     color: _tealDeep,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -169,6 +178,7 @@ class _Section extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
+                  fontFamily: _fontFamily,
                   color: _onDark,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -178,6 +188,7 @@ class _Section extends StatelessWidget {
               Text(
                 '· $sub',
                 style: const TextStyle(
+                  fontFamily: _fontFamily,
                   color: _onDarkMuted,
                   fontSize: 12,
                 ),
@@ -233,6 +244,7 @@ class _LanguageGrid extends StatelessWidget {
                     Text(
                       option.label,
                       style: const TextStyle(
+                        fontFamily: _fontFamily,
                         color: _onDark,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -243,6 +255,7 @@ class _LanguageGrid extends StatelessWidget {
                     Text(
                       option.sub,
                       style: const TextStyle(
+                        fontFamily: _fontFamily,
                         color: _onDarkMuted,
                         fontSize: 11,
                       ),
@@ -260,7 +273,8 @@ class _LanguageGrid extends StatelessWidget {
 
 class _ServerList extends StatelessWidget {
   final WelcomeViewModel viewModel;
-  const _ServerList({required this.viewModel});
+  final AppLocalizations l10n;
+  const _ServerList({required this.viewModel, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -284,8 +298,14 @@ class _ServerList extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Text(
-          viewModel.error('tenants') ?? 'No servers available',
-          style: const TextStyle(color: _onDarkMuted, fontSize: 13),
+          viewModel.loadFailed
+              ? l10n.welcomeCannotLoadServers
+              : l10n.welcomeNoServersText,
+          style: const TextStyle(
+            fontFamily: _fontFamily,
+            color: _onDarkMuted,
+            fontSize: 13,
+          ),
         ),
       );
     }
@@ -340,6 +360,7 @@ class _ServerCard extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
+                    fontFamily: _fontFamily,
                     color: _onDark,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -352,6 +373,7 @@ class _ServerCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
+                      fontFamily: _fontFamily,
                       color: _onDarkMuted,
                       fontSize: 12,
                     ),
@@ -429,9 +451,14 @@ class _Radio extends StatelessWidget {
 
 class _ContinueFooter extends StatelessWidget {
   final WelcomeViewModel viewModel;
+  final AppLocalizations l10n;
   final VoidCallback? onContinue;
 
-  const _ContinueFooter({required this.viewModel, this.onContinue});
+  const _ContinueFooter({
+    required this.viewModel,
+    required this.l10n,
+    this.onContinue,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -476,8 +503,11 @@ class _ContinueFooter extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                viewModel.isBusy ? 'Saving…' : 'Continue',
+                viewModel.isBusy
+                    ? l10n.welcomeSavingLabel
+                    : l10n.welcomeContinueButton,
                 style: const TextStyle(
+                  fontFamily: _fontFamily,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),

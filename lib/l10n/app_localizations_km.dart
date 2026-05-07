@@ -422,4 +422,34 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get loadMore => 'Load more';
+
+  @override
+  String get welcomeTitle => 'សូមស្វាគមន៍';
+
+  @override
+  String get welcomeSubtitle => 'Set up before signing in · ตั้งค่าก่อนเริ่ม';
+
+  @override
+  String get welcomeLanguageTitle => 'Language';
+
+  @override
+  String get welcomeLanguageSub => 'ภาษา';
+
+  @override
+  String get welcomeServerTitle => 'Server';
+
+  @override
+  String get welcomeServerSub => 'เซิร์ฟเวอร์';
+
+  @override
+  String get welcomeContinueButton => 'បន្ត';
+
+  @override
+  String get welcomeSavingLabel => 'កំពុងរក្សាទុក…';
+
+  @override
+  String get welcomeNoServersText => 'មិនមានម៉ាស៊ីនមេដែលអាចប្រើបាន';
+
+  @override
+  String get welcomeCannotLoadServers => 'មិនអាចផ្ទុកម៉ាស៊ីនមេបានទេ';
 }

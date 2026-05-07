@@ -106,5 +106,15 @@
   "passwordMismatch": "รหัสผ่านไม่ถูกต้อง",
   "restartApp": "แอปพลิเคชันจะทำการรีสตาร์ท",
   "locationServiceIsDisabled": "Location service is disabled, you need to turn it on.",
-  "loadMore": "ดูเพิ่มเติม"
+  "loadMore": "ดูเพิ่มเติม",
+  "welcomeTitle": "ยินดีต้อนรับ",
+  "welcomeSubtitle": "Set up before signing in · ตั้งค่าก่อนเริ่ม",
+  "welcomeLanguageTitle": "Language",
+  "welcomeLanguageSub": "ภาษา",
+  "welcomeServerTitle": "Server",
+  "welcomeServerSub": "เซิร์ฟเวอร์",
+  "welcomeContinueButton": "ดำเนินการต่อ",
+  "welcomeSavingLabel": "กำลังบันทึก…",
+  "welcomeNoServersText": "ไม่มีเซิร์ฟเวอร์ให้เลือก",
+  "welcomeCannotLoadServers": "โหลดข้อมูลเซิร์ฟเวอร์ไม่สำเร็จ"
 }

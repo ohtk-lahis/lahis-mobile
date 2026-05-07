@@ -421,4 +421,34 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get loadMore => 'ดูเพิ่มเติม';
+
+  @override
+  String get welcomeTitle => 'ยินดีต้อนรับ';
+
+  @override
+  String get welcomeSubtitle => 'Set up before signing in · ตั้งค่าก่อนเริ่ม';
+
+  @override
+  String get welcomeLanguageTitle => 'Language';
+
+  @override
+  String get welcomeLanguageSub => 'ภาษา';
+
+  @override
+  String get welcomeServerTitle => 'Server';
+
+  @override
+  String get welcomeServerSub => 'เซิร์ฟเวอร์';
+
+  @override
+  String get welcomeContinueButton => 'ดำเนินการต่อ';
+
+  @override
+  String get welcomeSavingLabel => 'กำลังบันทึก…';
+
+  @override
+  String get welcomeNoServersText => 'ไม่มีเซิร์ฟเวอร์ให้เลือก';
+
+  @override
+  String get welcomeCannotLoadServers => 'โหลดข้อมูลเซิร์ฟเวอร์ไม่สำเร็จ';
 }

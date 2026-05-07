@@ -414,4 +414,34 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get loadMore => 'ເບິ່ງເພີ່ມເຕີມ';
+
+  @override
+  String get welcomeTitle => 'ຍິນດີຕ້ອນຮັບ';
+
+  @override
+  String get welcomeSubtitle => 'Set up before signing in · ตั้งค่าก่อนเริ่ม';
+
+  @override
+  String get welcomeLanguageTitle => 'Language';
+
+  @override
+  String get welcomeLanguageSub => 'ภาษา';
+
+  @override
+  String get welcomeServerTitle => 'Server';
+
+  @override
+  String get welcomeServerSub => 'เซิร์ฟเวอร์';
+
+  @override
+  String get welcomeContinueButton => 'ສືບຕໍ່';
+
+  @override
+  String get welcomeSavingLabel => 'ກຳລັງບັນທຶກ…';
+
+  @override
+  String get welcomeNoServersText => 'ບໍ່ມີເຊີບເວີໃຫ້ເລືອກ';
+
+  @override
+  String get welcomeCannotLoadServers => 'ໂຫລດຂໍ້ມູນເຊີບເວີບໍ່ສຳເລັດ';
 }

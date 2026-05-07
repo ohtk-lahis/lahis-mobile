@@ -13,6 +13,7 @@ class WelcomeViewModel extends BaseViewModel {
   final _dio = Dio();
 
   List<Map<String, String>> servers = [];
+  bool loadFailed = false;
 
   String? selectedLanguage;
   String? selectedServerId;
@@ -29,6 +30,7 @@ class WelcomeViewModel extends BaseViewModel {
 
   Future<void> _bootstrap() async {
     setBusyForObject('tenants', true);
+    loadFailed = false;
 
     final prefs = await SharedPreferences.getInstance();
     selectedLanguage = prefs.getString(languageKey);
@@ -48,7 +50,7 @@ class WelcomeViewModel extends BaseViewModel {
       }
       notifyListeners();
     } catch (e) {
-      setErrorForObject('tenants', 'Cannot load servers');
+      loadFailed = true;
     } finally {
       setBusyForObject('tenants', false);
     }

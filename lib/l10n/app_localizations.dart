@@ -851,6 +851,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load more'**
   String get loadMore;
+
+  /// No description provided for @welcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get welcomeTitle;
+
+  /// No description provided for @welcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up before signing in · ตั้งค่าก่อนเริ่ม'**
+  String get welcomeSubtitle;
+
+  /// No description provided for @welcomeLanguageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get welcomeLanguageTitle;
+
+  /// No description provided for @welcomeLanguageSub.
+  ///
+  /// In en, this message translates to:
+  /// **'ภาษา'**
+  String get welcomeLanguageSub;
+
+  /// No description provided for @welcomeServerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Server'**
+  String get welcomeServerTitle;
+
+  /// No description provided for @welcomeServerSub.
+  ///
+  /// In en, this message translates to:
+  /// **'เซิร์ฟเวอร์'**
+  String get welcomeServerSub;
+
+  /// No description provided for @welcomeContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get welcomeContinueButton;
+
+  /// No description provided for @welcomeSavingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving…'**
+  String get welcomeSavingLabel;
+
+  /// No description provided for @welcomeNoServersText.
+  ///
+  /// In en, this message translates to:
+  /// **'No servers available'**
+  String get welcomeNoServersText;
+
+  /// No description provided for @welcomeCannotLoadServers.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot load servers'**
+  String get welcomeCannotLoadServers;
 }
 
 class _AppLocalizationsDelegate
