@@ -56,9 +56,11 @@ class WelcomeViewModel extends BaseViewModel {
     }
   }
 
-  void selectLanguage(String code) {
+  Future<void> selectLanguage(String code) async {
     selectedLanguage = code;
     notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(languageKey, code);
   }
 
   void selectServer(String domain) {

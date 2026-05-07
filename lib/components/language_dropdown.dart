@@ -3,20 +3,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:podd_app/app_theme.dart';
 import 'package:podd_app/locator.dart';
 
+const supportedLanguages = <List<String>>[
+  ['English', 'en'],
+  ['ภาษาไทย', 'th'],
+  ['ភាសាខ្មែរ', 'km'],
+  ['ພາສາລາວ', 'lo'],
+  ['Français', 'fr'],
+  ['Española', 'es'],
+  ['မြန်မာ', 'my'],
+];
+
 class LanguageDropdown extends StatelessWidget {
   final AppTheme appTheme = locator<AppTheme>();
   final Function(String?) onChanged;
   final String value;
 
-  final languages = [
-    ['English', 'en'],
-    ['ภาษาไทย', 'th'],
-    ['ភាសាខ្មែរ', 'km'],
-    ['ພາສາລາວ', 'lo'],
-    ['Français', 'fr'],
-    ['Española', 'es'],
-    ['မြန်မာ', 'my'],
-  ];
+  final languages = supportedLanguages;
 
   LanguageDropdown({super.key, required this.onChanged, required this.value});
 

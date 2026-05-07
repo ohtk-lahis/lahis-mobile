@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:podd_app/components/language_dropdown.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/ui/welcome/welcome_view_model.dart';
 import 'package:stacked/stacked.dart';
@@ -17,13 +18,6 @@ const _disabledBg = Color(0x26FFFFFF); // 15% white
 const _disabledFg = Color(0x66FFFFFF); // 40% white
 const _fontFamily = 'NotoSansThai';
 
-const _languages = [
-  _LanguageOption(code: 'th', label: 'ไทย', sub: 'Thai'),
-  _LanguageOption(code: 'en', label: 'English', sub: 'EN'),
-  _LanguageOption(code: 'lo', label: 'ລາວ', sub: 'Lao'),
-  _LanguageOption(code: 'km', label: 'ខ្មែរ', sub: 'Khmer'),
-];
-
 class WelcomeView extends StackedView<WelcomeViewModel> {
   final VoidCallback? onContinue;
 
@@ -36,44 +30,55 @@ class WelcomeView extends StackedView<WelcomeViewModel> {
   @override
   Widget builder(
       BuildContext context, WelcomeViewModel viewModel, Widget? child) {
-    final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: _tealDeep,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _BrandStrip(),
-            _TitleBlock(l10n: l10n),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _Section(
-                      number: '1',
-                      title: l10n.welcomeLanguageTitle,
-                      sub: l10n.welcomeLanguageSub,
-                      child: _LanguageGrid(viewModel: viewModel),
+    return Localizations.override(
+      context: context,
+      locale: viewModel.selectedLanguage != null
+          ? Locale(viewModel.selectedLanguage!, '')
+          : null,
+      child: Builder(
+        builder: (innerContext) {
+          final l10n = AppLocalizations.of(innerContext)!;
+          return Scaffold(
+            backgroundColor: _tealDeep,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  _BrandStrip(),
+                  _TitleBlock(l10n: l10n),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _Section(
+                            number: '1',
+                            title: l10n.welcomeLanguageTitle,
+                            sub: l10n.welcomeLanguageSub,
+                            child: _LanguageGrid(viewModel: viewModel),
+                          ),
+                          const SizedBox(height: 18),
+                          _Section(
+                            number: '2',
+                            title: l10n.welcomeServerTitle,
+                            sub: l10n.welcomeServerSub,
+                            child:
+                                _ServerList(viewModel: viewModel, l10n: l10n),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 18),
-                    _Section(
-                      number: '2',
-                      title: l10n.welcomeServerTitle,
-                      sub: l10n.welcomeServerSub,
-                      child: _ServerList(viewModel: viewModel, l10n: l10n),
-                    ),
-                  ],
-                ),
+                  ),
+                  _ContinueFooter(
+                    viewModel: viewModel,
+                    l10n: l10n,
+                    onContinue: onContinue,
+                  ),
+                ],
               ),
             ),
-            _ContinueFooter(
-              viewModel: viewModel,
-              l10n: l10n,
-              onContinue: onContinue,
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -202,17 +207,6 @@ class _Section extends StatelessWidget {
   }
 }
 
-class _LanguageOption {
-  final String code;
-  final String label;
-  final String sub;
-  const _LanguageOption({
-    required this.code,
-    required this.label,
-    required this.sub,
-  });
-}
-
 class _LanguageGrid extends StatelessWidget {
   final WelcomeViewModel viewModel;
   const _LanguageGrid({required this.viewModel});
@@ -225,42 +219,31 @@ class _LanguageGrid extends StatelessWidget {
       mainAxisSpacing: 8,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 158 / 56,
-      children: _languages.map((option) {
-        final selected = viewModel.selectedLanguage == option.code;
+      childAspectRatio: 158 / 44,
+      children: supportedLanguages.map((option) {
+        final label = option[0];
+        final code = option[1];
+        final selected = viewModel.selectedLanguage == code;
         return _SelectableCard(
           selected: selected,
-          onTap: () => viewModel.selectLanguage(option.code),
+          onTap: () => viewModel.selectLanguage(code),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: [
               _Radio(selected: selected, size: 18),
               const SizedBox(width: 10),
               Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      option.label,
-                      style: const TextStyle(
-                        fontFamily: _fontFamily,
-                        color: _onDark,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        height: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      option.sub,
-                      style: const TextStyle(
-                        fontFamily: _fontFamily,
-                        color: _onDarkMuted,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: _fontFamily,
+                    color: _onDark,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    height: 1.1,
+                  ),
                 ),
               ),
             ],
