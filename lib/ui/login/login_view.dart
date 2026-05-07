@@ -241,9 +241,9 @@ class _LoginForm extends StackedHookView<LoginViewModel> {
                                 ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       _qrcodeLogin(context),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
                         child: FlatButton.outline(
@@ -299,37 +299,35 @@ class _LoginForm extends StackedHookView<LoginViewModel> {
   Widget _qrcodeLogin(
     BuildContext context,
   ) {
-    return InkWell(
-      onTap: () async {
-        var error = await Navigator.push<String>(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const QrLoginView(),
-          ),
-        );
-        if (error != null) {
-          if (context.mounted) {
-            showAlert(context, error);
-          }
-        }
-      },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.qr_code_scanner,
-            color: Theme.of(context).primaryColor,
-            size: 16.w,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            AppLocalizations.of(context)!.qrCodeLoginButton,
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontSize: 15.sp,
+    final AppTheme appTheme = locator<AppTheme>();
+    return SizedBox(
+      width: double.infinity,
+      child: FlatButton.outline(
+        backgroundColor: appTheme.bg2,
+        onPressed: () async {
+          var error = await Navigator.push<String>(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const QrLoginView(),
             ),
-          ),
-        ],
+          );
+          if (error != null) {
+            if (context.mounted) {
+              showAlert(context, error);
+            }
+          }
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.qr_code_scanner, size: 16.w),
+            const SizedBox(width: 4),
+            Text(
+              AppLocalizations.of(context)!.qrCodeLoginButton,
+              style: TextStyle(fontSize: 15.sp),
+            ),
+          ],
+        ),
       ),
     );
   }
