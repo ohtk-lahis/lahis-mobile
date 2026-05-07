@@ -51,25 +51,31 @@ class OhtkRouter {
   }
   OhtkRouter._internal();
 
-  GoRouter getRouter() {
+  GoRouter getRouter({bool setupComplete = true}) {
     final IAuthService authService = locator<IAuthService>();
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: initialLocation,
       refreshListenable: authService,
-      // redirect to the login page if the user is not logged in
+      // redirect to the welcome gate (first launch) or login page (returning
+      // user) until both setup and authentication are complete
       redirect: (BuildContext context, GoRouterState state) {
-        // if the user is not logged in, they need to login
         final bool loggedIn = authService.isLogin ?? false;
         final bool loggingIn = state.matchedLocation == '/login';
         final bool onWelcome = state.matchedLocation == '/welcome';
-        if (!loggedIn && !onWelcome) {
+
+        // First-launch gate: no language or no server picked yet
+        if (!setupComplete && !onWelcome) {
+          return '/welcome';
+        }
+
+        // Standard auth gate: not logged in → /login
+        if (!loggedIn && !loggingIn && !onWelcome) {
           return '/login';
         }
 
-        // if the user is logged in but still on the login page, send them to
-        // the home page (shell route) on first view, default to 'reports'
-        if (loggingIn) {
+        // Logged-in users shouldn't sit on /login; bounce them home
+        if (loggedIn && loggingIn) {
           return initialLocation;
         }
 

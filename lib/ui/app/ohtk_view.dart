@@ -28,6 +28,7 @@ class OhtkApp extends StatelessWidget {
         future: Future.wait([
           locator.allReady(timeout: const Duration(seconds: 10)),
           fetchLocaleFromPreference(),
+          fetchSetupComplete(),
         ]),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           setupAppLocalization();
@@ -38,7 +39,8 @@ class OhtkApp extends StatelessWidget {
             return MaterialApp(home: WaitingScreen(progressStream));
           }
           final appViewModel = AppViewModel();
-          var locale = snapshot.data[1];
+          var locale = snapshot.data[1] as Locale;
+          var setupComplete = snapshot.data[2] as bool;
           return OverlaySupport.global(
             child: ListenableBuilder(
               listenable: appViewModel,
@@ -62,7 +64,8 @@ class OhtkApp extends StatelessWidget {
                 ],
                 locale: locale,
                 theme: locator<AppTheme>().themeData,
-                routerConfig: OhtkRouter().getRouter(),
+                routerConfig:
+                    OhtkRouter().getRouter(setupComplete: setupComplete),
               ),
             ),
           );
@@ -76,5 +79,15 @@ class OhtkApp extends StatelessWidget {
     var prefs = await SharedPreferences.getInstance();
     var languageCode = prefs.getString(languageKey) ?? "en";
     return Locale(languageCode, '');
+  }
+
+  /*
+  Both language and server must be picked at least once for the app to skip
+  the first-launch Welcome gate.
+   */
+  Future<bool> fetchSetupComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(languageKey) != null &&
+        prefs.getString(serverDomainKey) != null;
   }
 }

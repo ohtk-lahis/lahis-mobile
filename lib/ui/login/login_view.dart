@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -268,20 +267,6 @@ class _LoginForm extends StackedHookView<LoginViewModel> {
                                   ),
                                 ),
                               ]),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Center(
-                        child: TextButton(
-                          onPressed: () => context.go('/welcome'),
-                          child: Text(
-                            '(preview) Welcome setup →',
-                            style: TextStyle(
-                              fontFamily: appTheme.font,
-                              fontSize: 12.sp,
-                              color: appTheme.sub2,
-                            ),
-                          ),
                         ),
                       ),
                     ])
