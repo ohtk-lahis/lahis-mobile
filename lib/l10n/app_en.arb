@@ -237,5 +237,12 @@
   "signInQrCodeButton": "QRCode Sign In",
   "signInReturningEyebrow": "Returning reporter",
   "signInServerLabel": "Server",
-  "signInChangeServerButton": "Change"
+  "signInChangeServerButton": "Change",
+  "signInChangeLanguageTitle": "Language",
+  "signInChangeLanguageHint": "Single tap applies immediately",
+  "signInChangeServerTitle": "Switch server",
+  "signInChangeServerHint": "Different countries and orgs use different servers.",
+  "signInServerCurrentBadge": "CURRENT",
+  "signInCancelButton": "Cancel",
+  "signInConfirmServerButton": "Switch server"
 }

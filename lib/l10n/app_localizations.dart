@@ -935,6 +935,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change'**
   String get signInChangeServerButton;
+
+  /// No description provided for @signInChangeLanguageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get signInChangeLanguageTitle;
+
+  /// No description provided for @signInChangeLanguageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Single tap applies immediately'**
+  String get signInChangeLanguageHint;
+
+  /// No description provided for @signInChangeServerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch server'**
+  String get signInChangeServerTitle;
+
+  /// No description provided for @signInChangeServerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Different countries and orgs use different servers.'**
+  String get signInChangeServerHint;
+
+  /// No description provided for @signInServerCurrentBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'CURRENT'**
+  String get signInServerCurrentBadge;
+
+  /// No description provided for @signInCancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get signInCancelButton;
+
+  /// No description provided for @signInConfirmServerButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch server'**
+  String get signInConfirmServerButton;
 }
 
 class _AppLocalizationsDelegate

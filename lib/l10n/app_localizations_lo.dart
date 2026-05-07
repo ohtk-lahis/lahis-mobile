@@ -456,4 +456,25 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get signInChangeServerButton => 'ປ່ຽນ';
+
+  @override
+  String get signInChangeLanguageTitle => 'ພາສາ';
+
+  @override
+  String get signInChangeLanguageHint => 'ແຕະເພື່ອນຳໃຊ້ທັນທີ';
+
+  @override
+  String get signInChangeServerTitle => 'ປ່ຽນເຊີບເວີ';
+
+  @override
+  String get signInChangeServerHint => 'ປະເທດແລະອົງກອນຕ່າງໆໃຊ້ເຊີບເວີຕ່າງກັນ';
+
+  @override
+  String get signInServerCurrentBadge => 'ປັດຈຸບັນ';
+
+  @override
+  String get signInCancelButton => 'ຍົກເລີກ';
+
+  @override
+  String get signInConfirmServerButton => 'ປ່ຽນເຊີບເວີ';
 }

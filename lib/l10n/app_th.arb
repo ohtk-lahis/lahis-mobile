@@ -120,5 +120,12 @@
   "signInQrCodeButton": "เข้าระบบด้วย QRCode",
   "signInReturningEyebrow": "ผู้รายงานเดิม",
   "signInServerLabel": "เซิร์ฟเวอร์",
-  "signInChangeServerButton": "เปลี่ยน"
+  "signInChangeServerButton": "เปลี่ยน",
+  "signInChangeLanguageTitle": "ภาษา",
+  "signInChangeLanguageHint": "แตะเพื่อใช้งานทันที",
+  "signInChangeServerTitle": "เปลี่ยนเซิร์ฟเวอร์",
+  "signInChangeServerHint": "ประเทศและองค์กรต่าง ๆ ใช้เซิร์ฟเวอร์ต่างกัน",
+  "signInServerCurrentBadge": "ปัจจุบัน",
+  "signInCancelButton": "ยกเลิก",
+  "signInConfirmServerButton": "เปลี่ยนเซิร์ฟเวอร์"
 }

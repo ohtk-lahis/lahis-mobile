@@ -463,4 +463,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signInChangeServerButton => 'Change';
+
+  @override
+  String get signInChangeLanguageTitle => 'Language';
+
+  @override
+  String get signInChangeLanguageHint => 'Single tap applies immediately';
+
+  @override
+  String get signInChangeServerTitle => 'Switch server';
+
+  @override
+  String get signInChangeServerHint =>
+      'Different countries and orgs use different servers.';
+
+  @override
+  String get signInServerCurrentBadge => 'CURRENT';
+
+  @override
+  String get signInCancelButton => 'Cancel';
+
+  @override
+  String get signInConfirmServerButton => 'Switch server';
 }

@@ -120,5 +120,12 @@
   "signInQrCodeButton": "ចូលប្រើប្រាស់ដោយ QRCode",
   "signInReturningEyebrow": "អ្នករាយការណ៍ចាស់",
   "signInServerLabel": "ម៉ាស៊ីនមេ",
-  "signInChangeServerButton": "ប្ដូរ"
+  "signInChangeServerButton": "ប្ដូរ",
+  "signInChangeLanguageTitle": "ភាសា",
+  "signInChangeLanguageHint": "ប៉ះតែម្ដងអនុវត្តភ្លាមៗ",
+  "signInChangeServerTitle": "ប្ដូរម៉ាស៊ីនមេ",
+  "signInChangeServerHint": "ប្រទេសនិងអង្គការផ្សេងគ្នាប្រើម៉ាស៊ីនមេផ្សេងគ្នា",
+  "signInServerCurrentBadge": "បច្ចុប្បន្ន",
+  "signInCancelButton": "បោះបង់",
+  "signInConfirmServerButton": "ប្ដូរម៉ាស៊ីនមេ"
 }

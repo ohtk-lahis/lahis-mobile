@@ -464,4 +464,26 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get signInChangeServerButton => 'ប្ដូរ';
+
+  @override
+  String get signInChangeLanguageTitle => 'ភាសា';
+
+  @override
+  String get signInChangeLanguageHint => 'ប៉ះតែម្ដងអនុវត្តភ្លាមៗ';
+
+  @override
+  String get signInChangeServerTitle => 'ប្ដូរម៉ាស៊ីនមេ';
+
+  @override
+  String get signInChangeServerHint =>
+      'ប្រទេសនិងអង្គការផ្សេងគ្នាប្រើម៉ាស៊ីនមេផ្សេងគ្នា';
+
+  @override
+  String get signInServerCurrentBadge => 'បច្ចុប្បន្ន';
+
+  @override
+  String get signInCancelButton => 'បោះបង់';
+
+  @override
+  String get signInConfirmServerButton => 'ប្ដូរម៉ាស៊ីនមេ';
 }

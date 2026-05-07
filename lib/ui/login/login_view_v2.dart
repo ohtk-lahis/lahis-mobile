@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:podd_app/components/restart_widget.dart';
+import 'package:podd_app/constants.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/ui/login/login_view_model.dart';
+import 'package:podd_app/ui/login/picker_sheets.dart';
 import 'package:podd_app/ui/login/qr_login_view.dart';
 import 'package:podd_app/ui/register/register_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
@@ -122,6 +126,25 @@ class _LanguagePill extends StatelessWidget {
   final LoginViewModel viewModel;
   const _LanguagePill({required this.viewModel});
 
+  void _openLanguageSheet(BuildContext context) {
+    LanguagePickerSheet.show(
+      context,
+      currentLanguage: viewModel.language,
+      onPicked: (code) async {
+        if (code == viewModel.language) {
+          Navigator.of(context).pop();
+          return;
+        }
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(languageKey, code);
+        if (!context.mounted) return;
+        Navigator.of(context).pop();
+        if (!context.mounted) return;
+        RestartWidget.restartApp(context);
+      },
+    );
+  }
+
   String _languageLabel(String code) {
     switch (code) {
       case 'th':
@@ -149,9 +172,7 @@ class _LanguagePill extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(100),
-        onTap: () {
-          // TODO: open language bottom sheet (next commit)
-        },
+        onTap: () => _openLanguageSheet(context),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -547,6 +568,24 @@ class _ServerFooter extends StatelessWidget {
     return match['label'] ?? viewModel.subDomain;
   }
 
+  void _openServerSheet(BuildContext context) {
+    final selectableServers = viewModel.serverOptions
+        .where((o) => (o['domain'] ?? '').isNotEmpty)
+        .toList();
+    ServerPickerSheet.show(
+      context,
+      currentServerDomain: viewModel.subDomain,
+      servers: selectableServers,
+      onConfirmed: (domain) async {
+        await viewModel.changeServer(domain);
+        if (!context.mounted) return;
+        Navigator.of(context).pop();
+        if (!context.mounted) return;
+        RestartWidget.restartApp(context);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -586,9 +625,7 @@ class _ServerFooter extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(4),
-              onTap: () {
-                // TODO: open server bottom sheet (next commit)
-              },
+              onTap: () => _openServerSheet(context),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 child: Text(

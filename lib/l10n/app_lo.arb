@@ -135,5 +135,12 @@
   "signInQrCodeButton": "ເຂົ້າສູ່ລະບົບດ້ວຍ QRCode",
   "signInReturningEyebrow": "ຜູ້ລາຍງານເດີມ",
   "signInServerLabel": "ເຊີບເວີ",
-  "signInChangeServerButton": "ປ່ຽນ"
+  "signInChangeServerButton": "ປ່ຽນ",
+  "signInChangeLanguageTitle": "ພາສາ",
+  "signInChangeLanguageHint": "ແຕະເພື່ອນຳໃຊ້ທັນທີ",
+  "signInChangeServerTitle": "ປ່ຽນເຊີບເວີ",
+  "signInChangeServerHint": "ປະເທດແລະອົງກອນຕ່າງໆໃຊ້ເຊີບເວີຕ່າງກັນ",
+  "signInServerCurrentBadge": "ປັດຈຸບັນ",
+  "signInCancelButton": "ຍົກເລີກ",
+  "signInConfirmServerButton": "ປ່ຽນເຊີບເວີ"
 }

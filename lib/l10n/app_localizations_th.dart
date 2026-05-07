@@ -463,4 +463,26 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get signInChangeServerButton => 'เปลี่ยน';
+
+  @override
+  String get signInChangeLanguageTitle => 'ภาษา';
+
+  @override
+  String get signInChangeLanguageHint => 'แตะเพื่อใช้งานทันที';
+
+  @override
+  String get signInChangeServerTitle => 'เปลี่ยนเซิร์ฟเวอร์';
+
+  @override
+  String get signInChangeServerHint =>
+      'ประเทศและองค์กรต่าง ๆ ใช้เซิร์ฟเวอร์ต่างกัน';
+
+  @override
+  String get signInServerCurrentBadge => 'ปัจจุบัน';
+
+  @override
+  String get signInCancelButton => 'ยกเลิก';
+
+  @override
+  String get signInConfirmServerButton => 'เปลี่ยนเซิร์ฟเวอร์';
 }
