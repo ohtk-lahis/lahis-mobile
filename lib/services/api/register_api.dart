@@ -2,6 +2,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:podd_app/models/inviation_code_result.dart';
 import 'package:podd_app/models/login_result.dart';
 import 'package:podd_app/models/register_result.dart';
+import 'package:podd_app/models/village.dart';
 import 'package:podd_app/services/api/graph_ql_base_api.dart';
 
 class RegisterApi extends GraphQlBaseApi {
@@ -18,6 +19,11 @@ class RegisterApi extends GraphQlBaseApi {
               code
               name
             }
+            villages {
+              id
+              code
+              name
+            }
           }
         }
     ''';
@@ -31,6 +37,9 @@ class RegisterApi extends GraphQlBaseApi {
             resp['authority']['name'],
             resp['generatedUsername'],
             resp['generatedEmail'],
+            (resp['villages'] as List? ?? const [])
+                .map((village) => Village.fromJson(village))
+                .toList(),
           );
         },
       );

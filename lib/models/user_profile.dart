@@ -1,3 +1,5 @@
+import 'package:podd_app/models/village.dart';
+
 class UserProfile {
   int id;
   String username;
@@ -10,6 +12,7 @@ class UserProfile {
   String? role;
   bool? consent;
   List<String> features;
+  List<Village> assignedVillages;
   String? avatarUrl;
   String? address;
 
@@ -25,6 +28,7 @@ class UserProfile {
     this.role,
     this.consent,
     this.features = const [],
+    this.assignedVillages = const [],
     this.avatarUrl,
     this.address,
   });
@@ -40,7 +44,12 @@ class UserProfile {
         telephone: json['telephone']?.toString(),
         role: json['role']?.toString(),
         consent: json['consent'] ?? false,
-        features: (json['features'] as List).cast<String>(),
+        features: (json['features'] as List? ?? const [])
+            .map((feature) => feature.toString())
+            .toList(),
+        assignedVillages: (json['assignedVillages'] as List? ?? const [])
+            .map((village) => Village.fromJson(village))
+            .toList(),
         avatarUrl: json['avatarUrl']?.toString(),
         address: json['address']?.toString(),
       );
@@ -58,6 +67,8 @@ class UserProfile {
       'role': role,
       'consent': consent,
       'features': features,
+      'assignedVillages':
+          assignedVillages.map((village) => village.toJson()).toList(),
       'avatarUrl': avatarUrl,
       'address': address,
     };
@@ -65,4 +76,12 @@ class UserProfile {
 
   bool hasFeatureEnabled(String name) =>
       features.indexWhere((feature) => feature == "features.$name") != -1;
+
+  bool get hasAssignedVillages => assignedVillages.isNotEmpty;
+
+  Village? get primaryAssignedVillage =>
+      assignedVillages.isEmpty ? null : assignedVillages.first;
+
+  String get assignedVillageNames =>
+      assignedVillages.map((village) => village.displayName).join(', ');
 }

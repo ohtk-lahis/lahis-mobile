@@ -102,6 +102,14 @@ void main() {
             'role': 'reporter',
             'consent': true,
             'features': <String>[],
+            'assignedVillages': [
+              {
+                '__typename': 'VillageType',
+                'id': 11,
+                'code': 'V001',
+                'name': 'Village One',
+              }
+            ],
             'avatarUrl': null,
           }
         }
@@ -113,6 +121,7 @@ void main() {
       expect(profile, isA<UserProfile>());
       expect(profile.username, 'alice');
       expect(profile.authorityId, 7);
+      expect(profile.assignedVillageNames, 'V001 - Village One');
     });
   });
 }

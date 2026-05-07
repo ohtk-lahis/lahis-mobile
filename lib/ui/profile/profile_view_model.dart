@@ -2,6 +2,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:podd_app/constants.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/profile_result.dart';
+import 'package:podd_app/models/village.dart';
 import 'package:podd_app/services/auth_service.dart';
 import 'package:podd_app/services/profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,9 @@ class ProfileViewModel extends BaseViewModel {
   String? email;
   String? telephone;
   String? address;
+  String? assignedVillageNames;
+  List<Village> assignedVillages = [];
+  Village? selectedVillage;
   String? avatarUrl;
 
   String language = "en";
@@ -40,11 +44,31 @@ class ProfileViewModel extends BaseViewModel {
       username = userProfile.username;
       email = userProfile.email;
       authorityName = userProfile.authorityName;
+      assignedVillages = userProfile.assignedVillages;
+      selectedVillage =
+          authService.selectedVillage ?? userProfile.primaryAssignedVillage;
+      assignedVillageNames = userProfile.hasAssignedVillages
+          ? userProfile.assignedVillageNames
+          : null;
       avatarUrl = userProfile.avatarUrl;
       address = userProfile.address;
       notifyListeners();
     }
     language = prefs.getString(languageKey) ?? "en";
+  }
+
+  bool get hasMultipleAssignedVillages => assignedVillages.length > 1;
+
+  int? get selectedVillageId => selectedVillage?.id;
+
+  Future<void> selectVillage(int? villageId) async {
+    if (villageId == null) {
+      return;
+    }
+
+    await authService.selectVillage(villageId);
+    selectedVillage = authService.selectedVillage;
+    notifyListeners();
   }
 
   void setFirstName(String value) {

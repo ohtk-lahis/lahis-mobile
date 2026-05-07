@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/login_result.dart';
 import 'package:podd_app/models/user_profile.dart';
+import 'package:podd_app/models/village.dart';
 import 'package:podd_app/services/auth_service.dart';
 import 'package:podd_app/services/config_service.dart';
 import 'package:podd_app/services/gql_service.dart';
@@ -42,6 +43,9 @@ class AuthServiceMock extends ChangeNotifier implements IAuthService {
   UserProfile? get userProfile => null;
 
   @override
+  Village? get selectedVillage => null;
+
+  @override
   Future<void> saveTokenAndFetchProfile(AuthSuccess loginSuccess) {
     throw UnimplementedError();
   }
@@ -68,6 +72,11 @@ class AuthServiceMock extends ChangeNotifier implements IAuthService {
 
   @override
   updateAvatarUrl(String avatarUrl) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> selectVillage(int villageId) {
     throw UnimplementedError();
   }
 }

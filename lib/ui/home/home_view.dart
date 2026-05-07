@@ -108,6 +108,11 @@ class HomeView extends HookWidget {
                   'Observations',
               icon: const Icon(Icons.format_list_bulleted),
             ),
+          if (viewModel.hasAnimalCensusFeature)
+            const BottomNavigationBarItem(
+              label: 'Census',
+              icon: Icon(Icons.fact_check_outlined),
+            ),
           BottomNavigationBarItem(
             label: AppLocalizations.of(context)?.profileTabTitle ?? 'Profile',
             icon: const Icon(Icons.account_circle),
@@ -152,8 +157,13 @@ class HomeView extends HookWidget {
           viewModel.hasObservationFeature) {
         return 1;
       }
-      if (location.startsWith('/profile')) {
+      if (location.startsWith('/census') && viewModel.hasAnimalCensusFeature) {
         return viewModel.hasObservationFeature ? 2 : 1;
+      }
+      if (location.startsWith('/profile')) {
+        return 1 +
+            (viewModel.hasObservationFeature ? 1 : 0) +
+            (viewModel.hasAnimalCensusFeature ? 1 : 0);
       }
     } on AssertionError catch (e) {
       debugPrint(e.toString());
@@ -162,20 +172,15 @@ class HomeView extends HookWidget {
   }
 
   void _onItemTapped(int index, BuildContext context, HomeViewModel viewModel) {
-    switch (index) {
-      case 0:
-        GoRouter.of(context).go('/reports');
-        break;
-      case 1:
-        if (viewModel.hasObservationFeature) {
-          GoRouter.of(context).go('/observations');
-        } else {
-          GoRouter.of(context).go('/profile');
-        }
-        break;
-      case 2:
-        GoRouter.of(context).go('/profile');
-        break;
+    final paths = [
+      '/reports',
+      if (viewModel.hasObservationFeature) '/observations',
+      if (viewModel.hasAnimalCensusFeature) '/census',
+      '/profile',
+    ];
+
+    if (index >= 0 && index < paths.length) {
+      GoRouter.of(context).go(paths[index]);
     }
   }
 }

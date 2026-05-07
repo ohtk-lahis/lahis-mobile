@@ -70,6 +70,10 @@ class HomeViewModel extends IndexTrackingViewModel {
   bool get hasObservationFeature =>
       userProfile?.hasFeatureEnabled("observation") ?? false;
 
+  bool get hasAnimalCensusFeature =>
+      (userProfile?.hasFeatureEnabled("animal_census_enabled") ?? false) &&
+      (userProfile?.hasAssignedVillages ?? false);
+
   setupFirebaseMessaging({
     NotificationMessageCallback? onBackgroundMessage,
     NotificationMessageCallback? onForegroundMessage,

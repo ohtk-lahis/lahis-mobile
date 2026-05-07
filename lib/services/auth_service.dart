@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
+import 'package:podd_app/constants.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/login_result.dart';
 import 'package:podd_app/models/user_profile.dart';
+import 'package:podd_app/models/village.dart';
 import 'package:podd_app/services/gql_service.dart';
 import 'package:podd_app/services/jwt.dart';
 import 'package:podd_app/services/observation_definition_service.dart';
@@ -22,6 +24,8 @@ abstract class IAuthService extends Listenable {
 
   UserProfile? get userProfile;
 
+  Village? get selectedVillage;
+
   Future<AuthResult> authenticate(String username, String password);
 
   Future<void> logout();
@@ -39,6 +43,8 @@ abstract class IAuthService extends Listenable {
   updateConfirmedConsent();
 
   updateAvatarUrl(String avatarUrl);
+
+  Future<void> selectVillage(int villageId);
 }
 
 class AuthService with ListenableServiceMixin implements IAuthService {
@@ -68,8 +74,13 @@ class AuthService with ListenableServiceMixin implements IAuthService {
   @override
   UserProfile? get userProfile => _userProfile;
 
+  final ReactiveValue<Village?> _selectedVillage =
+      ReactiveValue<Village?>(null);
+  @override
+  Village? get selectedVillage => _selectedVillage.value;
+
   AuthService() {
-    listenToReactiveValues([_isLogin]);
+    listenToReactiveValues([_isLogin, _selectedVillage]);
   }
 
   init() async {
@@ -84,6 +95,7 @@ class AuthService with ListenableServiceMixin implements IAuthService {
     if (token != null) {
       _token = token;
       _userProfile = await _secureStorageService.getUserProfile();
+      await _syncSelectedVillage();
       var isExpired = await requestAccessTokenIfExpired();
       if (isExpired) {
         _isLogin.value = false;
@@ -155,6 +167,7 @@ class AuthService with ListenableServiceMixin implements IAuthService {
   _fetchProfile() async {
     var profile = await _authApi.getUserProfile();
     _userProfile = profile;
+    await _syncSelectedVillage();
 
     await _secureStorageService.setUserProfile(profile);
     await _reportTypeService.sync();
@@ -220,5 +233,43 @@ class AuthService with ListenableServiceMixin implements IAuthService {
       _userProfile!.avatarUrl = avatarUrl;
       _secureStorageService.setUserProfile(_userProfile!);
     }
+  }
+
+  Future<void> _syncSelectedVillage() async {
+    final villages = _userProfile?.assignedVillages ?? const <Village>[];
+    if (villages.isEmpty) {
+      _selectedVillage.value = null;
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final storedVillageId = prefs.getInt(selectedVillageIdKey);
+    final selected = villages.firstWhere(
+      (village) => village.id == storedVillageId,
+      orElse: () => villages.first,
+    );
+
+    _selectedVillage.value = selected;
+    await prefs.setInt(selectedVillageIdKey, selected.id);
+  }
+
+  @override
+  Future<void> selectVillage(int villageId) async {
+    final villages = _userProfile?.assignedVillages ?? const <Village>[];
+    Village? selected;
+    for (final village in villages) {
+      if (village.id == villageId) {
+        selected = village;
+        break;
+      }
+    }
+
+    if (selected == null) {
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    _selectedVillage.value = selected;
+    await prefs.setInt(selectedVillageIdKey, selected.id);
   }
 }
