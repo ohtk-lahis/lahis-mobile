@@ -429,19 +429,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get welcomeTitle => 'Welcome';
 
   @override
-  String get welcomeSubtitle => 'Set up before signing in · ตั้งค่าก่อนเริ่ม';
+  String get welcomeSubtitle => 'Set up before signing in';
 
   @override
   String get welcomeLanguageTitle => 'Language';
 
   @override
-  String get welcomeLanguageSub => 'ภาษา';
-
-  @override
   String get welcomeServerTitle => 'Server';
-
-  @override
-  String get welcomeServerSub => 'เซิร์ฟเวอร์';
 
   @override
   String get welcomeContinueButton => 'Continue';

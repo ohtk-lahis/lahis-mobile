@@ -861,7 +861,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Set up before signing in · ตั้งค่าก่อนเริ่ม'**
+  /// **'Set up before signing in'**
   String get welcomeSubtitle;
 
   /// No description provided for @welcomeLanguageTitle.
@@ -870,23 +870,11 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get welcomeLanguageTitle;
 
-  /// No description provided for @welcomeLanguageSub.
-  ///
-  /// In en, this message translates to:
-  /// **'ภาษา'**
-  String get welcomeLanguageSub;
-
   /// No description provided for @welcomeServerTitle.
   ///
   /// In en, this message translates to:
   /// **'Server'**
   String get welcomeServerTitle;
-
-  /// No description provided for @welcomeServerSub.
-  ///
-  /// In en, this message translates to:
-  /// **'เซิร์ฟเวอร์'**
-  String get welcomeServerSub;
 
   /// No description provided for @welcomeContinueButton.
   ///

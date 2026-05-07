@@ -54,14 +54,12 @@ class WelcomeView extends StackedView<WelcomeViewModel> {
                           _Section(
                             number: '1',
                             title: l10n.welcomeLanguageTitle,
-                            sub: l10n.welcomeLanguageSub,
                             child: _LanguageGrid(viewModel: viewModel),
                           ),
                           const SizedBox(height: 18),
                           _Section(
                             number: '2',
                             title: l10n.welcomeServerTitle,
-                            sub: l10n.welcomeServerSub,
                             child:
                                 _ServerList(viewModel: viewModel, l10n: l10n),
                           ),
@@ -142,13 +140,11 @@ class _TitleBlock extends StatelessWidget {
 class _Section extends StatelessWidget {
   final String number;
   final String title;
-  final String sub;
   final Widget child;
 
   const _Section({
     required this.number,
     required this.title,
-    required this.sub,
     required this.child,
   });
 
@@ -187,15 +183,6 @@ class _Section extends StatelessWidget {
                   color: _onDark,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '· $sub',
-                style: const TextStyle(
-                  fontFamily: _fontFamily,
-                  color: _onDarkMuted,
-                  fontSize: 12,
                 ),
               ),
             ],

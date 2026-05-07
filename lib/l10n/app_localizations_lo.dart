@@ -419,19 +419,13 @@ class AppLocalizationsLo extends AppLocalizations {
   String get welcomeTitle => 'ຍິນດີຕ້ອນຮັບ';
 
   @override
-  String get welcomeSubtitle => 'Set up before signing in · ตั้งค่าก่อนเริ่ม';
+  String get welcomeSubtitle => 'ຕັ້ງຄ່າກ່ອນເຂົ້າສູ່ລະບົບ';
 
   @override
-  String get welcomeLanguageTitle => 'Language';
+  String get welcomeLanguageTitle => 'ພາສາ';
 
   @override
-  String get welcomeLanguageSub => 'ภาษา';
-
-  @override
-  String get welcomeServerTitle => 'Server';
-
-  @override
-  String get welcomeServerSub => 'เซิร์ฟเวอร์';
+  String get welcomeServerTitle => 'ເຊີບເວີ';
 
   @override
   String get welcomeContinueButton => 'ສືບຕໍ່';
