@@ -28,19 +28,45 @@ class LoginView extends StackedView<LoginViewModel> {
           width: double.infinity,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: [0.0, 0.55, 1.0],
               colors: [
-                Color(0xFF393E46),
-                Color(0xFF393E46),
-                Color(0xFF393E46),
+                Color(0xFF1F4148),
+                Color(0xFF2A2F37),
+                Color(0xFF14171C),
               ],
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: Center(
-              child: _LoginForm(),
-            ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned(
+                top: -100,
+                left: -80,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 320,
+                    height: 320,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          Color(0x4000ADB5),
+                          Color(0x0000ADB5),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                child: Center(
+                  child: _LoginForm(),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -84,6 +110,39 @@ class _LoginForm extends StackedHookView<LoginViewModel> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Sign in',
+                            style: TextStyle(
+                              fontFamily: appTheme.font,
+                              fontSize: 26.sp,
+                              fontWeight: FontWeight.w700,
+                              color: appTheme.sub1,
+                              height: 1.1,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            viewModel.subDomain.isEmpty
+                                ? 'Pick a server to continue'
+                                : 'Connected to ${_serverLabel(viewModel)}',
+                            style: TextStyle(
+                              fontFamily: appTheme.font,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w400,
+                              color: appTheme.sub2,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     SizedBox(
                       width: 150.w,
                       child: _languageDropdown(viewModel, context),
@@ -227,6 +286,14 @@ class _LoginForm extends StackedHookView<LoginViewModel> {
     }
 
     return items;
+  }
+
+  String _serverLabel(LoginViewModel viewModel) {
+    final match = viewModel.serverOptions.firstWhere(
+      (o) => o['domain'] == viewModel.subDomain,
+      orElse: () => <String, String>{'label': ''},
+    );
+    return match['label'] ?? '';
   }
 
   Widget _qrcodeLogin(
