@@ -16,7 +16,7 @@ const _muted = Color(0xFF6B7370);
 const _hair = Color(0xFFE4E2DC);
 const _placeholder = Color(0xFFA8ACA7);
 const _fontFamily = 'Inter';
-const _fontFamilyFallback = <String>['NotoSansThai'];
+const _fontFamilyFallback = <String>['NotoSansThai', 'NotoSansLao'];
 
 class LoginViewV2 extends StackedView<LoginViewModel> {
   const LoginViewV2({Key? key}) : super(key: key);

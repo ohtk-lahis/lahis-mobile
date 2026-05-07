@@ -163,6 +163,9 @@ flutter:
     - family: Inter
       fonts:
         - asset: assets/fonts/Inter-Variable.ttf
+    - family: NotoSansLao
+      fonts:
+        - asset: assets/fonts/NotoSansLao-Variable.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

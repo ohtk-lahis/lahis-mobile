@@ -16,7 +16,8 @@ const _footerBg = Color(0x26000000); // 15% black
 const _footerBorder = Color(0x1AFFFFFF); // 10% white
 const _disabledBg = Color(0x26FFFFFF); // 15% white
 const _disabledFg = Color(0x66FFFFFF); // 40% white
-const _fontFamily = 'NotoSansThai';
+const _fontFamily = 'Inter';
+const _fontFamilyFallback = <String>['NotoSansThai', 'NotoSansLao'];
 
 class WelcomeView extends StackedView<WelcomeViewModel> {
   final VoidCallback? onContinue;
@@ -112,7 +113,7 @@ class _TitleBlock extends StatelessWidget {
           Text(
             l10n.welcomeTitle,
             style: const TextStyle(
-              fontFamily: _fontFamily,
+              fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
               color: _onDark,
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -125,7 +126,7 @@ class _TitleBlock extends StatelessWidget {
             l10n.welcomeSubtitle,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontFamily: _fontFamily,
+              fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
               color: _onDarkMuted,
               fontSize: 13,
               fontWeight: FontWeight.w400,
@@ -168,7 +169,7 @@ class _Section extends StatelessWidget {
                 child: Text(
                   number,
                   style: const TextStyle(
-                    fontFamily: _fontFamily,
+                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                     color: _tealDeep,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -179,7 +180,7 @@ class _Section extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  fontFamily: _fontFamily,
+                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                   color: _onDark,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -225,7 +226,7 @@ class _LanguageGrid extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontFamily: _fontFamily,
+                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                     color: _onDark,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -272,7 +273,7 @@ class _ServerList extends StatelessWidget {
               ? l10n.welcomeCannotLoadServers
               : l10n.welcomeNoServersText,
           style: const TextStyle(
-            fontFamily: _fontFamily,
+            fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
             color: _onDarkMuted,
             fontSize: 13,
           ),
@@ -330,7 +331,7 @@ class _ServerCard extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    fontFamily: _fontFamily,
+                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                     color: _onDark,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -343,7 +344,7 @@ class _ServerCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontFamily: _fontFamily,
+                      fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                       color: _onDarkMuted,
                       fontSize: 12,
                     ),
@@ -477,7 +478,7 @@ class _ContinueFooter extends StatelessWidget {
                     ? l10n.welcomeSavingLabel
                     : l10n.welcomeContinueButton,
                 style: const TextStyle(
-                  fontFamily: _fontFamily,
+                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
