@@ -477,4 +477,80 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get signInConfirmServerButton => 'ປ່ຽນເຊີບເວີ';
+
+  @override
+  String get registerTitle => 'ລົງທະບຽນຜູ້ລາຍງານ';
+
+  @override
+  String get registerStep1Eyebrow => 'ຂັ້ນຕອນ 1 ໃນ 2';
+
+  @override
+  String get registerStep2Eyebrow => 'ຂັ້ນຕອນ 2 ໃນ 2';
+
+  @override
+  String get registerCodeTitle => 'ໃສ່ລະຫັດເຊີນ';
+
+  @override
+  String get registerCodeSubtitle =>
+      'ຜູ້ປະສານງານຝຶກອົບຮົມຈະໃຫ້ລະຫັດ 7 ຫຼັກກັບທ່ານ';
+
+  @override
+  String get registerCodeError => 'ລະຫັດບໍ່ຖືກຕ້ອງ ກະລຸນາຕິດຕໍ່ຜູ້ປະສານງານ';
+
+  @override
+  String get registerCodeChecking => 'ກຳລັງກວດສອບລະຫັດ…';
+
+  @override
+  String get registerCodeContinue => 'ຕໍ່ໄປ';
+
+  @override
+  String get registerCodeContinueChecking => 'ກຳລັງກວດສອບ…';
+
+  @override
+  String get registerCodeHelp => 'ບໍ່ມີລະຫັດບໍ?';
+
+  @override
+  String get registerCodeHelpLink => 'ຕິດຕໍ່ຜູ້ປະສານງານ';
+
+  @override
+  String get registerCodeAccepted => 'ລະຫັດຖືກຕ້ອງ';
+
+  @override
+  String get registerVillageLabel => 'ບ້ານ';
+
+  @override
+  String get registerUsernameHint =>
+      'ສ້າງໃຫ້ໂດຍອັດຕະໂນມັດ ສາມາດແກ້ໄດ້ດຽວນີ້ເທົ່ານັ້ນ';
+
+  @override
+  String get registerFirstNamePlaceholder => 'ຊື່ແທ້';
+
+  @override
+  String get registerLastNamePlaceholder => 'ນາມສະກຸນ';
+
+  @override
+  String get registerPhonePlaceholder => '08x-xxx-xxxx';
+
+  @override
+  String get registerEmailHint =>
+      'ສ້າງອີເມວໃຫ້ແລ້ວ ແຕະເພື່ອໃສ່ອີເມວຈິງຂອງທ່ານຖ້າມີ';
+
+  @override
+  String get registerAddressPlaceholder => 'ບ້ານເລກທີ່ ຖະໜົນ';
+
+  @override
+  String get registerOptional => 'ບໍ່ບັງຄັບ';
+
+  @override
+  String get registerAuto => 'ອັດຕະໂນມັດ';
+
+  @override
+  String get registerNoPasswordInfo =>
+      'ຍັງບໍ່ຕ້ອງຕັ້ງລະຫັດຜ່ານ ຕັ້ງພາຍຫຼັງໄດ້ໃນຫນ້າຕັ້ງຄ່າ';
+
+  @override
+  String get registerSubmit => 'ສ້າງບັນຊີແລະເຂົ້າລະບົບ';
+
+  @override
+  String get registerCreating => 'ກຳລັງສ້າງບັນຊີ…';
 }

@@ -977,6 +977,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch server'**
   String get signInConfirmServerButton;
+
+  /// No description provided for @registerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register reporter'**
+  String get registerTitle;
+
+  /// No description provided for @registerStep1Eyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1 of 2'**
+  String get registerStep1Eyebrow;
+
+  /// No description provided for @registerStep2Eyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2 of 2'**
+  String get registerStep2Eyebrow;
+
+  /// No description provided for @registerCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter invitation code'**
+  String get registerCodeTitle;
+
+  /// No description provided for @registerCodeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your training coordinator gave you a 7-digit code.'**
+  String get registerCodeSubtitle;
+
+  /// No description provided for @registerCodeError.
+  ///
+  /// In en, this message translates to:
+  /// **'That code wasn\'t recognized. Check with your coordinator.'**
+  String get registerCodeError;
+
+  /// No description provided for @registerCodeChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking code…'**
+  String get registerCodeChecking;
+
+  /// No description provided for @registerCodeContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get registerCodeContinue;
+
+  /// No description provided for @registerCodeContinueChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get registerCodeContinueChecking;
+
+  /// No description provided for @registerCodeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have a code?'**
+  String get registerCodeHelp;
+
+  /// No description provided for @registerCodeHelpLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to your coordinator'**
+  String get registerCodeHelpLink;
+
+  /// No description provided for @registerCodeAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Code accepted'**
+  String get registerCodeAccepted;
+
+  /// No description provided for @registerVillageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Village'**
+  String get registerVillageLabel;
+
+  /// No description provided for @registerUsernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-suggested. You can change it now — but not later.'**
+  String get registerUsernameHint;
+
+  /// No description provided for @registerFirstNamePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Your given name'**
+  String get registerFirstNamePlaceholder;
+
+  /// No description provided for @registerLastNamePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Your family name'**
+  String get registerLastNamePlaceholder;
+
+  /// No description provided for @registerPhonePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'08x-xxx-xxxx'**
+  String get registerPhonePlaceholder;
+
+  /// No description provided for @registerEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'We made one for you. Tap to enter your real email if you have one.'**
+  String get registerEmailHint;
+
+  /// No description provided for @registerAddressPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'House number, road'**
+  String get registerAddressPlaceholder;
+
+  /// No description provided for @registerOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get registerOptional;
+
+  /// No description provided for @registerAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get registerAuto;
+
+  /// No description provided for @registerNoPasswordInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'No password yet. You can set one in Settings after sign-in.'**
+  String get registerNoPasswordInfo;
+
+  /// No description provided for @registerSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account & sign in'**
+  String get registerSubmit;
+
+  /// No description provided for @registerCreating.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating account…'**
+  String get registerCreating;
 }
 
 class _AppLocalizationsDelegate

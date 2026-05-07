@@ -486,4 +486,81 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get signInConfirmServerButton => 'Switch server';
+
+  @override
+  String get registerTitle => 'Register reporter';
+
+  @override
+  String get registerStep1Eyebrow => 'Step 1 of 2';
+
+  @override
+  String get registerStep2Eyebrow => 'Step 2 of 2';
+
+  @override
+  String get registerCodeTitle => 'Enter invitation code';
+
+  @override
+  String get registerCodeSubtitle =>
+      'Your training coordinator gave you a 7-digit code.';
+
+  @override
+  String get registerCodeError =>
+      'That code wasn\'t recognized. Check with your coordinator.';
+
+  @override
+  String get registerCodeChecking => 'Checking code…';
+
+  @override
+  String get registerCodeContinue => 'Continue';
+
+  @override
+  String get registerCodeContinueChecking => 'Checking…';
+
+  @override
+  String get registerCodeHelp => 'Don\'t have a code?';
+
+  @override
+  String get registerCodeHelpLink => 'Talk to your coordinator';
+
+  @override
+  String get registerCodeAccepted => 'Code accepted';
+
+  @override
+  String get registerVillageLabel => 'Village';
+
+  @override
+  String get registerUsernameHint =>
+      'Auto-suggested. You can change it now — but not later.';
+
+  @override
+  String get registerFirstNamePlaceholder => 'Your given name';
+
+  @override
+  String get registerLastNamePlaceholder => 'Your family name';
+
+  @override
+  String get registerPhonePlaceholder => '08x-xxx-xxxx';
+
+  @override
+  String get registerEmailHint =>
+      'We made one for you. Tap to enter your real email if you have one.';
+
+  @override
+  String get registerAddressPlaceholder => 'House number, road';
+
+  @override
+  String get registerOptional => 'Optional';
+
+  @override
+  String get registerAuto => 'Auto';
+
+  @override
+  String get registerNoPasswordInfo =>
+      'No password yet. You can set one in Settings after sign-in.';
+
+  @override
+  String get registerSubmit => 'Create account & sign in';
+
+  @override
+  String get registerCreating => 'Creating account…';
 }

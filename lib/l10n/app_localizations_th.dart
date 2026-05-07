@@ -485,4 +485,79 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get signInConfirmServerButton => 'เปลี่ยนเซิร์ฟเวอร์';
+
+  @override
+  String get registerTitle => 'ลงทะเบียนผู้รายงาน';
+
+  @override
+  String get registerStep1Eyebrow => 'ขั้นตอนที่ 1 จาก 2';
+
+  @override
+  String get registerStep2Eyebrow => 'ขั้นตอนที่ 2 จาก 2';
+
+  @override
+  String get registerCodeTitle => 'กรอกรหัสเชิญ';
+
+  @override
+  String get registerCodeSubtitle => 'ผู้ประสานงานอบรมจะให้รหัส 7 หลักกับคุณ';
+
+  @override
+  String get registerCodeError => 'รหัสไม่ถูกต้อง โปรดติดต่อผู้ประสานงาน';
+
+  @override
+  String get registerCodeChecking => 'กำลังตรวจสอบรหัส…';
+
+  @override
+  String get registerCodeContinue => 'ถัดไป';
+
+  @override
+  String get registerCodeContinueChecking => 'กำลังตรวจสอบ…';
+
+  @override
+  String get registerCodeHelp => 'ยังไม่มีรหัส?';
+
+  @override
+  String get registerCodeHelpLink => 'ติดต่อผู้ประสานงาน';
+
+  @override
+  String get registerCodeAccepted => 'รหัสถูกต้อง';
+
+  @override
+  String get registerVillageLabel => 'หมู่บ้าน';
+
+  @override
+  String get registerUsernameHint =>
+      'ระบบสร้างให้แล้ว แก้ไขได้ตอนนี้เท่านั้น ภายหลังจะแก้ไม่ได้';
+
+  @override
+  String get registerFirstNamePlaceholder => 'ชื่อจริง';
+
+  @override
+  String get registerLastNamePlaceholder => 'นามสกุล';
+
+  @override
+  String get registerPhonePlaceholder => '08x-xxx-xxxx';
+
+  @override
+  String get registerEmailHint =>
+      'ระบบสร้างอีเมลให้ แตะเพื่อใส่อีเมลจริงของคุณถ้ามี';
+
+  @override
+  String get registerAddressPlaceholder => 'บ้านเลขที่ ถนน';
+
+  @override
+  String get registerOptional => 'ไม่บังคับ';
+
+  @override
+  String get registerAuto => 'อัตโนมัติ';
+
+  @override
+  String get registerNoPasswordInfo =>
+      'ยังไม่ต้องตั้งรหัสผ่าน ตั้งภายหลังได้ที่หน้าตั้งค่า';
+
+  @override
+  String get registerSubmit => 'สร้างบัญชีและเข้าระบบ';
+
+  @override
+  String get registerCreating => 'กำลังสร้างบัญชี…';
 }

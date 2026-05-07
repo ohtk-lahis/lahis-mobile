@@ -486,4 +486,81 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get signInConfirmServerButton => 'ប្ដូរម៉ាស៊ីនមេ';
+
+  @override
+  String get registerTitle => 'ចុះឈ្មោះអ្នករាយការណ៍';
+
+  @override
+  String get registerStep1Eyebrow => 'ជំហានទី 1 ក្នុងចំណោម 2';
+
+  @override
+  String get registerStep2Eyebrow => 'ជំហានទី 2 ក្នុងចំណោម 2';
+
+  @override
+  String get registerCodeTitle => 'បញ្ចូលលេខកូដការអញ្ជើញ';
+
+  @override
+  String get registerCodeSubtitle =>
+      'អ្នកសម្របសម្រួលនឹងផ្ដល់លេខកូដ 7 ខ្ទង់ឱ្យអ្នក។';
+
+  @override
+  String get registerCodeError =>
+      'លេខកូដមិនត្រឹមត្រូវ សូមទាក់ទងអ្នកសម្របសម្រួល។';
+
+  @override
+  String get registerCodeChecking => 'កំពុងពិនិត្យលេខកូដ…';
+
+  @override
+  String get registerCodeContinue => 'បន្ទាប់';
+
+  @override
+  String get registerCodeContinueChecking => 'កំពុងពិនិត្យ…';
+
+  @override
+  String get registerCodeHelp => 'មិនមានលេខកូដទេ?';
+
+  @override
+  String get registerCodeHelpLink => 'ទាក់ទងអ្នកសម្របសម្រួល';
+
+  @override
+  String get registerCodeAccepted => 'លេខកូដត្រឹមត្រូវ';
+
+  @override
+  String get registerVillageLabel => 'ភូមិ';
+
+  @override
+  String get registerUsernameHint =>
+      'បានបង្កើតដោយស្វ័យប្រវត្តិ អាចកែប្រែបានតែឥឡូវនេះប៉ុណ្ណោះ';
+
+  @override
+  String get registerFirstNamePlaceholder => 'ឈ្មោះដំបូង';
+
+  @override
+  String get registerLastNamePlaceholder => 'នាមត្រកូល';
+
+  @override
+  String get registerPhonePlaceholder => '08x-xxx-xxxx';
+
+  @override
+  String get registerEmailHint =>
+      'យើងបង្កើតអ៊ីមែលឱ្យអ្នកហើយ ចុចដើម្បីបញ្ចូលអ៊ីមែលពិតរបស់អ្នកប្រសិនបើមាន';
+
+  @override
+  String get registerAddressPlaceholder => 'លេខផ្ទះ ផ្លូវ';
+
+  @override
+  String get registerOptional => 'ស្រេចចិត្ត';
+
+  @override
+  String get registerAuto => 'ស្វ័យប្រវត្តិ';
+
+  @override
+  String get registerNoPasswordInfo =>
+      'មិនទាន់មានពាក្យសម្ងាត់ទេ អាចកំណត់នៅក្នុងការកំណត់ក្រោយចូលប្រើ';
+
+  @override
+  String get registerSubmit => 'បង្កើតគណនី និងចូល';
+
+  @override
+  String get registerCreating => 'កំពុងបង្កើតគណនី…';
 }
