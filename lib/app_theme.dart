@@ -100,11 +100,11 @@ class AppTheme {
             borderRadius: BorderRadius.circular(borderRadius),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: primary),
+            borderSide: BorderSide(color: sub3),
             borderRadius: BorderRadius.circular(borderRadius),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: primary),
+            borderSide: BorderSide(color: primary, width: 1.6),
             borderRadius: BorderRadius.circular(borderRadius),
           ),
           errorBorder: OutlineInputBorder(

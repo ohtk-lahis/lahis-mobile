@@ -359,12 +359,17 @@ class _LoginForm extends StackedHookView<LoginViewModel> {
       );
     }
 
+    final AppTheme appTheme = locator<AppTheme>();
     return DropdownButtonFormField<String>(
       isExpanded: true,
       decoration: InputDecoration(
         border: InputBorder.none,
         enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+          borderSide: BorderSide(color: appTheme.sub3),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: appTheme.primary, width: 1.6),
+        ),
         labelText: AppLocalizations.of(context)!.serverLabel,
       ),
       hint: const Text("Server"),
