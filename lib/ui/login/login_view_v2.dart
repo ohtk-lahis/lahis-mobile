@@ -171,7 +171,7 @@ class _LanguagePill extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: _fontFamily,
                   color: Colors.white,
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -211,12 +211,12 @@ class _RegisterCta extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: _fontFamily,
                   color: _tealDeep,
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(width: 10),
-              const Icon(Icons.arrow_forward, color: _tealDeep, size: 18),
+              const Icon(Icons.arrow_forward, color: _tealDeep, size: 20),
             ],
           ),
         ),
@@ -236,7 +236,6 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
       width: double.infinity,
       decoration: const BoxDecoration(
         color: _sand,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
             color: Color(0x0F000000), // ~6% black
@@ -266,7 +265,7 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
             style: const TextStyle(
               fontFamily: _fontFamily,
               color: _muted,
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.5,
             ),
@@ -314,7 +313,7 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
               style: const TextStyle(
                 fontFamily: _fontFamily,
                 color: Colors.red,
-                fontSize: 12,
+                fontSize: 13,
               ),
             ),
           ],
@@ -384,10 +383,11 @@ class _TextFieldShell extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: _fontFamily,
                     color: _ink,
-                    fontSize: 14,
+                    fontSize: 16,
                   ),
                   decoration: InputDecoration(
                     isCollapsed: true,
+                    filled: false,
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -396,7 +396,7 @@ class _TextFieldShell extends StatelessWidget {
                     hintStyle: const TextStyle(
                       fontFamily: _fontFamily,
                       color: _placeholder,
-                      fontSize: 14,
+                      fontSize: 16,
                     ),
                   ),
                 ),
@@ -414,7 +414,7 @@ class _TextFieldShell extends StatelessWidget {
               style: const TextStyle(
                 fontFamily: _fontFamily,
                 color: Colors.red,
-                fontSize: 11,
+                fontSize: 12,
               ),
             ),
           ),
@@ -464,7 +464,7 @@ class _SignInButton extends StatelessWidget {
                 l10n.signInButton,
                 style: const TextStyle(
                   fontFamily: _fontFamily,
-                  fontSize: 15,
+                  fontSize: 17,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -521,7 +521,7 @@ class _QrSignInButton extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: _fontFamily,
                     color: _ink,
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -564,7 +564,7 @@ class _ServerFooter extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: _fontFamily,
                   color: _muted,
-                  fontSize: 11,
+                  fontSize: 13,
                 ),
                 children: [
                   TextSpan(text: '${l10n.signInServerLabel}: '),
@@ -595,7 +595,7 @@ class _ServerFooter extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: _fontFamily,
                     color: _tealHero,
-                    fontSize: 11,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
