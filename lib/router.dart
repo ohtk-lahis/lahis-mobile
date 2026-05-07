@@ -5,6 +5,7 @@ import 'package:podd_app/ui/census/census_view.dart';
 import 'package:podd_app/ui/home/home_view.dart';
 import 'package:podd_app/ui/home/observation/observation_home_view.dart';
 import 'package:podd_app/ui/home/report_home_view.dart';
+import 'package:podd_app/components/restart_widget.dart';
 import 'package:podd_app/ui/login/login_view.dart';
 import 'package:podd_app/ui/welcome/welcome_view.dart';
 import 'package:podd_app/ui/observation/form/monitoring_record_form_view.dart';
@@ -85,7 +86,7 @@ class OhtkRouter {
           path: '/welcome',
           builder: (BuildContext context, GoRouterState state) => WelcomeView(
             onContinue: () {
-              if (context.mounted) context.go('/login');
+              if (context.mounted) RestartWidget.restartApp(context);
             },
           ),
         ),
