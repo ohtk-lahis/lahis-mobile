@@ -1,0 +1,75 @@
+import 'package:dio/dio.dart';
+import 'package:podd_app/constants.dart';
+import 'package:podd_app/locator.dart';
+import 'package:podd_app/services/config_service.dart';
+import 'package:podd_app/services/gql_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stacked/stacked.dart';
+
+class WelcomeViewModel extends BaseViewModel {
+  ConfigService configService = locator<ConfigService>();
+  GqlService gqlService = locator<GqlService>();
+
+  final _dio = Dio();
+
+  List<Map<String, String>> servers = [];
+
+  String? selectedLanguage;
+  String? selectedServerId;
+
+  bool get continueEnabled =>
+      selectedLanguage != null &&
+      selectedLanguage!.isNotEmpty &&
+      selectedServerId != null &&
+      selectedServerId!.isNotEmpty;
+
+  WelcomeViewModel() {
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    setBusyForObject('tenants', true);
+
+    final prefs = await SharedPreferences.getInstance();
+    selectedLanguage = prefs.getString(languageKey);
+    final storedServer = prefs.getString(gqlService.backendUrlKey);
+
+    try {
+      final resp = await _dio.get(configService.tenantApiEndpoint);
+      final tenants = (resp.data['tenants'] as List)
+          .map<Map<String, String>>((it) =>
+              {'label': it['label'], 'domain': it['domain']})
+          .toList();
+      servers = tenants;
+
+      if (storedServer != null &&
+          tenants.any((t) => t['domain'] == storedServer)) {
+        selectedServerId = storedServer;
+      }
+      notifyListeners();
+    } catch (e) {
+      setErrorForObject('tenants', 'Cannot load servers');
+    } finally {
+      setBusyForObject('tenants', false);
+    }
+  }
+
+  void selectLanguage(String code) {
+    selectedLanguage = code;
+    notifyListeners();
+  }
+
+  void selectServer(String domain) {
+    selectedServerId = domain;
+    notifyListeners();
+  }
+
+  Future<void> submit() async {
+    if (!continueEnabled) return;
+    setBusy(true);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(languageKey, selectedLanguage!);
+    await gqlService.setBackendSubDomain(selectedServerId!);
+    setBusy(false);
+  }
+}

@@ -6,6 +6,7 @@ import 'package:podd_app/ui/home/home_view.dart';
 import 'package:podd_app/ui/home/observation/observation_home_view.dart';
 import 'package:podd_app/ui/home/report_home_view.dart';
 import 'package:podd_app/ui/login/login_view.dart';
+import 'package:podd_app/ui/welcome/welcome_view.dart';
 import 'package:podd_app/ui/observation/form/monitoring_record_form_view.dart';
 import 'package:podd_app/ui/observation/form/subject_form_view.dart';
 import 'package:podd_app/ui/observation/monitoring/observation_monitoring_view.dart';
@@ -60,7 +61,8 @@ class OhtkRouter {
         // if the user is not logged in, they need to login
         final bool loggedIn = authService.isLogin ?? false;
         final bool loggingIn = state.matchedLocation == '/login';
-        if (!loggedIn) {
+        final bool onWelcome = state.matchedLocation == '/welcome';
+        if (!loggedIn && !onWelcome) {
           return '/login';
         }
 
@@ -78,6 +80,14 @@ class OhtkRouter {
           path: '/login',
           builder: (BuildContext context, GoRouterState state) =>
               const LoginView(),
+        ),
+        GoRoute(
+          path: '/welcome',
+          builder: (BuildContext context, GoRouterState state) => WelcomeView(
+            onContinue: () {
+              if (context.mounted) context.go('/login');
+            },
+          ),
         ),
 
         /// Application shell
