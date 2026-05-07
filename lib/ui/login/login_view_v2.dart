@@ -15,7 +15,8 @@ const _ink = Color(0xFF1A1F1D);
 const _muted = Color(0xFF6B7370);
 const _hair = Color(0xFFE4E2DC);
 const _placeholder = Color(0xFFA8ACA7);
-const _fontFamily = 'NotoSansThai';
+const _fontFamily = 'Inter';
+const _fontFamilyFallback = <String>['NotoSansThai'];
 
 class LoginViewV2 extends StackedView<LoginViewModel> {
   const LoginViewV2({Key? key}) : super(key: key);
@@ -39,7 +40,7 @@ class LoginViewV2 extends StackedView<LoginViewModel> {
                 clipBehavior: Clip.none,
                 children: [
                   Positioned(
-                    top: -16,
+                    top: 0,
                     left: 0,
                     right: 0,
                     bottom: 0,
@@ -169,9 +170,9 @@ class _LanguagePill extends StatelessWidget {
               Text(
                 _languageLabel(viewModel.language),
                 style: const TextStyle(
-                  fontFamily: _fontFamily,
+                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                   color: Colors.white,
-                  fontSize: 15,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -209,14 +210,14 @@ class _RegisterCta extends StatelessWidget {
               Text(
                 l10n.signInRegisterCta,
                 style: const TextStyle(
-                  fontFamily: _fontFamily,
+                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                   color: _tealDeep,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(width: 10),
-              const Icon(Icons.arrow_forward, color: _tealDeep, size: 20),
+              const Icon(Icons.arrow_forward, color: _tealDeep, size: 18),
             ],
           ),
         ),
@@ -247,83 +248,83 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: _hair,
-                borderRadius: BorderRadius.circular(2),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: _hair,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            l10n.signInReturningEyebrow.toUpperCase(),
-            style: const TextStyle(
-              fontFamily: _fontFamily,
-              color: _muted,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.5,
-            ),
-          ),
-          const SizedBox(height: 14),
-          _TextFieldShell(
-            icon: Icons.person_outline,
-            controller: username,
-            hint: l10n.usernameLabel,
-            errorText: viewModel.error('username'),
-            obscure: false,
-            onChanged: viewModel.setUsername,
-            textInputAction: TextInputAction.next,
-          ),
-          const SizedBox(height: 10),
-          _TextFieldShell(
-            icon: Icons.lock_outline,
-            controller: password,
-            hint: l10n.passwordLabel,
-            errorText: viewModel.error('password'),
-            obscure: viewModel.obscureText,
-            onChanged: viewModel.setPassword,
-            onSubmitted: (value) {
-              viewModel.setPassword(value);
-              viewModel.authenticate();
-            },
-            textInputAction: TextInputAction.done,
-            trailing: IconButton(
-              tooltip: 'Toggle password visibility',
-              icon: Icon(
-                viewModel.obscureText
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: _muted,
-                size: 20,
-              ),
-              onPressed: () =>
-                  viewModel.setObscureText(!viewModel.obscureText),
-            ),
-          ),
-          if (viewModel.hasErrorForKey('general')) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
-              viewModel.error('general'),
+              l10n.signInReturningEyebrow.toUpperCase(),
               style: const TextStyle(
-                fontFamily: _fontFamily,
-                color: Colors.red,
-                fontSize: 13,
+                fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                color: _muted,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
               ),
             ),
+            const SizedBox(height: 14),
+            _TextFieldShell(
+              icon: Icons.person_outline,
+              controller: username,
+              hint: l10n.usernameLabel,
+              errorText: viewModel.error('username'),
+              obscure: false,
+              onChanged: viewModel.setUsername,
+              textInputAction: TextInputAction.next,
+            ),
+            const SizedBox(height: 10),
+            _TextFieldShell(
+              icon: Icons.lock_outline,
+              controller: password,
+              hint: l10n.passwordLabel,
+              errorText: viewModel.error('password'),
+              obscure: viewModel.obscureText,
+              onChanged: viewModel.setPassword,
+              onSubmitted: (value) {
+                viewModel.setPassword(value);
+                viewModel.authenticate();
+              },
+              textInputAction: TextInputAction.done,
+              trailing: IconButton(
+                tooltip: 'Toggle password visibility',
+                icon: Icon(
+                  viewModel.obscureText
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: _muted,
+                  size: 20,
+                ),
+                onPressed: () =>
+                    viewModel.setObscureText(!viewModel.obscureText),
+              ),
+            ),
+            if (viewModel.hasErrorForKey('general')) ...[
+              const SizedBox(height: 8),
+              Text(
+                viewModel.error('general'),
+                style: const TextStyle(
+                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                  color: Colors.red,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+            const SizedBox(height: 14),
+            _SignInButton(viewModel: viewModel, l10n: l10n),
+            const SizedBox(height: 10),
+            _QrSignInButton(),
+            const SizedBox(height: 16),
+            _ServerFooter(viewModel: viewModel),
           ],
-          const SizedBox(height: 14),
-          _SignInButton(viewModel: viewModel, l10n: l10n),
-          const SizedBox(height: 10),
-          _QrSignInButton(),
-          const SizedBox(height: 16),
-          _ServerFooter(viewModel: viewModel),
-        ],
         ),
       ),
     );
@@ -381,9 +382,9 @@ class _TextFieldShell extends StatelessWidget {
                   onChanged: onChanged,
                   onSubmitted: onSubmitted,
                   style: const TextStyle(
-                    fontFamily: _fontFamily,
+                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                     color: _ink,
-                    fontSize: 16,
+                    fontSize: 14,
                   ),
                   decoration: InputDecoration(
                     isCollapsed: true,
@@ -394,9 +395,9 @@ class _TextFieldShell extends StatelessWidget {
                     contentPadding: const EdgeInsets.symmetric(vertical: 14),
                     hintText: hint,
                     hintStyle: const TextStyle(
-                      fontFamily: _fontFamily,
+                      fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                       color: _placeholder,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -412,9 +413,9 @@ class _TextFieldShell extends StatelessWidget {
             child: Text(
               errorText!,
               style: const TextStyle(
-                fontFamily: _fontFamily,
+                fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                 color: Colors.red,
-                fontSize: 12,
+                fontSize: 11,
               ),
             ),
           ),
@@ -463,8 +464,8 @@ class _SignInButton extends StatelessWidget {
             : Text(
                 l10n.signInButton,
                 style: const TextStyle(
-                  fontFamily: _fontFamily,
-                  fontSize: 17,
+                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -519,9 +520,9 @@ class _QrSignInButton extends StatelessWidget {
                 Text(
                   l10n.signInQrCodeButton,
                   style: const TextStyle(
-                    fontFamily: _fontFamily,
+                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                     color: _ink,
-                    fontSize: 15,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -562,16 +563,16 @@ class _ServerFooter extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
                 style: const TextStyle(
-                  fontFamily: _fontFamily,
+                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                   color: _muted,
-                  fontSize: 13,
+                  fontSize: 11,
                 ),
                 children: [
                   TextSpan(text: '${l10n.signInServerLabel}: '),
                   TextSpan(
                     text: _serverLabel(),
                     style: const TextStyle(
-                      fontFamily: _fontFamily,
+                      fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                       color: _ink,
                       fontWeight: FontWeight.w600,
                     ),
@@ -593,9 +594,9 @@ class _ServerFooter extends StatelessWidget {
                 child: Text(
                   '${l10n.signInChangeServerButton} ›',
                   style: const TextStyle(
-                    fontFamily: _fontFamily,
+                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
                     color: _tealHero,
-                    fontSize: 13,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

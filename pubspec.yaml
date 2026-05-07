@@ -160,6 +160,9 @@ flutter:
         - asset: assets/fonts/NotoSansThai-Regular.ttf
         - asset: assets/fonts/NotoSansThai-Bold.ttf
           weight: 700
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Variable.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
