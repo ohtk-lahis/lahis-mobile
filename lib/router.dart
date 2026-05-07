@@ -7,7 +7,6 @@ import 'package:podd_app/ui/home/observation/observation_home_view.dart';
 import 'package:podd_app/ui/home/report_home_view.dart';
 import 'package:podd_app/components/restart_widget.dart';
 import 'package:podd_app/ui/login/login_view.dart';
-import 'package:podd_app/ui/login/login_view_v2.dart';
 import 'package:podd_app/ui/welcome/welcome_view.dart';
 import 'package:podd_app/ui/observation/form/monitoring_record_form_view.dart';
 import 'package:podd_app/ui/observation/form/subject_form_view.dart';
@@ -62,8 +61,7 @@ class OhtkRouter {
       // user) until both setup and authentication are complete
       redirect: (BuildContext context, GoRouterState state) {
         final bool loggedIn = authService.isLogin ?? false;
-        final bool loggingIn = state.matchedLocation == '/login' ||
-            state.matchedLocation == '/login-v2';
+        final bool loggingIn = state.matchedLocation == '/login';
         final bool onWelcome = state.matchedLocation == '/welcome';
 
         // First-launch gate: no language or no server picked yet
@@ -89,11 +87,6 @@ class OhtkRouter {
           path: '/login',
           builder: (BuildContext context, GoRouterState state) =>
               const LoginView(),
-        ),
-        GoRoute(
-          path: '/login-v2',
-          builder: (BuildContext context, GoRouterState state) =>
-              const LoginViewV2(),
         ),
         GoRoute(
           path: '/welcome',
