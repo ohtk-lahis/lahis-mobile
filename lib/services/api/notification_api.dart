@@ -82,6 +82,12 @@ class NotificationApi extends GraphQlBaseApi {
             body
             image
           }
+          user {
+            id
+            username
+            firstName
+            lastName
+          }
           isSeen
           createdAt
         }                

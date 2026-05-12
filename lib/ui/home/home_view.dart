@@ -39,7 +39,15 @@ class HomeView extends HookWidget {
           _viewUserMessage(context, userMessageId);
         }, onForegroundMessage: (userMessageId) {
           showSimpleNotification(
-            const Text("You've got a new message"),
+            const Text(
+              'You have a new message',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             trailing: Builder(builder: (context) {
               return TextButton(
                 onPressed: () {
@@ -47,14 +55,20 @@ class HomeView extends HookWidget {
                   _viewUserMessage(context, userMessageId);
                 },
                 child: const Text(
-                  'View message',
-                  style: TextStyle(color: Colors.amber),
+                  'VIEW',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                  ),
                 ),
               );
             }),
-            background: Colors.blueAccent.shade700,
+            background: incidentsTealDeep,
             slideDismissDirection: DismissDirection.horizontal,
-            duration: const Duration(seconds: 3),
+            duration: const Duration(seconds: 4),
           );
         });
 

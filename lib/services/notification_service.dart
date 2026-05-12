@@ -30,11 +30,13 @@ abstract class INotificationService with ListenableServiceMixin {
     NotificationMessageCallback? onForegroundMessage,
   });
 
-  fetchMyMessages(bool resetFlag);
+  Future<bool> fetchMyMessages(bool resetFlag);
 
   Future<UserMessage> getMyMessage(String id);
 
   bool get hasUnseenMessages;
+
+  void markMessageSeenLocally(String id);
 }
 
 class NotificationService extends INotificationService {
@@ -165,7 +167,7 @@ class NotificationService extends INotificationService {
   }
 
   @override
-  fetchMyMessages(bool resetFlag) async {
+  Future<bool> fetchMyMessages(bool resetFlag) async {
     if (resetFlag) {
       currentUserMessageNextOffset = 0;
       _userMessages.clear();
@@ -180,17 +182,28 @@ class NotificationService extends INotificationService {
       hasMoreUserMessages = result.hasNextPage;
       currentUserMessageNextOffset =
           currentUserMessageNextOffset + userMessageLimit;
+      return true;
     } catch (e) {
-      // do nothing
+      _logger.e(e);
+      return false;
     }
   }
 
   @override
   Future<UserMessage> getMyMessage(String id) async {
     final result = await _notificationApi.getMyMessage(id);
-    // imply than this message should be seen
-    _userMessages.firstWhere((message) => message.id == id).isSeen = true;
-    _updateHasMoreUnseenMessages();
+    markMessageSeenLocally(id);
     return result.data;
+  }
+
+  @override
+  void markMessageSeenLocally(String id) {
+    final index = _userMessages.indexWhere((message) => message.id == id);
+    if (index == -1 || _userMessages[index].isSeen) {
+      return;
+    }
+
+    _userMessages[index].isSeen = true;
+    _updateHasMoreUnseenMessages();
   }
 }
