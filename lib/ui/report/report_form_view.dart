@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart' hide Form;
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:podd_app/app_theme.dart';
-import 'package:podd_app/components/back_appbar_action.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:podd_app/components/confirm.dart';
+import 'package:podd_app/components/form_chrome.dart';
 import 'package:podd_app/components/form_confirm.dart';
 import 'package:podd_app/components/form_input.dart';
-import 'package:podd_app/components/form_stepper.dart';
-import 'package:podd_app/components/form_test_banner.dart';
-import 'package:podd_app/locator.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/report_submit_result.dart';
-import 'package:podd_app/opsv_form/widgets/widgets.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/report/form_base_view_model.dart';
 import 'package:podd_app/ui/report/report_form_view_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
-import 'package:podd_app/l10n/app_localizations.dart';
 
 class ReportFormView extends StatelessWidget {
-  final AppTheme apptheme = locator<AppTheme>();
   final String reportTypeId;
   final bool testFlag;
-  ReportFormView(this.testFlag, this.reportTypeId, {Key? key})
+
+  const ReportFormView(this.testFlag, this.reportTypeId, {Key? key})
       : super(key: key);
 
   @override
@@ -29,36 +25,54 @@ class ReportFormView extends StatelessWidget {
       viewModelBuilder: () => ReportFormViewModel(testFlag, reportTypeId),
       builder: (context, viewModel, child) {
         if (!viewModel.isReady) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+            backgroundColor: incidentsSand,
+            body: Center(
+              child: CircularProgressIndicator(color: incidentsTeal),
+            ),
+          );
         }
+        final localize = AppLocalizations.of(context)!;
+        final reportName = viewModel.reportType?.name ?? '';
+        final title = reportName.isEmpty
+            ? localize.reportTitle
+            : '${localize.reportTitle} $reportName';
         return ConfirmPopScope(
           onWillPop: () => _onWillpPop(context, viewModel),
           child: GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Scaffold(
-              resizeToAvoidBottomInset: false,
-              appBar: AppBar(
-                leading: const BackAppBarAction(),
-                title: Text(
-                    "${AppLocalizations.of(context)!.reportTitle} ${viewModel.reportType?.name}"),
-                backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-                foregroundColor: testFlag
-                    ? Colors.black87
-                    : Theme.of(context).appBarTheme.foregroundColor,
+              resizeToAvoidBottomInset: true,
+              backgroundColor: incidentsSand,
+              appBar: FormChromeAppBar(
+                title: title,
+                onBack: () async {
+                  if (await _onWillpPop(context, viewModel) &&
+                      context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                onSaveDraft: viewModel.state == ReportFormState.formInput
+                    ? () => _saveDraft(context)
+                    : null,
               ),
               body: SafeArea(
+                top: false,
                 child: Column(
                   children: [
-                    FormTestBanner(testFlag: testFlag),
+                    FormChromeTestBanner(testFlag: testFlag),
                     if (viewModel.state == ReportFormState.formInput)
-                      FormStepper(form: viewModel.formStore),
+                      FormChromeProgressStrip(form: viewModel.formStore),
                     if (viewModel.state == ReportFormState.confirmation)
                       Expanded(
                         flex: 1,
                         child: FormConfirmSubmit(
                           busy: viewModel.isBusy,
+                          showDataSummary: true,
+                          dataSummary: viewModel.dataSummary,
+                          authority: const _AuthorityRadios(),
                           onSubmit: () async {
-                            var result = await viewModel.submit();
+                            final result = await viewModel.submit();
                             if (result is ReportSubmitSuccess ||
                                 result is ReportSubmitPending) {
                               if (context.mounted) {
@@ -69,9 +83,6 @@ class ReportFormView extends StatelessWidget {
                           onBack: () {
                             viewModel.back();
                           },
-                          showDataSummary: true,
-                          dataSummary: viewModel.dataSummary,
-                          child: _ConfirmIncidentArea(),
                         ),
                       ),
                     if (viewModel.state == ReportFormState.formInput)
@@ -96,98 +107,130 @@ class ReportFormView extends StatelessWidget {
 
   Future<bool> _onWillpPop(
       BuildContext context, ReportFormViewModel viewModel) async {
-    var result = await confirm(context);
-    if (result) {
-      // clear pending images, files for this report
+    if (viewModel.state == ReportFormState.confirmation) {
+      viewModel.back();
+      return false;
+    }
+    final discard = await showExitConfirmDialog(context);
+    if (discard) {
       await viewModel.clearPendingFilesAndImages();
     }
-    return result;
+    return discard;
+  }
+
+  // TODO: full draft persistence (form values → DB, resume UI in MyReports).
+  // For now, "Save as draft" pops without deleting pending images/files so
+  // attachments survive on-device. Form answers themselves are not persisted yet.
+  Future<void> _saveDraft(BuildContext context) async {
+    final localize = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(localize.formDraftSavedMessage),
+        backgroundColor: incidentsTeal,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    Navigator.of(context).pop();
   }
 }
 
-class _ConfirmIncidentArea extends StackedHookView<ReportFormViewModel> {
-  final AppTheme apptheme = locator<AppTheme>();
+class _AuthorityRadios extends StackedHookView<ReportFormViewModel> {
+  const _AuthorityRadios();
+
   @override
   Widget builder(BuildContext context, ReportFormViewModel viewModel) {
-    return Column(
-      children: [
-        Center(
-          child: Text(
-            AppLocalizations.of(context)!.incidentInAuthority,
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  fontSize: 13.sp,
-                ),
+    return Observer(builder: (_) {
+      final localize = AppLocalizations.of(context)!;
+      final selected = viewModel.incidentInAuthority;
+      return Column(
+        children: [
+          _AuthorityRadioRow(
+            label: localize.yesAsAccept,
+            selected: selected == true,
+            onTap: () => viewModel.incidentInAuthority = true,
           ),
-        ),
-        const SizedBox(
-          height: 6,
-        ),
-        Column(
+          const SizedBox(height: 4),
+          _AuthorityRadioRow(
+            label: localize.noAsReject,
+            selected: selected == false,
+            onTap: () => viewModel.incidentInAuthority = false,
+          ),
+        ],
+      );
+    });
+  }
+}
+
+class _AuthorityRadioRow extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _AuthorityRadioRow({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
           children: [
-            _RadioOption(
-              title: AppLocalizations.of(context)!.yesAsAccept,
-              value: true,
-              groupValue: viewModel.incidentInAuthority,
-              onChanged: (bool? value) {
-                viewModel.incidentInAuthority = value;
-              },
-            ),
-            _RadioOption(
-              title: AppLocalizations.of(context)!.noAsReject,
-              value: false,
-              groupValue: viewModel.incidentInAuthority,
-              onChanged: (bool? value) {
-                viewModel.incidentInAuthority = value;
-              },
+            _RadioRing(selected: selected),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: incidentsInk,
+                ),
+              ),
             ),
           ],
-        )
-      ],
+        ),
+      ),
     );
   }
 }
 
-class _RadioOption extends StatelessWidget {
-  final AppTheme apptheme = locator<AppTheme>();
-  final String title;
-  final bool? value;
-  final bool? groupValue;
-  final ValueChanged<bool?> onChanged;
-  final AppTheme appTheme = locator<AppTheme>();
-
-  _RadioOption({
-    Key? key,
-    required this.title,
-    required this.value,
-    required this.groupValue,
-    required this.onChanged,
-  }) : super(key: key);
+class _RadioRing extends StatelessWidget {
+  final bool selected;
+  const _RadioRing({required this.selected});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        RadioGroup<bool?>(
-          groupValue: groupValue,
-          onChanged: onChanged,
-          child: RadioListTile<bool?>(
-            title: Text(
-              title,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            contentPadding: const EdgeInsets.all(0),
-            activeColor: apptheme.primary,
-            value: value,
-            visualDensity: VisualDensity.standard,
-          ),
+    return Container(
+      width: 20,
+      height: 20,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: selected ? incidentsTeal : incidentsHair,
+          width: 2,
         ),
-        CustomPaint(
-          painter: DashedLinePainter(backgroundColor: apptheme.primary),
-          child: Container(
-            height: 1,
-          ),
-        ),
-      ],
+      ),
+      child: selected
+          ? Center(
+              child: Container(
+                width: 10,
+                height: 10,
+                decoration: const BoxDecoration(
+                  color: incidentsTeal,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            )
+          : null,
     );
   }
 }

@@ -200,6 +200,203 @@ class AppLocalizationsTh extends AppLocalizations {
   String get zeroReportLabel => 'รายงานไม่พบเหตุผิดปกติ';
 
   @override
+  String get zeroReportPillLabel => 'Zero report';
+
+  @override
+  String get nothingToReportTitle => 'สัปดาห์นี้ไม่มีอะไรต้องรายงาน';
+
+  @override
+  String lastZeroReportLabel(String datetime) {
+    return 'Zero report ล่าสุด $datetime';
+  }
+
+  @override
+  String get testModeLabel => 'โหมดทดสอบ';
+
+  @override
+  String get testModeBannerMessage =>
+      'โหมดทดสอบเปิดอยู่ — ข้อมูลที่ส่งจะไปที่กระบะทดสอบเท่านั้น';
+
+  @override
+  String offlineCachedListMessage(String date) {
+    return 'ออฟไลน์ · แสดงรายการที่บันทึกไว้จาก $date';
+  }
+
+  @override
+  String get noReportTypesTitle => 'ไม่มีประเภทรายงาน';
+
+  @override
+  String get noReportTypesHelper =>
+      'ผู้ประสานงานยังไม่ได้เผยแพร่รายการ หรือการซิงค์ยังไม่เสร็จ ดึงเพื่อรีเฟรช หรือสอบถามผู้นำหมู่บ้าน';
+
+  @override
+  String get tryAgainButton => 'ลองอีกครั้ง';
+
+  @override
+  String get adminToolsSectionLabel => 'เครื่องมือผู้ดูแล';
+
+  @override
+  String get testDraftFormLabel => 'ทดสอบฟอร์มร่าง';
+
+  @override
+  String get testDraftFormHelper =>
+      'สแกน QR จากแดชบอร์ดเว็บเพื่อดูตัวอย่างประเภทรายงานที่ยังไม่ได้เผยแพร่';
+
+  @override
+  String get formChromeBackLabel => 'ย้อนกลับ';
+
+  @override
+  String get formChromeNextLabel => 'ถัดไป';
+
+  @override
+  String get formChromeReviewLabel => 'ตรวจสอบ';
+
+  @override
+  String get formChromeSubmitReportLabel => 'ส่งรายงาน';
+
+  @override
+  String get formChromeSubmitFollowupLabel => 'ส่งการติดตาม';
+
+  @override
+  String formStepLabel(int current, int total) {
+    return 'ขั้นตอนที่ $current จาก $total';
+  }
+
+  @override
+  String get formSaveDraftAction => 'บันทึกเป็นแบบร่าง';
+
+  @override
+  String get formDraftSavedMessage =>
+      'บันทึกแบบร่างแล้ว — ภาพและไฟล์ถูกเก็บไว้ในเครื่อง';
+
+  @override
+  String get exitDialogTitle => 'ออกโดยไม่ส่งใช่ไหม';
+
+  @override
+  String get exitDialogBody =>
+      'คำตอบและภาพที่แนบไว้จะถูกลบ คุณสามารถบันทึกเป็นแบบร่างจากเมนูเพื่อเก็บไว้';
+
+  @override
+  String get exitDialogDiscardButton => 'ลบและออก';
+
+  @override
+  String get exitDialogKeepButton => 'ทำต่อ';
+
+  @override
+  String get choiceOtherPlaceholder => 'โปรดระบุ';
+
+  @override
+  String get attachFileButton => 'แนบไฟล์';
+
+  @override
+  String get addAnotherSubformButton => 'เพิ่มอีก';
+
+  @override
+  String get subformDeleteConfirmTitle => 'ลบรายการนี้?';
+
+  @override
+  String get subformDeleteConfirmBody => 'รายการนี้จะถูกลบออกจากแบบฟอร์ม';
+
+  @override
+  String get subformDeleteConfirmAction => 'ลบ';
+
+  @override
+  String get reviewHeaderEyebrow => 'ทบทวนและส่ง';
+
+  @override
+  String get reviewHeaderTitle => 'ตรวจสอบรายงานก่อนส่ง';
+
+  @override
+  String get authorityEyebrow => 'อีกหนึ่งข้อ';
+
+  @override
+  String get authorityHelper => 'ใช้สำหรับส่งรายงานไปยังทีมที่รับผิดชอบ';
+
+  @override
+  String get reviewEditButton => 'แก้ไข';
+
+  @override
+  String get reviewReminderBody =>
+      'หลังส่งรายงานแล้วจะไม่สามารถแก้ไขได้ กรุณาตรวจสอบสรุปด้านบนให้เรียบร้อยก่อนส่ง';
+
+  @override
+  String get reviewBackToFormButton => 'กลับไปแก้แบบฟอร์ม';
+
+  @override
+  String get recentSectionLabel => 'ล่าสุด';
+
+  @override
+  String get earlierSectionLabel => 'ก่อนหน้านี้';
+
+  @override
+  String get noReportsTitle => 'ยังไม่มีรายงาน';
+
+  @override
+  String get noReportsHelper =>
+      'กดปุ่ม + สีเขียวด้านล่างเพื่อสร้างรายงานฉบับแรก หรือส่งรายงานปกติหากไม่มีเหตุการณ์ในสัปดาห์นี้';
+
+  @override
+  String get descriptionSectionLabel => 'รายละเอียด';
+
+  @override
+  String get noDescriptionProvided => 'ไม่มีรายละเอียด';
+
+  @override
+  String get photosSectionLabel => 'ภาพถ่าย';
+
+  @override
+  String get attachmentsSectionLabel => 'เอกสารแนบ';
+
+  @override
+  String get locationSectionLabel => 'ตำแหน่ง';
+
+  @override
+  String get followUpFabLabel => 'ติดตามผล';
+
+  @override
+  String get commentPlaceholder => 'เขียนความคิดเห็น…';
+
+  @override
+  String get noCommentsTitle => 'ยังไม่มีความคิดเห็น';
+
+  @override
+  String get noCommentsHelper =>
+      'เป็นคนแรกที่แสดงความคิดเห็น ทีมงานจะได้รับการแจ้งเตือน';
+
+  @override
+  String get noFollowupsTitle => 'ยังไม่มีการติดตามผล';
+
+  @override
+  String get noFollowupsHelper =>
+      'กด + เพื่อเพิ่มการติดตามผลครั้งแรก เช่น การลงพื้นที่ ผลตรวจ หรือสถานะล่าสุด';
+
+  @override
+  String followupsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ติดตามผล $count รายการ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportNotFoundTitle => 'ไม่พบรายงานนี้';
+
+  @override
+  String get reportNotFoundHelper =>
+      'รายงานอาจถูกลบไปแล้ว หรือคุณอาจออฟไลน์อยู่ ดึงเพื่อรีเฟรชหรือกลับไปยังรายการ';
+
+  @override
+  String get backToIncidentsButton => 'กลับไปหน้ารายงาน';
+
+  @override
+  String get loadingLabel => 'กำลังโหลด…';
+
+  @override
+  String get testTag => 'ทดสอบ';
+
+  @override
   String zeroReportLastReportedMessage(String datetime) {
     return 'รายงานครั้งสุดท้ายเมื่อวันที่ $datetime';
   }

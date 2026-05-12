@@ -1,21 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:podd_app/l10n/app_localizations.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:podd_app/app_theme.dart';
-import 'package:podd_app/locator.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/followup_report.dart';
-import 'package:podd_app/models/entities/incident_report.dart';
 import 'package:podd_app/router.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
 import 'followup_list_view_model.dart';
 
+final _followupTimestamp = DateFormat('dd/MM/yyyy HH:mm');
+
 class FollowupListView extends StatelessWidget {
   final String incidentId;
+
   const FollowupListView(this.incidentId, {Key? key}) : super(key: key);
 
   @override
@@ -24,17 +24,12 @@ class FollowupListView extends StatelessWidget {
       viewModelBuilder: () => FollowupListViewModel(incidentId),
       disposeViewModel: false,
       initialiseSpecialViewModelsOnce: true,
-      builder: (context, viewModel, child) => Padding(
-        padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-        child: _FollowupList(),
-      ),
+      builder: (context, viewModel, child) => _FollowupList(),
     );
   }
 }
 
 class _FollowupList extends StackedHookView<FollowupListViewModel> {
-  final AppTheme appTheme = locator<AppTheme>();
-
   @override
   Widget builder(BuildContext context, FollowupListViewModel viewModel) {
     return RefreshIndicator(
@@ -42,158 +37,271 @@ class _FollowupList extends StackedHookView<FollowupListViewModel> {
         await viewModel.refetchFollowups();
       },
       child: viewModel.followupReport.isEmpty
-          ? Center(
-              child: Text(
-                AppLocalizations.of(context)!.noFollowupReport,
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w300,
-                    ),
-              ),
-            )
-          : ListView.builder(
-              key: const PageStorageKey('all-followups-storage-key'),
-              itemCount: viewModel.followupReport.length,
-              itemBuilder: (context, index) {
-                var followup = viewModel.followupReport[index];
-
-                IncidentReportImage? image;
-                if (followup.images?.isNotEmpty != false) {
-                  image = followup.images?.first;
-                }
-                var leading = image != null
-                    ? CachedNetworkImage(
-                        cacheKey: 'thumbnail-${image.id}',
-                        imageUrl:
-                            viewModel.resolveImagePath(image.thumbnailPath),
-                        placeholder: (context, url) => const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(),
-                        ),
-                        fit: BoxFit.cover,
-                      )
-                    : ColoredBox(
-                        color: appTheme.sub4,
-                        child: Image.asset(
-                          "assets/images/OHTK.png",
-                        ),
-                      );
-
-                return FollowupReportItem(
-                  report: followup,
-                  leading: leading,
-                  onTap: () {
-                    GoRouter.of(context).goNamed(
-                      OhtkRouter.incidentFollowup,
-                      pathParameters: {
-                        "incidentId": viewModel.incidentId,
-                        "followupId": followup.id,
-                      },
-                    );
-                  },
-                );
-              },
-            ),
+          ? _FollowupEmptyState()
+          : _FollowupContent(viewModel: viewModel),
     );
   }
 }
 
-class FollowupReportItem extends StatelessWidget {
-  final FollowupReport report;
-  final void Function() onTap;
-  final Widget? leading;
+class _FollowupContent extends StatelessWidget {
+  final FollowupListViewModel viewModel;
 
-  final AppTheme appTheme = locator<AppTheme>();
-  final formatter = DateFormat("dd/MM/yyyy HH:mm");
-
-  FollowupReportItem({
-    Key? key,
-    required this.report,
-    required this.onTap,
-    this.leading,
-  }) : super(key: key);
+  const _FollowupContent({required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        color: appTheme.bg2,
-        elevation: 0,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4.0),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 80.w,
-                    maxWidth: 80.w,
-                    minHeight: 75.w,
-                    maxHeight: 75.w,
-                  ),
-                  child: leading,
-                ),
+    final localize = AppLocalizations.of(context)!;
+    final reports = viewModel.followupReport;
+    return ListView.separated(
+      key: const PageStorageKey('all-followups-storage-key'),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 96),
+      itemCount: reports.length + 1,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+            child: Text(
+              localize.followupsCount(reports.length).toUpperCase(),
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
+                color: incidentsMuted,
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 0),
+          );
+        }
+        final report = reports[index - 1];
+        return _FollowupRow(
+          report: report,
+          imagePath: _firstImagePath(viewModel, report),
+          onTap: () {
+            GoRouter.of(context).goNamed(
+              OhtkRouter.incidentFollowup,
+              pathParameters: {
+                'incidentId': viewModel.incidentId,
+                'followupId': report.id,
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String? _firstImagePath(FollowupListViewModel vm, FollowupReport report) {
+    final image =
+        (report.images?.isNotEmpty ?? false) ? report.images!.first : null;
+    if (image == null) return null;
+    return vm.resolveImagePath(image.thumbnailPath);
+  }
+}
+
+class _FollowupRow extends StatelessWidget {
+  final FollowupReport report;
+  final String? imagePath;
+  final VoidCallback onTap;
+
+  const _FollowupRow({
+    required this.report,
+    required this.imagePath,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: incidentsHair),
+          ),
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _FollowupThumbnail(imagePath: imagePath),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _title(),
-                    SizedBox(height: 5.h),
-                    _description(),
+                    Text(
+                      _followupTimestamp.format(report.createdAt.toLocal()),
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: incidentsMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      report.trimWhitespaceDescription,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 13,
+                        height: 1.45,
+                        color: incidentsBody,
+                      ),
+                    ),
                   ],
                 ),
               ),
-            )
-          ],
+              const SizedBox(width: 12),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 22),
+                child: Icon(
+                  Icons.chevron_right,
+                  size: 18,
+                  color: incidentsTeal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
 
-  _title() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          formatter.format(report.createdAt.toLocal()),
-          style: TextStyle(
-            fontSize: 10.sp,
-            fontWeight: FontWeight.w300,
+class _FollowupThumbnail extends StatelessWidget {
+  final String? imagePath;
+
+  const _FollowupThumbnail({required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    if (imagePath != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: SizedBox(
+          width: 72,
+          height: 72,
+          child: CachedNetworkImage(
+            imageUrl: imagePath!,
+            fit: BoxFit.cover,
+            placeholder: (context, url) => Container(color: incidentsHair),
+            errorWidget: (context, url, error) => _HFallback(),
           ),
         ),
-      ],
+      );
+    }
+    return _HFallback();
+  }
+}
+
+class _HFallback extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 72,
+      height: 72,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: CustomPaint(
+          painter: _HFallbackPainter(),
+          size: const Size(72, 72),
+        ),
+      ),
+    );
+  }
+}
+
+class _HFallbackPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bg = Paint()..color = incidentsFallbackTile;
+    canvas.drawRect(Offset.zero & size, bg);
+
+    final glyphSide = size.width * 0.55;
+    final origin = Offset(
+      (size.width - glyphSide) / 2,
+      (size.height - glyphSide) / 2,
+    );
+    final scale = glyphSide / 60.0;
+
+    final dark = Paint()..color = incidentsFallbackStemDark;
+    final light = Paint()..color = incidentsFallbackStemLight;
+
+    canvas.drawRect(
+      Rect.fromLTWH(origin.dx + 8 * scale, origin.dy + 6 * scale,
+          12 * scale, 48 * scale),
+      dark,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(origin.dx + 26 * scale, origin.dy + 12 * scale,
+          12 * scale, 42 * scale),
+      light,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(origin.dx + 20 * scale, origin.dy + 26 * scale,
+          6 * scale, 10 * scale),
+      dark,
     );
   }
 
-  _description() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _FollowupEmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(24, 56, 24, 96),
       children: [
-        Expanded(
-          child: Text(
-            report.trimWhitespaceDescription,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: appTheme.sub1,
+        Center(
+          child: Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: incidentsTeal.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.update,
+              size: 32,
+              color: incidentsTeal,
             ),
           ),
         ),
-        SizedBox(width: 10.w),
-        Icon(
-          Icons.arrow_forward_ios_sharp,
-          size: 9.h,
-          color: appTheme.secondary,
+        const SizedBox(height: 14),
+        Text(
+          localize.noFollowupsTitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: incidentsInk,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          localize.noFollowupsHelper,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 12.5,
+            height: 1.5,
+            color: incidentsMuted,
+          ),
         ),
       ],
     );

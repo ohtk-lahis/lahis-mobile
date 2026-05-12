@@ -199,6 +199,203 @@ class AppLocalizationsLo extends AppLocalizations {
   String get zeroReportLabel => 'ບົດ​ລາຍ​ງານ​ບໍ່​ໄດ້​ພົບ​ເຫັນ​ຄວາມ​ຜິດ​ປົກກະຕິ';
 
   @override
+  String get zeroReportPillLabel => 'Zero report';
+
+  @override
+  String get nothingToReportTitle => 'ບໍ່ມີຫຍັງລາຍງານໃນອາທິດນີ້';
+
+  @override
+  String lastZeroReportLabel(String datetime) {
+    return 'Zero report ຄັ້ງສຸດທ້າຍ $datetime';
+  }
+
+  @override
+  String get testModeLabel => 'ໂໝດທົດສອບ';
+
+  @override
+  String get testModeBannerMessage =>
+      'ໂໝດທົດສອບເປີດຢູ່ — ການສົ່ງຂໍ້ມູນຈະໄປແຊນບອກເທົ່ານັ້ນ';
+
+  @override
+  String offlineCachedListMessage(String date) {
+    return 'ອອບລາຍ · ສະແດງລາຍການທີ່ບັນທຶກໄວ້ຈາກ $date';
+  }
+
+  @override
+  String get noReportTypesTitle => 'ບໍ່ມີປະເພດລາຍງານ';
+
+  @override
+  String get noReportTypesHelper =>
+      'ຜູ້ປະສານງານຍັງບໍ່ໄດ້ເຜີຍແຜ່ລາຍການ ຫຼື ການຊິງຄ໌ຍັງບໍ່ສຳເລັດ. ດຶງເພື່ອໂຫຼດໃໝ່ ຫຼື ຕິດຕໍ່ຫົວໜ້າບ້ານ';
+
+  @override
+  String get tryAgainButton => 'ລອງໃໝ່';
+
+  @override
+  String get adminToolsSectionLabel => 'ເຄື່ອງມືຜູ້ດູແລ';
+
+  @override
+  String get testDraftFormLabel => 'ທົດສອບແບບຟອມຮ່າງ';
+
+  @override
+  String get testDraftFormHelper =>
+      'ສະແກນ QR ຈາກແດສບອດເວັບເພື່ອເບິ່ງປະເພດລາຍງານທີ່ຍັງບໍ່ໄດ້ເຜີຍແຜ່';
+
+  @override
+  String get formChromeBackLabel => 'ກັບຄືນ';
+
+  @override
+  String get formChromeNextLabel => 'ຕໍ່ໄປ';
+
+  @override
+  String get formChromeReviewLabel => 'ກວດສອບ';
+
+  @override
+  String get formChromeSubmitReportLabel => 'ສົ່ງລາຍງານ';
+
+  @override
+  String get formChromeSubmitFollowupLabel => 'ສົ່ງການຕິດຕາມ';
+
+  @override
+  String formStepLabel(int current, int total) {
+    return 'ຂັ້ນຕອນທີ $current ຈາກ $total';
+  }
+
+  @override
+  String get formSaveDraftAction => 'ບັນທຶກເປັນຮ່າງ';
+
+  @override
+  String get formDraftSavedMessage =>
+      'ບັນທຶກຮ່າງແລ້ວ — ຮູບແລະໄຟລ໌ຍັງຖືກເກັບໄວ້ໃນເຄື່ອງ';
+
+  @override
+  String get exitDialogTitle => 'ອອກໂດຍບໍ່ສົ່ງບໍ?';
+
+  @override
+  String get exitDialogBody =>
+      'ຄຳຕອບແລະຮູບທີ່ແນບໄວ້ຈະຖືກລຶບ. ທ່ານສາມາດບັນທຶກເປັນຮ່າງຈາກເມນູເພື່ອເກັບໄວ້';
+
+  @override
+  String get exitDialogDiscardButton => 'ລຶບ ແລະ ອອກ';
+
+  @override
+  String get exitDialogKeepButton => 'ສືບຕໍ່ແກ້ໄຂ';
+
+  @override
+  String get choiceOtherPlaceholder => 'ກະລຸນາລະບຸ';
+
+  @override
+  String get attachFileButton => 'ແນບໄຟລ໌';
+
+  @override
+  String get addAnotherSubformButton => 'ເພີ່ມອີກ';
+
+  @override
+  String get subformDeleteConfirmTitle => 'ລຶບລາຍການນີ້?';
+
+  @override
+  String get subformDeleteConfirmBody => 'ລາຍການນີ້ຈະຖືກລຶບອອກຈາກແບບຟອມ';
+
+  @override
+  String get subformDeleteConfirmAction => 'ລຶບ';
+
+  @override
+  String get reviewHeaderEyebrow => 'ກວດກາ ແລະ ສົ່ງ';
+
+  @override
+  String get reviewHeaderTitle => 'ກວດກາລາຍງານກ່ອນສົ່ງ';
+
+  @override
+  String get authorityEyebrow => 'ອີກໜຶ່ງເລື່ອງ';
+
+  @override
+  String get authorityHelper => 'ໃຊ້ສຳລັບສົ່ງລາຍງານໄປຫາທີມທີ່ຮັບຜິດຊອບ';
+
+  @override
+  String get reviewEditButton => 'ແກ້ໄຂ';
+
+  @override
+  String get reviewReminderBody =>
+      'ຫຼັງສົ່ງລາຍງານແລ້ວຈະບໍ່ສາມາດແກ້ໄຂໄດ້ ກະລຸນາກວດກາສະຫຼຸບຂ້າງເທິງກ່ອນສົ່ງ';
+
+  @override
+  String get reviewBackToFormButton => 'ກັບໄປແບບຟອມ';
+
+  @override
+  String get recentSectionLabel => 'ຫຼ້າສຸດ';
+
+  @override
+  String get earlierSectionLabel => 'ກ່ອນໜ້ານີ້';
+
+  @override
+  String get noReportsTitle => 'ຍັງບໍ່ມີລາຍງານ';
+
+  @override
+  String get noReportsHelper =>
+      'ກົດປຸ່ມ + ສີຂຽວດ້ານລຸ່ມເພື່ອສ້າງລາຍງານສະບັບທຳອິດ ຫຼື ສົ່ງລາຍງານປົກກະຕິຫາກບໍ່ມີເຫດການໃນອາທິດນີ້';
+
+  @override
+  String get descriptionSectionLabel => 'ລາຍລະອຽດ';
+
+  @override
+  String get noDescriptionProvided => 'ບໍ່ມີລາຍລະອຽດ';
+
+  @override
+  String get photosSectionLabel => 'ຮູບພາບ';
+
+  @override
+  String get attachmentsSectionLabel => 'ເອກະສານແນບ';
+
+  @override
+  String get locationSectionLabel => 'ສະຖານທີ່';
+
+  @override
+  String get followUpFabLabel => 'ຕິດຕາມຜົນ';
+
+  @override
+  String get commentPlaceholder => 'ຂຽນຄຳເຫັນ…';
+
+  @override
+  String get noCommentsTitle => 'ຍັງບໍ່ມີຄຳເຫັນ';
+
+  @override
+  String get noCommentsHelper =>
+      'ເປັນຄົນທຳອິດທີ່ຕື່ມຄຳເຫັນ ທີມງານຈະໄດ້ຮັບການແຈ້ງເຕືອນ';
+
+  @override
+  String get noFollowupsTitle => 'ຍັງບໍ່ມີການຕິດຕາມຜົນ';
+
+  @override
+  String get noFollowupsHelper =>
+      'ກົດ + ເພື່ອເພີ່ມການຕິດຕາມຜົນຄັ້ງທຳອິດ ເຊັ່ນ ການລົງພື້ນທີ່ ຜົນກວດ ຫຼື ສະຖານະຫຼ້າສຸດ';
+
+  @override
+  String followupsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ຕິດຕາມຜົນ $count ລາຍການ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportNotFoundTitle => 'ບໍ່ພົບລາຍງານນີ້';
+
+  @override
+  String get reportNotFoundHelper =>
+      'ລາຍງານອາດຖືກລົບໄປແລ້ວ ຫຼື ທ່ານອາດອອບລາຍຢູ່ ດຶງເພື່ອໂຫຼດໃໝ່ ຫຼື ກັບໄປລາຍການ';
+
+  @override
+  String get backToIncidentsButton => 'ກັບໄປໜ້າລາຍງານ';
+
+  @override
+  String get loadingLabel => 'ກຳລັງໂຫຼດ…';
+
+  @override
+  String get testTag => 'ທົດສອບ';
+
+  @override
   String zeroReportLastReportedMessage(String datetime) {
     return 'ລາຍງານຫຼ້າສຸດກ່ຽວກັບ $datetime';
   }

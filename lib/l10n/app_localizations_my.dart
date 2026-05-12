@@ -200,6 +200,204 @@ class AppLocalizationsMy extends AppLocalizations {
   String get zeroReportLabel => 'သုညအစီရင်ခံစာ';
 
   @override
+  String get zeroReportPillLabel => 'Zero report';
+
+  @override
+  String get nothingToReportTitle => 'ဒီအပတ်မှာ အစီရင်ခံစရာ မရှိပါ';
+
+  @override
+  String lastZeroReportLabel(String datetime) {
+    return 'နောက်ဆုံး Zero report $datetime';
+  }
+
+  @override
+  String get testModeLabel => 'စမ်းသပ်မုဒ်';
+
+  @override
+  String get testModeBannerMessage =>
+      'စမ်းသပ်မုဒ်ဖွင့်ထား — တင်ပြထားသည့်အရာများသည် စမ်းသပ်နေရာသို့သာ ရောက်ပါမည်။';
+
+  @override
+  String offlineCachedListMessage(String date) {
+    return 'အော့ဖ်လိုင်း · $date မှ မှတ်ထားသော စာရင်းကို ပြသထား';
+  }
+
+  @override
+  String get noReportTypesTitle => 'အစီရင်ခံစာ အမျိုးအစားများ မရှိပါ';
+
+  @override
+  String get noReportTypesHelper =>
+      'သင့်ညှိနှိုင်းရေးမှူး စာရင်းမထုတ်ပြန်ရသေးပါ၊ သို့မဟုတ် ဆင့်ပွားခြင်း မပြီးသေးပါ။ ပြန်ဆွဲပါ၊ သို့မဟုတ် ရွာခေါင်းနှင့် ဆက်သွယ်ပါ။';
+
+  @override
+  String get tryAgainButton => 'ထပ်ကြိုးစားပါ';
+
+  @override
+  String get adminToolsSectionLabel => 'အက်ဒ်မင် ကိရိယာများ';
+
+  @override
+  String get testDraftFormLabel => 'မူကြမ်းဖောင် စမ်းသပ်ပါ';
+
+  @override
+  String get testDraftFormHelper =>
+      'မထုတ်ပြန်ရသေးသော အစီရင်ခံစာအမျိုးအစားကို ကြိုကြည့်ရန် ဝက်ဘ်ဒိုင်ခ်ဘုတ်မှ QR ကို စကန်ဖတ်ပါ။';
+
+  @override
+  String get formChromeBackLabel => 'ပြန်သွား';
+
+  @override
+  String get formChromeNextLabel => 'ရှေ့ဆက်';
+
+  @override
+  String get formChromeReviewLabel => 'စစ်ဆေး';
+
+  @override
+  String get formChromeSubmitReportLabel => 'အစီရင်ခံစာ တင်ပါ';
+
+  @override
+  String get formChromeSubmitFollowupLabel => 'လိုက်လံစုံစမ်းမှု တင်ပါ';
+
+  @override
+  String formStepLabel(int current, int total) {
+    return 'အဆင့် $current / $total';
+  }
+
+  @override
+  String get formSaveDraftAction => 'မူကြမ်းအဖြစ် သိမ်းပါ';
+
+  @override
+  String get formDraftSavedMessage =>
+      'မူကြမ်းကို သိမ်းပြီး — ဓာတ်ပုံများနှင့် ဖိုင်များကို ဤစက်တွင် ဆက်ထား';
+
+  @override
+  String get exitDialogTitle => 'မတင်ဘဲ ထွက်မှာလား';
+
+  @override
+  String get exitDialogBody =>
+      'သင်၏ အဖြေများနှင့် တွဲထားသော ဓာတ်ပုံများ ပျောက်ပါမည်။ မူကြမ်းအဖြစ် သိမ်းရန် မီနူးကို သုံးနိုင်ပါသည်။';
+
+  @override
+  String get exitDialogDiscardButton => 'ဖျက်ပြီး ထွက်ပါ';
+
+  @override
+  String get exitDialogKeepButton => 'ဆက်ပြင်ပါ';
+
+  @override
+  String get choiceOtherPlaceholder => 'ဖော်ပြပါ';
+
+  @override
+  String get attachFileButton => 'ဖိုင်တွဲရန်';
+
+  @override
+  String get addAnotherSubformButton => 'နောက်ထပ်ထည့်ပါ';
+
+  @override
+  String get subformDeleteConfirmTitle => 'ဖျက်မလား?';
+
+  @override
+  String get subformDeleteConfirmBody =>
+      'ဤထည့်သွင်းမှုကို ဖောင်မှ ဖျက်ပစ်ပါမည်။';
+
+  @override
+  String get subformDeleteConfirmAction => 'ဖျက်ပါ';
+
+  @override
+  String get reviewHeaderEyebrow => 'ပြန်စစ်ပြီး ပေးပို့';
+
+  @override
+  String get reviewHeaderTitle => 'မပို့ခင် အစီရင်ခံစာကို ပြန်စစ်ပါ';
+
+  @override
+  String get authorityEyebrow => 'နောက်တစ်ခု';
+
+  @override
+  String get authorityHelper =>
+      'တာဝန်ရှိ အဖွဲ့ထံ အစီရင်ခံစာ ပို့ရန် အသုံးပြုပါသည်။';
+
+  @override
+  String get reviewEditButton => 'တည်းဖြတ်';
+
+  @override
+  String get reviewReminderBody =>
+      'ပေးပို့ပြီးပါက ဤအစီရင်ခံစာကို ပြန်တည်းဖြတ်၍ မရတော့ပါ။ မပို့ခင် အကျဉ်းချုပ်ကို သေချာစစ်ပါ။';
+
+  @override
+  String get reviewBackToFormButton => 'ဖောင်သို့ ပြန်';
+
+  @override
+  String get recentSectionLabel => 'မကြာသေးမီ';
+
+  @override
+  String get earlierSectionLabel => 'ယခင်က';
+
+  @override
+  String get noReportsTitle => 'အစီရင်ခံစာများ မရှိသေးပါ';
+
+  @override
+  String get noReportsHelper =>
+      'ပထမဆုံးအစီရင်ခံစာ တင်ရန် အောက်က အစိမ်းရောင် + ကို နှိပ်ပါ၊ သို့မဟုတ် ဤအပတ်တွင် တင်ပြရန် မရှိပါက သုညအစီရင်ခံစာ တင်ပါ။';
+
+  @override
+  String get descriptionSectionLabel => 'ဖော်ပြချက်';
+
+  @override
+  String get noDescriptionProvided => 'ဖော်ပြချက် မရှိပါ';
+
+  @override
+  String get photosSectionLabel => 'ဓာတ်ပုံများ';
+
+  @override
+  String get attachmentsSectionLabel => 'တွဲဖက်ဖိုင်များ';
+
+  @override
+  String get locationSectionLabel => 'တည်နေရာ';
+
+  @override
+  String get followUpFabLabel => 'လိုက်လံစုံစမ်းခြင်း';
+
+  @override
+  String get commentPlaceholder => 'မှတ်ချက်ရေးပါ…';
+
+  @override
+  String get noCommentsTitle => 'မှတ်ချက် မရှိသေးပါ';
+
+  @override
+  String get noCommentsHelper => 'ပထမဆုံးပို့ပါ။ သင့်အဖွဲ့သို့ အသိပေးပါမည်။';
+
+  @override
+  String get noFollowupsTitle => 'လိုက်လံစုံစမ်းမှု မရှိသေးပါ';
+
+  @override
+  String get noFollowupsHelper =>
+      'ပထမဆုံး လိုက်လံစုံစမ်းမှု ထည့်ရန် + ကို နှိပ်ပါ — ကွင်းဆင်းမှု၊ ဓာတ်ခွဲစမ်းသပ်ရလဒ်၊ သို့မဟုတ် အခြေအနေအသစ်။';
+
+  @override
+  String followupsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'လိုက်လံစုံစမ်းမှု $count ခု',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportNotFoundTitle => 'အစီရင်ခံစာ ရှာမတွေ့ပါ';
+
+  @override
+  String get reportNotFoundHelper =>
+      'ဤအစီရင်ခံစာ ဖျက်ပြီးဖြစ်နိုင်သည် သို့မဟုတ် အင်တာနက်မရှိနိုင်ပါ။ ပြန်ဆွဲပါ သို့မဟုတ် စာရင်းသို့ ပြန်သွားပါ။';
+
+  @override
+  String get backToIncidentsButton => 'ပြန်သွားရန်';
+
+  @override
+  String get loadingLabel => 'ဖွင့်နေသည်…';
+
+  @override
+  String get testTag => 'စမ်းသပ်';
+
+  @override
   String zeroReportLastReportedMessage(String datetime) {
     return '$datetime တွင် နောက်ဆုံးအစီရင်ခံသည်';
   }

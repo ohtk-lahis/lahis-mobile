@@ -1,148 +1,402 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
-import 'package:podd_app/components/flat_button.dart';
-import 'package:podd_app/opsv_form/widgets/widgets.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 
 typedef OnSubmit = Future<void> Function();
 
 class FormConfirmSubmit extends StatelessWidget {
   final OnSubmit onSubmit;
-  final Function() onBack;
-  final Widget? child;
+  final VoidCallback onBack;
+
+  /// Authority radio block (or any auxiliary section) rendered inside a
+  /// teal-tinted "ONE MORE THING" card above the summary. Pass `null` to omit.
+  final Widget? authority;
+
+  /// Override for the primary submit pill copy. Defaults to
+  /// `formChromeSubmitReportLabel`.
   final String? submitText;
-  final String? backText;
+
   final String? dataSummary;
   final bool showDataSummary;
   final bool busy;
 
-  const FormConfirmSubmit(
-      {required this.onSubmit,
-      required this.onBack,
-      this.child,
-      this.submitText,
-      this.backText,
-      this.dataSummary,
-      this.showDataSummary = false,
-      this.busy = false,
-      Key? key})
-      : super(key: key);
+  const FormConfirmSubmit({
+    required this.onSubmit,
+    required this.onBack,
+    this.authority,
+    this.submitText,
+    this.dataSummary,
+    this.showDataSummary = false,
+    this.busy = false,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(40, 40, 40, 0),
-        child: Column(children: [
-          child ?? Container(),
-          const SizedBox(
-            height: 20,
-          ),
-          if (showDataSummary) ...[
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                AppLocalizations.of(context)!.reportDataSummary,
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      fontSize: 14.sp,
-                    ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                dataSummary != null && dataSummary!.isNotEmpty
-                    ? dataSummary!
-                    : AppLocalizations.of(context)!.reportDataSummaryNotFound,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontSize: 13.sp,
-                    ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            CustomPaint(
-              painter: DashedLinePainter(
-                  backgroundColor: Theme.of(context).primaryColor),
-              child: Container(
-                height: 1,
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
-          Center(
-            child: Text(
-              AppLocalizations.of(context)!.confirmCheckReport,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontSize: 13.sp,
-                  ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          ConstrainedBox(
-            constraints: const BoxConstraints(minWidth: double.infinity),
-            child: FlatButton.primary(
-              onPressed: () {
-                if (!busy) {
-                  onSubmit();
-                }
-              },
-              child: busy
-                  ? busyIndicator()
-                  : Text(
-                      submitText ?? AppLocalizations.of(context)!.submitButton,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          if (!busy)
-            TextButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50), // NEW
-              ),
-              onPressed: () {
-                if (!busy) {
-                  onBack();
-                }
-              },
-              child: Text(
-                backText ?? AppLocalizations.of(context)!.formBackButton,
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
+    final localize = AppLocalizations.of(context)!;
+    return Column(
+      children: [
+        _ReviewHeader(
+          eyebrow: localize.reviewHeaderEyebrow,
+          title: localize.reviewHeaderTitle,
+        ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            children: [
+              if (authority != null) ...[
+                _AuthorityCard(child: authority!),
+                const SizedBox(height: 12),
+              ],
+              if (showDataSummary) ...[
+                _DataSummaryCard(
+                  dataSummary: dataSummary,
+                  onEdit: onBack,
                 ),
-              ),
+                const SizedBox(height: 12),
+              ],
+              _ReminderStrip(message: localize.reviewReminderBody),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+        _ReviewFooter(
+          busy: busy,
+          submitText: submitText ?? localize.formChromeSubmitReportLabel,
+          backText: localize.reviewBackToFormButton,
+          onSubmit: onSubmit,
+          onBack: onBack,
+        ),
+      ],
+    );
+  }
+}
+
+class _ReviewHeader extends StatelessWidget {
+  final String eyebrow;
+  final String title;
+  const _ReviewHeader({required this.eyebrow, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: incidentsHair, width: 1)),
+      ),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            eyebrow,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+              color: incidentsMuted,
             ),
-          const SizedBox(
-            height: 60,
-          )
-        ]),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: incidentsInk,
+              height: 1.3,
+            ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  static Widget busyIndicator({Color color = Colors.white}) {
-    return Center(
-      child: SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(
-          color: color,
+class _AuthorityCard extends StatelessWidget {
+  final Widget child;
+  const _AuthorityCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return Container(
+      decoration: BoxDecoration(
+        color: incidentsTeal.withValues(alpha: 0.05),
+        border: Border.all(
+          color: incidentsTeal.withValues(alpha: 0.18),
+          width: 1,
         ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            localize.authorityEyebrow,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+              color: incidentsTeal,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            localize.incidentInAuthority,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: incidentsInk,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            localize.authorityHelper,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 12,
+              color: incidentsMuted,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _DataSummaryCard extends StatelessWidget {
+  final String? dataSummary;
+  final VoidCallback onEdit;
+
+  const _DataSummaryCard({
+    required this.dataSummary,
+    required this.onEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    final body = (dataSummary != null && dataSummary!.isNotEmpty)
+        ? dataSummary!
+        : localize.reportDataSummaryNotFound;
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: incidentsHair, width: 1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  localize.reportDataSummary,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: incidentsInk,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: onEdit,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4, vertical: 4),
+                  child: Text(
+                    localize.reviewEditButton,
+                    style: const TextStyle(
+                      fontFamily: incidentsFontFamily,
+                      fontFamilyFallback: incidentsFontFamilyFallback,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: incidentsTeal,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            body,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 13.5,
+              color: incidentsBody,
+              height: 1.55,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReminderStrip extends StatelessWidget {
+  final String message;
+  const _ReminderStrip({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: incidentsTestBannerBg,
+        border: Border.all(color: incidentsTestBannerBorder, width: 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 1),
+            child: Icon(
+              Icons.info_outline,
+              size: 16,
+              color: incidentsTestPillFg,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: incidentsTestPillFg,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewFooter extends StatelessWidget {
+  final bool busy;
+  final String submitText;
+  final String backText;
+  final OnSubmit onSubmit;
+  final VoidCallback onBack;
+
+  const _ReviewFooter({
+    required this.busy,
+    required this.submitText,
+    required this.backText,
+    required this.onSubmit,
+    required this.onBack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: incidentsHair, width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0D000000),
+            offset: Offset(0, -6),
+            blurRadius: 18,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.fromLTRB(14, 10, 14, 10 + media.padding.bottom),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: busy ? null : () => onSubmit(),
+              style: TextButton.styleFrom(
+                backgroundColor: incidentsTeal,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor:
+                    incidentsTeal.withValues(alpha: 0.5),
+                disabledForegroundColor: Colors.white,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                minimumSize: const Size(0, 48),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: busy
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          submitText,
+                          style: const TextStyle(
+                            fontFamily: incidentsFontFamily,
+                            fontFamilyFallback: incidentsFontFamilyFallback,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.send_rounded, size: 16),
+                      ],
+                    ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          TextButton(
+            onPressed: busy ? null : onBack,
+            style: TextButton.styleFrom(
+              foregroundColor: incidentsInk,
+              minimumSize: const Size(0, 40),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              backText,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

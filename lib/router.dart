@@ -108,7 +108,7 @@ class OhtkRouter {
               path: '/reports',
               pageBuilder: (context, state) => CustomTransitionPage<void>(
                 key: state.pageKey,
-                child: ReportHomeView(),
+                child: const ReportHomeView(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                   return SlideTransition(

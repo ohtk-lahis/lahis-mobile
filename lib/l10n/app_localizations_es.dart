@@ -201,6 +201,206 @@ class AppLocalizationsEs extends AppLocalizations {
   String get zeroReportLabel => 'Informe cero';
 
   @override
+  String get zeroReportPillLabel => 'Informe cero';
+
+  @override
+  String get nothingToReportTitle => 'Nada que informar esta semana';
+
+  @override
+  String lastZeroReportLabel(String datetime) {
+    return 'Último informe cero $datetime';
+  }
+
+  @override
+  String get testModeLabel => 'Modo de prueba';
+
+  @override
+  String get testModeBannerMessage =>
+      'El modo de prueba está activado — los envíos van solo al entorno de pruebas.';
+
+  @override
+  String offlineCachedListMessage(String date) {
+    return 'Sin conexión · mostrando lista guardada del $date';
+  }
+
+  @override
+  String get noReportTypesTitle => 'No hay tipos de informe disponibles';
+
+  @override
+  String get noReportTypesHelper =>
+      'Tu coordinador aún no ha publicado una lista, o la sincronización no ha terminado. Desliza para actualizar o contacta al líder de tu pueblo.';
+
+  @override
+  String get tryAgainButton => 'Reintentar';
+
+  @override
+  String get adminToolsSectionLabel => 'Herramientas de administrador';
+
+  @override
+  String get testDraftFormLabel => 'Probar formulario borrador';
+
+  @override
+  String get testDraftFormHelper =>
+      'Escanea un QR del panel web para previsualizar un tipo de informe no publicado.';
+
+  @override
+  String get formChromeBackLabel => 'Atrás';
+
+  @override
+  String get formChromeNextLabel => 'Siguiente';
+
+  @override
+  String get formChromeReviewLabel => 'Revisar';
+
+  @override
+  String get formChromeSubmitReportLabel => 'Enviar informe';
+
+  @override
+  String get formChromeSubmitFollowupLabel => 'Enviar seguimiento';
+
+  @override
+  String formStepLabel(int current, int total) {
+    return 'Paso $current de $total';
+  }
+
+  @override
+  String get formSaveDraftAction => 'Guardar borrador';
+
+  @override
+  String get formDraftSavedMessage =>
+      'Borrador guardado: las fotos y archivos siguen en este dispositivo.';
+
+  @override
+  String get exitDialogTitle => '¿Salir sin enviar?';
+
+  @override
+  String get exitDialogBody =>
+      'Tus respuestas y fotos adjuntas se descartarán. Puedes guardar un borrador desde el menú para conservarlas.';
+
+  @override
+  String get exitDialogDiscardButton => 'Descartar y salir';
+
+  @override
+  String get exitDialogKeepButton => 'Seguir editando';
+
+  @override
+  String get choiceOtherPlaceholder => 'Por favor especifique';
+
+  @override
+  String get attachFileButton => 'Adjuntar archivo';
+
+  @override
+  String get addAnotherSubformButton => 'Añadir otro';
+
+  @override
+  String get subformDeleteConfirmTitle => '¿Eliminar entrada?';
+
+  @override
+  String get subformDeleteConfirmBody =>
+      'Esta entrada se eliminará del formulario.';
+
+  @override
+  String get subformDeleteConfirmAction => 'Eliminar';
+
+  @override
+  String get reviewHeaderEyebrow => 'REVISAR Y ENVIAR';
+
+  @override
+  String get reviewHeaderTitle => 'Revisa el informe antes de enviarlo';
+
+  @override
+  String get authorityEyebrow => 'UNA COSA MÁS';
+
+  @override
+  String get authorityHelper =>
+      'Lo usamos para enrutar el informe al equipo responsable.';
+
+  @override
+  String get reviewEditButton => 'Editar';
+
+  @override
+  String get reviewReminderBody =>
+      'Una vez enviado, este informe no se puede editar. Verifica el resumen anterior antes de enviar.';
+
+  @override
+  String get reviewBackToFormButton => 'Volver al formulario';
+
+  @override
+  String get recentSectionLabel => 'Reciente';
+
+  @override
+  String get earlierSectionLabel => 'Antes';
+
+  @override
+  String get noReportsTitle => 'Aún no hay informes';
+
+  @override
+  String get noReportsHelper =>
+      'Toca el + verde para crear tu primer informe, o envía un Informe cero si no hay nada que reportar esta semana.';
+
+  @override
+  String get descriptionSectionLabel => 'Descripción';
+
+  @override
+  String get noDescriptionProvided => 'Sin descripción';
+
+  @override
+  String get photosSectionLabel => 'Fotos';
+
+  @override
+  String get attachmentsSectionLabel => 'Adjuntos';
+
+  @override
+  String get locationSectionLabel => 'Ubicación';
+
+  @override
+  String get followUpFabLabel => 'Seguimiento';
+
+  @override
+  String get commentPlaceholder => 'Escribe un comentario…';
+
+  @override
+  String get noCommentsTitle => 'Sin comentarios';
+
+  @override
+  String get noCommentsHelper =>
+      'Sé el primero en comentar. Tu equipo recibirá una notificación.';
+
+  @override
+  String get noFollowupsTitle => 'Sin seguimientos';
+
+  @override
+  String get noFollowupsHelper =>
+      'Toca + para añadir el primer seguimiento — visita de campo, resultado de laboratorio o actualización de estado.';
+
+  @override
+  String followupsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seguimientos',
+      one: '$count seguimiento',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportNotFoundTitle => 'Informe no encontrado';
+
+  @override
+  String get reportNotFoundHelper =>
+      'Este informe puede haber sido eliminado, o estás sin conexión. Desliza para recargar, o vuelve a la lista.';
+
+  @override
+  String get backToIncidentsButton => 'Volver a incidentes';
+
+  @override
+  String get loadingLabel => 'Cargando…';
+
+  @override
+  String get testTag => 'Prueba';
+
+  @override
   String zeroReportLastReportedMessage(String datetime) {
     return 'Reportado por última vez el $datetime';
   }

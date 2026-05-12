@@ -14,25 +14,10 @@ class _FormDateFieldState extends State<FormDateField> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (BuildContext context) {
-        return ValidationWrapper(
-          widget.field,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (widget.field.label != null && widget.field.label != "")
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(
-                    widget.field.label!,
-                    style: TextStyle(color: Colors.grey.shade700),
-                  ),
-                ),
-              widget.field.separatedFields
-                  ? _DateTimeDropdown(widget.field)
-                  : _DateTimePicker(widget.field)
-            ],
-          ),
-        );
+        if (!widget.field.display) return const SizedBox.shrink();
+        return widget.field.separatedFields
+            ? _DateTimeDropdown(widget.field)
+            : _DateTimePicker(widget.field);
       },
     );
   }
@@ -47,25 +32,26 @@ class _DateTimeDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (BuildContext context) {
-      if (!field.display) {
-        return Container();
-      }
-
+      if (!field.display) return const SizedBox.shrink();
       return Row(
         children: [
-          Expanded(child: _dayDropdown(field), flex: 1),
-          const SizedBox(width: 6, child: null),
-          Expanded(child: _monthDropdown(field, context), flex: 2),
-          const SizedBox(width: 6, child: null),
-          Expanded(child: _yearDropdown(field), flex: 1),
-          if (field.withTime)
+          Expanded(flex: 1, child: _dayDropdown(field)),
+          const SizedBox(width: 6),
+          Expanded(flex: 2, child: _monthDropdown(field, context)),
+          const SizedBox(width: 6),
+          Expanded(flex: 1, child: _yearDropdown(field)),
+          if (field.withTime) ...[
+            const SizedBox(width: 6),
+            Expanded(child: _hourDropdown(field)),
             const Text(
-              ": ",
-              style: TextStyle(fontWeight: FontWeight.bold),
-              textScaler: TextScaler.linear(1.2),
+              ":",
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: incidentsMuted,
+              ),
             ),
-          if (field.withTime) Expanded(child: _hourDropdown(field)),
-          if (field.withTime) Expanded(child: _minuteDropdown(field)),
+            Expanded(child: _minuteDropdown(field)),
+          ],
         ],
       );
     });
@@ -77,12 +63,19 @@ class _DateTimeDropdown extends StatelessWidget {
   }
 
   TextStyle _optionStyle(bool enabled) => TextStyle(
-        color: enabled ? Colors.grey[700] : Colors.black26,
+        fontFamily: incidentsFontFamily,
+        fontFamilyFallback: incidentsFontFamilyFallback,
+        color: enabled ? incidentsInk : incidentsHair,
+        fontSize: 15,
         fontWeight: FontWeight.w500,
       );
 
-  // Day is from 1-31
-  _dayDropdown(opsv.DateField field) {
+  InputDecoration _dropdownDecoration({String? hint}) {
+    final isInvalid = !field.isValid;
+    return ohtkInputDecoration(hintText: hint, isInvalid: isInvalid);
+  }
+
+  Widget _dayDropdown(opsv.DateField field) {
     final items = List<int>.generate(31, (int index) => index).map((e) {
       final day = e + 1;
       bool enabled = true;
@@ -90,9 +83,7 @@ class _DateTimeDropdown extends StatelessWidget {
         if (day == 29 && field.month == 2 && !_isLeapYear(field.year)) {
           enabled = false;
         }
-        if (day == 30 && field.month == 2) {
-          enabled = false;
-        }
+        if (day == 30 && field.month == 2) enabled = false;
         if (day == 31 && [2, 4, 6, 9, 11].contains(field.month)) {
           enabled = false;
         }
@@ -104,24 +95,20 @@ class _DateTimeDropdown extends StatelessWidget {
       );
     }).toList();
 
-    return DropdownButtonFormField(
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-      ),
-      hint: const Text("D"),
+    return DropdownButtonFormField<int>(
+      decoration: _dropdownDecoration(hint: "D"),
       initialValue: field.day,
       onChanged: (int? value) {
         field.day = value;
+        if (!field.isValid) field.clearError();
       },
       items: items,
     );
   }
 
-  // month value is between 1-12
-  _monthDropdown(opsv.DateField field, BuildContext context) {
+  Widget _monthDropdown(opsv.DateField field, BuildContext context) {
     final locale = Localizations.localeOf(context);
-
-    var formatter = DateFormat.MMMM(locale.toString());
+    final formatter = DateFormat.MMMM(locale.toString());
     final items = List<int>.generate(12, (int index) => index).map((e) {
       final month = e + 1;
       bool enabled = true;
@@ -129,16 +116,12 @@ class _DateTimeDropdown extends StatelessWidget {
         if (field.day == 29 && month == 2 && !_isLeapYear(field.year)) {
           enabled = false;
         }
-        if (field.day == 30 && month == 2) {
-          enabled = false;
-        }
+        if (field.day == 30 && month == 2) enabled = false;
         if (field.day == 31 && [2, 4, 6, 9, 11].contains(month)) {
           enabled = false;
         }
       }
-
       final monthStr = formatter.format(DateTime(2000, month, 1));
-
       return DropdownMenuItem(
         value: month,
         enabled: enabled,
@@ -146,21 +129,18 @@ class _DateTimeDropdown extends StatelessWidget {
       );
     }).toList();
 
-    return DropdownButtonFormField(
-      hint: const Text("M"),
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-      ),
+    return DropdownButtonFormField<int>(
+      decoration: _dropdownDecoration(hint: "M"),
       initialValue: field.month,
       onChanged: (int? value) {
         field.month = value;
+        if (!field.isValid) field.clearError();
       },
       items: items,
     );
   }
 
-  // Year range is between +/- 10 years from now
-  _yearDropdown(opsv.DateField field) {
+  Widget _yearDropdown(opsv.DateField field) {
     final items = List<int>.generate(20, (int index) => index).map((e) {
       final year = e + currentYear - 9;
       bool enabled = true;
@@ -176,58 +156,56 @@ class _DateTimeDropdown extends StatelessWidget {
       );
     }).toList();
 
-    return DropdownButtonFormField(
-      hint: const Text("Y"),
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-      ),
+    return DropdownButtonFormField<int>(
+      decoration: _dropdownDecoration(hint: "Y"),
       initialValue: field.year,
       onChanged: (int? value) {
         field.year = value;
+        if (!field.isValid) field.clearError();
       },
       items: items,
     );
   }
 
-  _hourDropdown(opsv.DateField field) {
+  Widget _hourDropdown(opsv.DateField field) {
     final items = List<int>.generate(24, (int index) => index).map((e) {
       return DropdownMenuItem(
         value: e,
-        child: Text((e / 10 >= 1 ? "" : "0") + e.toString(),
-            style: _optionStyle(true)),
+        child: Text(
+          (e / 10 >= 1 ? "" : "0") + e.toString(),
+          style: _optionStyle(true),
+        ),
       );
     }).toList();
 
-    return DropdownButtonFormField(
-      hint: const Text("hh"),
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-      ),
+    return DropdownButtonFormField<int>(
+      decoration: _dropdownDecoration(hint: "hh"),
       initialValue: field.hour,
       onChanged: (int? value) {
         field.hour = value;
+        if (!field.isValid) field.clearError();
       },
       items: items,
     );
   }
 
-  _minuteDropdown(opsv.DateField field) {
+  Widget _minuteDropdown(opsv.DateField field) {
     final items = List<int>.generate(60, (int index) => index).map((e) {
       return DropdownMenuItem(
         value: e,
-        child: Text((e / 10 >= 1 ? "" : "0") + e.toString(),
-            style: _optionStyle(true)),
+        child: Text(
+          (e / 10 >= 1 ? "" : "0") + e.toString(),
+          style: _optionStyle(true),
+        ),
       );
     }).toList();
 
-    return DropdownButtonFormField(
-      hint: const Text("mm"),
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-      ),
+    return DropdownButtonFormField<int>(
+      decoration: _dropdownDecoration(hint: "mm"),
       initialValue: field.minute,
       onChanged: (int? value) {
         field.minute = value;
+        if (!field.isValid) field.clearError();
       },
       items: items,
     );
@@ -241,59 +219,52 @@ class _DateTimePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (BuildContext context) {
-      var datetime = field.value;
-
-      if (!field.display) {
-        return Container();
-      }
-
-      final buttonStyle = ButtonStyle(
-        foregroundColor: WidgetStateProperty.all(
-            datetime != null ? Colors.grey.shade700 : Colors.black54),
-        padding: WidgetStateProperty.all(
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-        ),
-      );
-
+      final datetime = field.value;
+      if (!field.display) return const SizedBox.shrink();
+      final isInvalid = !field.isValid;
+      final borderColor = isInvalid ? incidentsErrorRed : incidentsHair;
       return Row(
         children: [
-          TextButton(
-            style: buttonStyle,
-            onPressed: () =>
-                _showDialog(context, datetime, CupertinoDatePickerMode.date),
-            child: Text(
-              datetime != null
-                  ? '${datetime.day}/${datetime.month}/${datetime.year}'
-                  : 'DD/MM/YYYY',
-              style: TextStyle(
-                fontSize: 15.sp,
-              ),
+          Expanded(
+            child: _DateTimePillButton(
+              icon: Icons.calendar_today_outlined,
+              value: datetime != null
+                  ? '${datetime.day.toString().padLeft(2, '0')}/${datetime.month.toString().padLeft(2, '0')}/${datetime.year}'
+                  : null,
+              placeholder: 'DD/MM/YYYY',
+              borderColor: borderColor,
+              onTap: () =>
+                  _showDialog(context, datetime, CupertinoDatePickerMode.date),
             ),
           ),
-          if (field.withTime)
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: TextButton(
-                style: buttonStyle,
-                onPressed: () => _showDialog(
-                    context, datetime, CupertinoDatePickerMode.time),
-                child: Text(
-                  datetime != null
-                      ? '${datetime.hour}:${datetime.minute}'
-                      : 'HH:MM',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                  ),
+          if (field.withTime) ...[
+            const SizedBox(width: 8),
+            Expanded(
+              child: _DateTimePillButton(
+                icon: Icons.access_time,
+                value: datetime != null
+                    ? '${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')}'
+                    : null,
+                placeholder: 'HH:MM',
+                borderColor: borderColor,
+                onTap: () => _showDialog(
+                  context,
+                  datetime,
+                  CupertinoDatePickerMode.time,
                 ),
               ),
-            )
+            ),
+          ],
         ],
       );
     });
   }
 
-  Future<void> _showDialog(BuildContext context, DateTime? datetime,
-      CupertinoDatePickerMode mode) async {
+  Future<void> _showDialog(
+    BuildContext context,
+    DateTime? datetime,
+    CupertinoDatePickerMode mode,
+  ) async {
     if (Platform.isIOS) {
       final child = CupertinoDatePicker(
         initialDateTime: datetime,
@@ -301,6 +272,7 @@ class _DateTimePicker extends StatelessWidget {
         use24hFormat: true,
         onDateTimeChanged: (DateTime newTime) {
           field.value = newTime;
+          if (!field.isValid) field.clearError();
         },
       );
       showCupertinoModalPopup<void>(
@@ -308,17 +280,11 @@ class _DateTimePicker extends StatelessWidget {
         builder: (BuildContext context) => Container(
           height: 216,
           padding: const EdgeInsets.only(top: 6.0),
-          // The Bottom margin is provided to align the popup above the system navigation bar.
           margin: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          // Provide a background color for the popup.
           color: CupertinoColors.systemBackground.resolveFrom(context),
-          // Use a SafeArea widget to avoid system overlaps.
-          child: SafeArea(
-            top: false,
-            child: child,
-          ),
+          child: SafeArea(top: false, child: child),
         ),
       );
     } else {
@@ -330,27 +296,87 @@ class _DateTimePicker extends StatelessWidget {
           lastDate: DateTime(now.year + 50),
           initialDate: datetime ?? now,
         );
-        if (picked != null) field.value = picked;
+        if (picked != null) {
+          field.value = picked;
+          if (!field.isValid) field.clearError();
+        }
       } else {
         final TimeOfDay? picked = await showTimePicker(
           context: context,
-          initialTime: (datetime != null)
-              ? TimeOfDay(
-                  hour: datetime.hour,
-                  minute: datetime.minute,
-                )
+          initialTime: datetime != null
+              ? TimeOfDay(hour: datetime.hour, minute: datetime.minute)
               : TimeOfDay.now(),
         );
         if (picked != null) {
           if (datetime != null) {
-            field.value = DateTime(datetime.year, datetime.month, datetime.day,
-                picked.hour, picked.minute);
+            field.value = DateTime(
+              datetime.year,
+              datetime.month,
+              datetime.day,
+              picked.hour,
+              picked.minute,
+            );
           } else {
             field.value = DateTime(
-                now.year, now.month, now.day, picked.hour, picked.minute);
+              now.year,
+              now.month,
+              now.day,
+              picked.hour,
+              picked.minute,
+            );
           }
+          if (!field.isValid) field.clearError();
         }
       }
     }
+  }
+}
+
+class _DateTimePillButton extends StatelessWidget {
+  final IconData icon;
+  final String? value;
+  final String placeholder;
+  final Color borderColor;
+  final VoidCallback onTap;
+
+  const _DateTimePillButton({
+    required this.icon,
+    required this.value,
+    required this.placeholder,
+    required this.borderColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasValue = value != null;
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: borderColor, width: 1.5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+          child: Row(
+            children: [
+              Icon(icon, size: 16, color: incidentsMuted),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  hasValue ? value! : placeholder,
+                  style: hasValue ? ohtkInputTextStyle : _ohtkInputHintStyle,
+                ),
+              ),
+              const Icon(Icons.expand_more, size: 18, color: incidentsMuted),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

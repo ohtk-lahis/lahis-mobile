@@ -61,6 +61,86 @@
   "noComment": "ไม่มีความคิดเห็น",
   "noGpsProvided": "ไม่ได้ระบุสถานที่ gps",
   "zeroReportLabel": "รายงานไม่พบเหตุผิดปกติ",
+  "zeroReportPillLabel": "Zero report",
+  "nothingToReportTitle": "สัปดาห์นี้ไม่มีอะไรต้องรายงาน",
+  "lastZeroReportLabel": "Zero report ล่าสุด {datetime}",
+  "@lastZeroReportLabel": {
+    "placeholders": {
+      "datetime": {
+        "type": "String",
+        "example": "09/05 · 08:14"
+      }
+    }
+  },
+  "testModeLabel": "โหมดทดสอบ",
+  "testModeBannerMessage": "โหมดทดสอบเปิดอยู่ — ข้อมูลที่ส่งจะไปที่กระบะทดสอบเท่านั้น",
+  "offlineCachedListMessage": "ออฟไลน์ · แสดงรายการที่บันทึกไว้จาก {date}",
+  "@offlineCachedListMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "09 May"
+      }
+    }
+  },
+  "noReportTypesTitle": "ไม่มีประเภทรายงาน",
+  "noReportTypesHelper": "ผู้ประสานงานยังไม่ได้เผยแพร่รายการ หรือการซิงค์ยังไม่เสร็จ ดึงเพื่อรีเฟรช หรือสอบถามผู้นำหมู่บ้าน",
+  "tryAgainButton": "ลองอีกครั้ง",
+  "adminToolsSectionLabel": "เครื่องมือผู้ดูแล",
+  "testDraftFormLabel": "ทดสอบฟอร์มร่าง",
+  "testDraftFormHelper": "สแกน QR จากแดชบอร์ดเว็บเพื่อดูตัวอย่างประเภทรายงานที่ยังไม่ได้เผยแพร่",
+  "formChromeBackLabel": "ย้อนกลับ",
+  "formChromeNextLabel": "ถัดไป",
+  "formChromeReviewLabel": "ตรวจสอบ",
+  "formChromeSubmitReportLabel": "ส่งรายงาน",
+  "formChromeSubmitFollowupLabel": "ส่งการติดตาม",
+  "formStepLabel": "ขั้นตอนที่ {current} จาก {total}",
+  "@formStepLabel": {
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total":   { "type": "int", "example": "5" }
+    }
+  },
+  "formSaveDraftAction": "บันทึกเป็นแบบร่าง",
+  "formDraftSavedMessage": "บันทึกแบบร่างแล้ว — ภาพและไฟล์ถูกเก็บไว้ในเครื่อง",
+  "exitDialogTitle": "ออกโดยไม่ส่งใช่ไหม",
+  "exitDialogBody": "คำตอบและภาพที่แนบไว้จะถูกลบ คุณสามารถบันทึกเป็นแบบร่างจากเมนูเพื่อเก็บไว้",
+  "exitDialogDiscardButton": "ลบและออก",
+  "exitDialogKeepButton": "ทำต่อ",
+  "choiceOtherPlaceholder": "โปรดระบุ",
+  "attachFileButton": "แนบไฟล์",
+  "addAnotherSubformButton": "เพิ่มอีก",
+  "subformDeleteConfirmTitle": "ลบรายการนี้?",
+  "subformDeleteConfirmBody": "รายการนี้จะถูกลบออกจากแบบฟอร์ม",
+  "subformDeleteConfirmAction": "ลบ",
+  "reviewHeaderEyebrow": "ทบทวนและส่ง",
+  "reviewHeaderTitle": "ตรวจสอบรายงานก่อนส่ง",
+  "authorityEyebrow": "อีกหนึ่งข้อ",
+  "authorityHelper": "ใช้สำหรับส่งรายงานไปยังทีมที่รับผิดชอบ",
+  "reviewEditButton": "แก้ไข",
+  "reviewReminderBody": "หลังส่งรายงานแล้วจะไม่สามารถแก้ไขได้ กรุณาตรวจสอบสรุปด้านบนให้เรียบร้อยก่อนส่ง",
+  "reviewBackToFormButton": "กลับไปแก้แบบฟอร์ม",
+  "recentSectionLabel": "ล่าสุด",
+  "earlierSectionLabel": "ก่อนหน้านี้",
+  "noReportsTitle": "ยังไม่มีรายงาน",
+  "noReportsHelper": "กดปุ่ม + สีเขียวด้านล่างเพื่อสร้างรายงานฉบับแรก หรือส่งรายงานปกติหากไม่มีเหตุการณ์ในสัปดาห์นี้",
+  "descriptionSectionLabel": "รายละเอียด",
+  "noDescriptionProvided": "ไม่มีรายละเอียด",
+  "photosSectionLabel": "ภาพถ่าย",
+  "attachmentsSectionLabel": "เอกสารแนบ",
+  "locationSectionLabel": "ตำแหน่ง",
+  "followUpFabLabel": "ติดตามผล",
+  "commentPlaceholder": "เขียนความคิดเห็น…",
+  "noCommentsTitle": "ยังไม่มีความคิดเห็น",
+  "noCommentsHelper": "เป็นคนแรกที่แสดงความคิดเห็น ทีมงานจะได้รับการแจ้งเตือน",
+  "noFollowupsTitle": "ยังไม่มีการติดตามผล",
+  "noFollowupsHelper": "กด + เพื่อเพิ่มการติดตามผลครั้งแรก เช่น การลงพื้นที่ ผลตรวจ หรือสถานะล่าสุด",
+  "followupsCount": "{count, plural, other{ติดตามผล {count} รายการ}}",
+  "reportNotFoundTitle": "ไม่พบรายงานนี้",
+  "reportNotFoundHelper": "รายงานอาจถูกลบไปแล้ว หรือคุณอาจออฟไลน์อยู่ ดึงเพื่อรีเฟรชหรือกลับไปยังรายการ",
+  "backToIncidentsButton": "กลับไปหน้ารายงาน",
+  "loadingLabel": "กำลังโหลด…",
+  "testTag": "ทดสอบ",
   "zeroReportLastReportedMessage": "รายงานครั้งสุดท้ายเมื่อวันที่ {datetime}",
   "zeroReportSubmitSuccess": "ส่งรายงานไม่พบเหตุผิดปกติสำเร็จ",
   "fieldUndefinedLocation": "ยังไม่ระบุพิกัด",

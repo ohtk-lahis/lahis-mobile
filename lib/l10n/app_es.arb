@@ -62,6 +62,86 @@
   "noComment": "Sin comentarios",
   "noGpsProvided": "No gps location provided",
   "zeroReportLabel": "Informe cero",
+  "zeroReportPillLabel": "Informe cero",
+  "nothingToReportTitle": "Nada que informar esta semana",
+  "lastZeroReportLabel": "Último informe cero {datetime}",
+  "@lastZeroReportLabel": {
+    "placeholders": {
+      "datetime": {
+        "type": "String",
+        "example": "09/05 · 08:14"
+      }
+    }
+  },
+  "testModeLabel": "Modo de prueba",
+  "testModeBannerMessage": "El modo de prueba está activado — los envíos van solo al entorno de pruebas.",
+  "offlineCachedListMessage": "Sin conexión · mostrando lista guardada del {date}",
+  "@offlineCachedListMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "09 May"
+      }
+    }
+  },
+  "noReportTypesTitle": "No hay tipos de informe disponibles",
+  "noReportTypesHelper": "Tu coordinador aún no ha publicado una lista, o la sincronización no ha terminado. Desliza para actualizar o contacta al líder de tu pueblo.",
+  "tryAgainButton": "Reintentar",
+  "adminToolsSectionLabel": "Herramientas de administrador",
+  "testDraftFormLabel": "Probar formulario borrador",
+  "testDraftFormHelper": "Escanea un QR del panel web para previsualizar un tipo de informe no publicado.",
+  "formChromeBackLabel": "Atrás",
+  "formChromeNextLabel": "Siguiente",
+  "formChromeReviewLabel": "Revisar",
+  "formChromeSubmitReportLabel": "Enviar informe",
+  "formChromeSubmitFollowupLabel": "Enviar seguimiento",
+  "formStepLabel": "Paso {current} de {total}",
+  "@formStepLabel": {
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total":   { "type": "int", "example": "5" }
+    }
+  },
+  "formSaveDraftAction": "Guardar borrador",
+  "formDraftSavedMessage": "Borrador guardado: las fotos y archivos siguen en este dispositivo.",
+  "exitDialogTitle": "¿Salir sin enviar?",
+  "exitDialogBody": "Tus respuestas y fotos adjuntas se descartarán. Puedes guardar un borrador desde el menú para conservarlas.",
+  "exitDialogDiscardButton": "Descartar y salir",
+  "exitDialogKeepButton": "Seguir editando",
+  "choiceOtherPlaceholder": "Por favor especifique",
+  "attachFileButton": "Adjuntar archivo",
+  "addAnotherSubformButton": "Añadir otro",
+  "subformDeleteConfirmTitle": "¿Eliminar entrada?",
+  "subformDeleteConfirmBody": "Esta entrada se eliminará del formulario.",
+  "subformDeleteConfirmAction": "Eliminar",
+  "reviewHeaderEyebrow": "REVISAR Y ENVIAR",
+  "reviewHeaderTitle": "Revisa el informe antes de enviarlo",
+  "authorityEyebrow": "UNA COSA MÁS",
+  "authorityHelper": "Lo usamos para enrutar el informe al equipo responsable.",
+  "reviewEditButton": "Editar",
+  "reviewReminderBody": "Una vez enviado, este informe no se puede editar. Verifica el resumen anterior antes de enviar.",
+  "reviewBackToFormButton": "Volver al formulario",
+  "recentSectionLabel": "Reciente",
+  "earlierSectionLabel": "Antes",
+  "noReportsTitle": "Aún no hay informes",
+  "noReportsHelper": "Toca el + verde para crear tu primer informe, o envía un Informe cero si no hay nada que reportar esta semana.",
+  "descriptionSectionLabel": "Descripción",
+  "noDescriptionProvided": "Sin descripción",
+  "photosSectionLabel": "Fotos",
+  "attachmentsSectionLabel": "Adjuntos",
+  "locationSectionLabel": "Ubicación",
+  "followUpFabLabel": "Seguimiento",
+  "commentPlaceholder": "Escribe un comentario…",
+  "noCommentsTitle": "Sin comentarios",
+  "noCommentsHelper": "Sé el primero en comentar. Tu equipo recibirá una notificación.",
+  "noFollowupsTitle": "Sin seguimientos",
+  "noFollowupsHelper": "Toca + para añadir el primer seguimiento — visita de campo, resultado de laboratorio o actualización de estado.",
+  "followupsCount": "{count, plural, =1{{count} seguimiento} other{{count} seguimientos}}",
+  "reportNotFoundTitle": "Informe no encontrado",
+  "reportNotFoundHelper": "Este informe puede haber sido eliminado, o estás sin conexión. Desliza para recargar, o vuelve a la lista.",
+  "backToIncidentsButton": "Volver a incidentes",
+  "loadingLabel": "Cargando…",
+  "testTag": "Prueba",
   "zeroReportLastReportedMessage": "Reportado por última vez el {datetime}",
   "@zeroReportLastReportedMessage": {
     "placeholders": {

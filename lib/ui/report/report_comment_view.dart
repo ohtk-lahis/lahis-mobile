@@ -1,22 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:podd_app/app_theme.dart';
-import 'package:podd_app/components/flat_button.dart';
-import 'package:podd_app/locator.dart';
+import 'package:intl/intl.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/comment.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/report/report_comment_view_model.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
-import 'package:intl/intl.dart';
-import 'package:podd_app/l10n/app_localizations.dart';
+
+final _commentTimestamp = DateFormat('dd/MM/yyyy HH:mm');
 
 class ReportCommentView extends StatelessWidget {
   final int threadId;
+
   const ReportCommentView(this.threadId, {Key? key}) : super(key: key);
 
   @override
@@ -25,22 +24,18 @@ class ReportCommentView extends StatelessWidget {
       viewModelBuilder: () => ReportCommentViewModel(threadId),
       builder: (context, viewModel, child) => GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: SafeArea(
-          child: Scaffold(
-            body: Column(
-              children: [
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () async {
-                      await viewModel.fetchComments();
-                    },
-                    child: _CommentList(),
-                  ),
-                ),
-                _CommentForm(),
-              ],
+        child: Column(
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await viewModel.fetchComments();
+                },
+                child: _CommentList(),
+              ),
             ),
-          ),
+            _CommentComposer(),
+          ],
         ),
       ),
     );
@@ -48,319 +43,496 @@ class ReportCommentView extends StatelessWidget {
 }
 
 class _CommentList extends StackedHookView<ReportCommentViewModel> {
-  final AppTheme appTheme = locator<AppTheme>();
-  final formatter = DateFormat("dd/MM/yyyy HH:mm");
-
   @override
   Widget builder(BuildContext context, ReportCommentViewModel viewModel) {
-    if (viewModel.comments.isNotEmpty) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-        child: ScrollablePositionedList.builder(
-          initialScrollIndex: viewModel.comments.length - 1,
-          itemScrollController: viewModel.scrollController,
-          itemCount: viewModel.comments.length,
-          itemBuilder: (context, index) {
-            var comment = viewModel.comments[index];
-
-            return Card(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: ListTile(
-                leading: _user(viewModel, comment, context),
-                title: _body(viewModel, comment, context),
-              ),
-            );
-          },
-        ),
-      );
+    final comments = viewModel.comments;
+    if (comments.isEmpty) {
+      return _CommentEmptyState();
     }
-    return Center(
-      child: Text(
-        AppLocalizations.of(context)!.noComment,
-        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w300,
+    return ScrollablePositionedList.separated(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      initialScrollIndex: comments.length - 1,
+      itemScrollController: viewModel.scrollController,
+      itemCount: comments.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        return _CommentCard(
+          comment: comments[index],
+          resolveImagePath: viewModel.resolveImagePath,
+        );
+      },
+    );
+  }
+}
+
+class _CommentCard extends StatelessWidget {
+  final Comment comment;
+  final dynamic Function(String) resolveImagePath;
+
+  const _CommentCard({
+    required this.comment,
+    required this.resolveImagePath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final attachments = comment.attachments;
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: incidentsHair),
+      ),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Avatar(
+            avatarUrl: comment.user.avatarUrl,
+            name: comment.user.username,
+            resolveImagePath: resolveImagePath,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  comment.user.username,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: incidentsInk,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  _commentTimestamp.format(comment.createdAt.toLocal()),
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 10,
+                    color: incidentsMuted,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  comment.body,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 13,
+                    height: 1.5,
+                    color: incidentsBody,
+                  ),
+                ),
+                if (attachments.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 6,
+                      crossAxisSpacing: 6,
+                      childAspectRatio: 1,
+                    ),
+                    itemCount: attachments.length,
+                    itemBuilder: (context, index) {
+                      final attach = attachments[index];
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: resolveImagePath(
+                              attach.thumbnailPath ?? attach.filePath),
+                          placeholder: (context, url) =>
+                              Container(color: incidentsHair),
+                          errorWidget: (context, url, error) => Container(
+                            color: incidentsHair,
+                            child: const Icon(Icons.broken_image,
+                                color: incidentsMuted),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ],
             ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _user(
-      ReportCommentViewModel viewModel, Comment comment, BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(40),
-          child: comment.user.avatarUrl != null
-              ? CachedNetworkImage(
-                  cacheKey: 'user-avatar-${comment.user.id}',
-                  width: 30,
-                  imageUrl: viewModel.resolveImagePath(comment.user.avatarUrl!),
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
-                )
-              : Container(
-                  color: appTheme.sub4,
-                  width: 40,
-                  height: 40,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Icon(
-                      Icons.person,
-                      size: 40,
-                      color: appTheme.sub3.withAlpha(100),
-                    ),
-                  ),
-                ),
+class _Avatar extends StatelessWidget {
+  final String? avatarUrl;
+  final String name;
+  final dynamic Function(String) resolveImagePath;
+
+  const _Avatar({
+    required this.avatarUrl,
+    required this.name,
+    required this.resolveImagePath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (avatarUrl != null && avatarUrl!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: CachedNetworkImage(
+            imageUrl: resolveImagePath(avatarUrl!),
+            fit: BoxFit.cover,
+            placeholder: (context, url) => Container(color: incidentsHair),
+            errorWidget: (context, url, error) => _initialFallback(),
+          ),
         ),
-        Expanded(
-          child: SizedBox(
-            width: 70,
-            child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                comment.user.username,
-                overflow: TextOverflow.ellipsis,
-                textScaler: const TextScaler.linear(.9),
-                maxLines: 2,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall!
-                    .copyWith(fontWeight: FontWeight.w500),
-              ),
+      );
+    }
+    return _initialFallback();
+  }
+
+  Widget _initialFallback() {
+    final initial = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?';
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: incidentsTeal.withValues(alpha: 0.15),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        initial,
+        style: const TextStyle(
+          fontFamily: incidentsFontFamily,
+          fontFamilyFallback: incidentsFontFamilyFallback,
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: incidentsTeal,
+        ),
+      ),
+    );
+  }
+}
+
+class _CommentEmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(24, 56, 24, 24),
+      children: [
+        Center(
+          child: Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: incidentsTeal.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
             ),
+            child: const Icon(
+              Icons.chat_bubble_outline,
+              size: 32,
+              color: incidentsTeal,
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          localize.noCommentsTitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: incidentsInk,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          localize.noCommentsHelper,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 12.5,
+            height: 1.5,
+            color: incidentsMuted,
           ),
         ),
       ],
     );
   }
-
-  Widget _body(
-      ReportCommentViewModel viewModel, Comment comment, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            formatter.format(comment.createdAt.toLocal()),
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(fontSize: 10.sp, color: appTheme.sub2),
-          ),
-          Text(
-            comment.body,
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  fontSize: 12.sp,
-                ),
-          ),
-          const SizedBox(height: 8),
-          _attachmentList(viewModel, comment),
-        ],
-      ),
-    );
-  }
-
-  Widget _attachmentList(ReportCommentViewModel viewModel, Comment comment) {
-    return comment.attachments.isNotEmpty
-        ? GridView.builder(
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              // width / height: fixed for *all* items
-              childAspectRatio: 1,
-            ),
-            itemCount: comment.attachments.length,
-            itemBuilder: (context, index) {
-              var attachment = comment.attachments[index];
-              return CachedNetworkImage(
-                fit: BoxFit.cover,
-                imageUrl: viewModel.resolveImagePath(
-                    attachment.thumbnailPath ?? attachment.filePath),
-                placeholder: (context, url) =>
-                    const CircularProgressIndicator(),
-              );
-            },
-          )
-        : const SizedBox.shrink();
-  }
 }
 
-class _CommentForm extends StackedHookView<ReportCommentViewModel> {
-  final AppTheme apptheme = locator<AppTheme>();
-
+class _CommentComposer extends StackedHookView<ReportCommentViewModel> {
   @override
   Widget builder(BuildContext context, ReportCommentViewModel viewModel) {
+    final controller = useTextEditingController();
+    final focusNode = useFocusNode();
+    final isFocused = useState(false);
+    final hasText = useState(controller.text.trim().isNotEmpty);
+
+    useEffect(() {
+      void onFocus() => isFocused.value = focusNode.hasFocus;
+      focusNode.addListener(onFocus);
+      return () => focusNode.removeListener(onFocus);
+    }, [focusNode]);
+
+    useEffect(() {
+      void onChange() {
+        hasText.value = controller.text.trim().isNotEmpty;
+      }
+
+      controller.addListener(onChange);
+      return () => controller.removeListener(onChange);
+    }, [controller]);
+
+    // Mirror controller text back into the view-model, and clear on submit.
+    useEffect(() {
+      if (viewModel.body == null && controller.text.isNotEmpty) {
+        controller.clear();
+      }
+      return null;
+    });
+
+    final localize = AppLocalizations.of(context)!;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-      decoration: BoxDecoration(
+      padding: EdgeInsets.fromLTRB(
+        12,
+        10,
+        12,
+        10 + MediaQuery.of(context).padding.bottom,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: incidentsHair)),
         boxShadow: [
-          const BoxShadow(
-            color: Colors.black38,
-            blurRadius: 5.0,
-            offset: Offset(0.0, 0.75),
-          ),
           BoxShadow(
-            color: apptheme.bg2,
-            offset: const Offset(0.0, 8),
+            color: Color(0x0A000000),
+            offset: Offset(0, -4),
+            blurRadius: 16,
           ),
         ],
-        color: apptheme.bg2,
       ),
-      width: MediaQuery.of(context).size.width,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          _attachImageButton(context, viewModel),
-          const SizedBox(width: 5),
+          _AttachButton(viewModel: viewModel),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _imageList(viewModel),
-                _commentField(viewModel),
+                if (viewModel.images.isNotEmpty) ...[
+                  _PendingImagesGrid(images: viewModel.images),
+                  const SizedBox(height: 8),
+                ],
+                Container(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: incidentsSand,
+                    border: Border.all(
+                      color: isFocused.value ? incidentsTeal : incidentsHair,
+                    ),
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    onChanged: viewModel.setBody,
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    minLines: 1,
+                    maxLines: 4,
+                    style: const TextStyle(
+                      fontFamily: incidentsFontFamily,
+                      fontFamilyFallback: incidentsFontFamilyFallback,
+                      fontSize: 14,
+                      color: incidentsInk,
+                    ),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      isCollapsed: true,
+                      hintText: localize.commentPlaceholder,
+                      hintStyle: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 14,
+                        color: incidentsMuted,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          const SizedBox(width: 15),
-          _sendButton(context, viewModel),
+          const SizedBox(width: 8),
+          _SendButton(
+            enabled: hasText.value && !viewModel.isBusy,
+            busy: viewModel.isBusy,
+            onPressed: () async {
+              await viewModel.saveComment();
+              controller.clear();
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _attachImageButton(
-      BuildContext context, ReportCommentViewModel viewModel) {
-    return InkWell(
-      onTap: () => _showAddImageModal(context, viewModel),
-      child: SizedBox(
-        height: 50,
-        width: 50,
-        child: Align(
-          alignment: Alignment.center,
-          child: SvgPicture.asset(
-            "assets/images/add_image_comment_icon.svg",
-            colorFilter: ColorFilter.mode(
-                Theme.of(context).primaryColor, BlendMode.srcIn),
-            width: 40,
-          ),
-        ),
-      ),
-    );
-  }
+class _AttachButton extends StatelessWidget {
+  final ReportCommentViewModel viewModel;
 
-  _showAddImageModal(BuildContext context, ReportCommentViewModel viewModel) {
+  const _AttachButton({required this.viewModel});
+
+  Future<void> _showAddImageModal(BuildContext context) async {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_album),
-              title: const Text('Pick from Gallery'),
-              onTap: () async {
-                var image = await _pickImage(ImageSource.gallery);
-                if (image != null) {
-                  viewModel.addImage(image);
-                }
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_camera),
-              title: const Text('Take a Photo'),
-              onTap: () async {
-                var image = await _pickImage(ImageSource.camera);
-                if (image != null) {
-                  viewModel.addImage(image);
-                }
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          ],
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: const Text('Pick from Gallery'),
+                onTap: () async {
+                  final image = await _pickImage(ImageSource.gallery);
+                  if (image != null) viewModel.addImage(image);
+                  if (context.mounted) Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera_outlined),
+                title: const Text('Take a Photo'),
+                onTap: () async {
+                  final image = await _pickImage(ImageSource.camera);
+                  if (image != null) viewModel.addImage(image);
+                  if (context.mounted) Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
   Future<XFile?> _pickImage(ImageSource source) async {
-    var picker = ImagePicker();
     try {
-      final image = await picker.pickImage(source: source);
-      return image;
+      return await ImagePicker().pickImage(source: source);
     } catch (e) {
-      debugPrint("$e");
+      debugPrint('$e');
+      return null;
     }
-    return null;
   }
 
-  _imageList(ReportCommentViewModel viewModel) {
-    return viewModel.images.isNotEmpty
-        ? GridView.builder(
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              // width / height: fixed for *all* items
-              childAspectRatio: 1,
-            ),
-            itemCount: viewModel.images.length,
-            itemBuilder: (context, index) {
-              var image = viewModel.images[index];
-              return Image.memory(image, fit: BoxFit.cover);
-            },
-          )
-        : const SizedBox.shrink();
-  }
-
-  Widget _sendButton(BuildContext context, ReportCommentViewModel viewModel) {
-    return FlatButton.primary(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      onPressed: () async {
-        await viewModel.saveComment();
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: viewModel.isBusy
-          ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            )
-          : Text(
-              AppLocalizations.of(context)!.sendButton,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
-            ),
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: Material(
+        color: incidentsTeal.withValues(alpha: 0.10),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () => _showAddImageModal(context),
+          child: const Icon(
+            Icons.camera_alt_outlined,
+            size: 22,
+            color: incidentsTeal,
+          ),
+        ),
+      ),
     );
   }
+}
 
-  Widget _commentField(ReportCommentViewModel viewModel) {
-    var body = useTextEditingController();
-    if (viewModel.body == null) {
-      body.clear();
-    }
+class _SendButton extends StatelessWidget {
+  final bool enabled;
+  final bool busy;
+  final VoidCallback onPressed;
 
-    return TextField(
-      controller: body,
-      onChanged: viewModel.setBody,
-      textInputAction: TextInputAction.done,
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 4,
+  const _SendButton({
+    required this.enabled,
+    required this.busy,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = enabled ? incidentsTeal : incidentsHair;
+    final fg = enabled ? Colors.white : incidentsMuted;
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: Material(
+        color: bg,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: enabled ? onPressed : null,
+          child: busy
+              ? const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Icon(
+                  Icons.send_rounded,
+                  size: 20,
+                  color: fg,
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PendingImagesGrid extends StatelessWidget {
+  final List images;
+
+  const _PendingImagesGrid({required this.images});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        mainAxisSpacing: 6,
+        crossAxisSpacing: 6,
+        childAspectRatio: 1,
+      ),
+      itemCount: images.length,
+      itemBuilder: (context, index) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.memory(images[index], fit: BoxFit.cover),
+        );
+      },
     );
   }
 }

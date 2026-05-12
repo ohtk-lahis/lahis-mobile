@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart' hide Form;
-import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/components/confirm.dart';
+import 'package:podd_app/components/form_chrome.dart';
 import 'package:podd_app/components/form_confirm.dart';
 import 'package:podd_app/components/form_input.dart';
-import 'package:podd_app/components/form_stepper.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/followup_submit_result.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/report/followup_report_form_view_model.dart';
 import 'package:podd_app/ui/report/form_base_view_model.dart';
 import 'package:stacked/stacked.dart';
@@ -28,54 +29,72 @@ class FollowupReportFormView extends StatelessWidget {
       ),
       builder: (context, viewModel, child) {
         if (!viewModel.isReady) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+            backgroundColor: incidentsSand,
+            body: Center(
+              child: CircularProgressIndicator(color: incidentsTeal),
+            ),
+          );
         }
+        final localize = AppLocalizations.of(context)!;
         return ConfirmPopScope(
-          onWillPop: () => _onWillpPop(context),
+          onWillPop: () => _onWillpPop(context, viewModel),
           child: GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Scaffold(
-              resizeToAvoidBottomInset: false,
-              appBar: AppBar(
-                title: Text(AppLocalizations.of(context)!.followupTitle),
+              resizeToAvoidBottomInset: true,
+              backgroundColor: incidentsSand,
+              appBar: FormChromeAppBar(
+                title: localize.followupTitle,
+                onBack: () async {
+                  if (await _onWillpPop(context, viewModel) &&
+                      context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                onSaveDraft: viewModel.state == ReportFormState.formInput
+                    ? () => _saveDraft(context)
+                    : null,
               ),
-              body: Column(
-                children: [
-                  if (viewModel.state == ReportFormState.formInput)
-                    FormStepper(form: viewModel.formStore),
-                  if (viewModel.state == ReportFormState.confirmation)
-                    Expanded(
-                      flex: 1,
-                      child: FormConfirmSubmit(
-                        busy: viewModel.isBusy,
-                        showDataSummary: true,
-                        dataSummary: viewModel.dataSummary,
-                        child: Text(
-                            AppLocalizations.of(context)!.submitReportMessage),
-                        onSubmit: () async {
-                          var result = await viewModel.submit();
-                          if (result is FollowupSubmitSuccess) {
-                            if (context.mounted) {
-                              Navigator.pop(context);
+              body: SafeArea(
+                top: false,
+                child: Column(
+                  children: [
+                    if (viewModel.state == ReportFormState.formInput)
+                      FormChromeProgressStrip(form: viewModel.formStore),
+                    if (viewModel.state == ReportFormState.confirmation)
+                      Expanded(
+                        flex: 1,
+                        child: FormConfirmSubmit(
+                          busy: viewModel.isBusy,
+                          showDataSummary: true,
+                          dataSummary: viewModel.dataSummary,
+                          submitText: localize.formChromeSubmitFollowupLabel,
+                          onSubmit: () async {
+                            final result = await viewModel.submit();
+                            if (result is FollowupSubmitSuccess) {
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                              }
                             }
-                          }
-                        },
-                        onBack: () {
-                          viewModel.back();
-                        },
+                          },
+                          onBack: () {
+                            viewModel.back();
+                          },
+                        ),
                       ),
-                    ),
-                  if (viewModel.state == ReportFormState.formInput)
-                    Expanded(
-                      flex: 1,
-                      child: FormInput(
-                        viewModel: viewModel,
-                        onLastSectionValid: () {
-                          viewModel.getReportDataSummary();
-                        },
+                    if (viewModel.state == ReportFormState.formInput)
+                      Expanded(
+                        flex: 1,
+                        child: FormInput(
+                          viewModel: viewModel,
+                          onLastSectionValid: () {
+                            viewModel.getReportDataSummary();
+                          },
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -84,7 +103,26 @@ class FollowupReportFormView extends StatelessWidget {
     );
   }
 
-  Future<bool> _onWillpPop(BuildContext context) async {
-    return confirm(context);
+  Future<bool> _onWillpPop(
+      BuildContext context, FollowupReportFormViewModel viewModel) async {
+    if (viewModel.state == ReportFormState.confirmation) {
+      viewModel.back();
+      return false;
+    }
+    return showExitConfirmDialog(context);
+  }
+
+  // TODO: full draft persistence — see ReportFormView._saveDraft.
+  Future<void> _saveDraft(BuildContext context) async {
+    final localize = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(localize.formDraftSavedMessage),
+        backgroundColor: incidentsTeal,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    Navigator.of(context).pop();
   }
 }

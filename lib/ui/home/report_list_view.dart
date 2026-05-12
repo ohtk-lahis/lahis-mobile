@@ -1,247 +1,401 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:podd_app/app_theme.dart';
-import 'package:podd_app/components/incident_report_tag.dart';
-import 'package:podd_app/locator.dart';
-import 'package:podd_app/models/entities/incident_report.dart';
 import 'package:intl/intl.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
+import 'package:podd_app/models/entities/incident_report.dart';
 import 'package:podd_app/router.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 
 import 'all_reports_view_model.dart';
 
-typedef TrailingFunction = Widget? Function(IncidentReport report);
+final _timestampFormatter = DateFormat('dd/MM/yyyy HH:mm');
 
-var formatter = DateFormat("dd/MM/yyyy HH:mm");
-
-/// rewrite code base of this thread
-/// https://github.com/flutter/flutter/issues/19269#issuecomment-577515503
-/// https://github.com/flutter/flutter/issues/19269#issuecomment-454164875
 class ReportListView<T extends BaseReportViewModel> extends StatelessWidget {
   final T viewModel;
-  final TrailingFunction trailingFn;
 
-  final AppTheme appTheme = locator<AppTheme>();
-
-  ReportListView({
+  const ReportListView({
     Key? key,
     required this.viewModel,
-    required this.trailingFn,
   }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final reports = viewModel.incidentReports;
+    if (reports.isEmpty) {
+      return _EmptyState();
+    }
+
+    final groups = _groupReports(reports);
+    final localize = AppLocalizations.of(context)!;
+
+    final List<Widget> children = [];
+    for (final group in groups) {
+      children.add(_SectionEyebrow(label: group.labelFor(localize)));
+      for (final report in group.reports) {
+        children.add(_IncidentReportCard(
+          report: report,
+          imagePath: _resolveImagePath(viewModel, report),
+        ));
+      }
+    }
+
+    return ListView(
+      key: key,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 90),
+      children: [
+        for (int i = 0; i < children.length; i++) ...[
+          if (i > 0) const SizedBox(height: 10),
+          children[i],
+        ],
+      ],
+    );
+  }
+
+  String? _resolveImagePath(T vm, IncidentReport report) {
+    final image = (report.images?.isNotEmpty ?? false) ? report.images!.first : null;
+    if (image == null) return null;
+    return vm.resolveImagePath(image.thumbnailPath);
+  }
+
+  List<_ReportGroup> _groupReports(List<IncidentReport> reports) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final recentCutoff = today.subtract(const Duration(days: 7));
+
+    final recent = <IncidentReport>[];
+    final earlier = <IncidentReport>[];
+
+    for (final r in reports) {
+      final created = r.createdAt.toLocal();
+      if (!created.isBefore(recentCutoff)) {
+        recent.add(r);
+      } else {
+        earlier.add(r);
+      }
+    }
+
+    final groups = <_ReportGroup>[];
+    if (recent.isNotEmpty) {
+      groups.add(_ReportGroup(_GroupKind.recent, recent));
+    }
+    if (earlier.isNotEmpty) {
+      groups.add(_ReportGroup(_GroupKind.earlier, earlier));
+    }
+    return groups;
+  }
+}
+
+enum _GroupKind { recent, earlier }
+
+class _ReportGroup {
+  final _GroupKind kind;
+  final List<IncidentReport> reports;
+
+  _ReportGroup(this.kind, this.reports);
+
+  String labelFor(AppLocalizations localize) {
+    switch (kind) {
+      case _GroupKind.recent:
+        return localize.recentSectionLabel;
+      case _GroupKind.earlier:
+        return localize.earlierSectionLabel;
+    }
+  }
+}
+
+class _SectionEyebrow extends StatelessWidget {
+  final String label;
+
+  const _SectionEyebrow({required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-      child: ListView.builder(
-        key: key,
-        itemCount: viewModel.incidentReports.length,
-        itemBuilder: (context, index) {
-          var report = viewModel.incidentReports[index];
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+      child: Text(
+        label.toUpperCase(),
+        style: const TextStyle(
+          fontFamily: incidentsFontFamily,
+          fontFamilyFallback: incidentsFontFamilyFallback,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.5,
+          color: incidentsMuted,
+        ),
+      ),
+    );
+  }
+}
 
-          IncidentReportImage? image;
-          if (report.images?.isNotEmpty != false) {
-            image = report.images?.first;
-          }
-          var leading = image != null
-              ? CachedNetworkImage(
-                  cacheKey: 'thumbnail-${image.id}',
-                  imageUrl: viewModel.resolveImagePath(image.thumbnailPath),
-                  placeholder: (context, url) => const Padding(
-                    padding: EdgeInsets.all(24),
-                    child: CircularProgressIndicator(),
-                  ),
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) {
-                    return Image.asset(
-                      "assets/images/OHTK.png",
-                    );
-                  },
-                )
-              : ColoredBox(
-                  color: appTheme.sub4,
-                  child: Image.asset(
-                    "assets/images/OHTK.png",
-                  ),
-                );
+class _IncidentReportCard extends StatelessWidget {
+  final IncidentReport report;
+  final String? imagePath;
 
-          var trailing = trailingFn(report);
+  const _IncidentReportCard({
+    required this.report,
+    required this.imagePath,
+  });
 
-          return IncidentReportItem(
-            report: report,
-            leading: leading,
-            trailing: trailing,
-            onTap: () {
-              GoRouter.of(context).goNamed(
-                OhtkRouter.incidentDetail,
-                pathParameters: {
-                  "incidentId": report.id,
-                },
-              );
-            },
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          GoRouter.of(context).goNamed(
+            OhtkRouter.incidentDetail,
+            pathParameters: {'incidentId': report.id},
           );
         },
-      ),
-    );
-  }
-}
-
-class IncidentReportItem extends StatelessWidget {
-  final IncidentReport report;
-  final void Function() onTap;
-  final Widget? leading;
-  final Widget? trailing;
-
-  final AppTheme appTheme = locator<AppTheme>();
-
-  IncidentReportItem({
-    Key? key,
-    required this.report,
-    required this.onTap,
-    this.leading,
-    this.trailing,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        color: appTheme.bg2,
-        elevation: 0,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4.0),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 80.w,
-                    maxWidth: 80.w,
-                    minHeight: 75.w,
-                    maxHeight: 75.w,
-                  ),
-                  child: leading,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _Title(report: report, appTheme: appTheme),
-                    _Description(report: report, appTheme: appTheme),
-                    _Options(report: report, trailing: trailing)
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  final IncidentReport report;
-  final AppTheme appTheme;
-
-  const _Title({Key? key, required this.report, required this.appTheme})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            report.reportTypeName,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                  color: appTheme.primary,
-                ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: incidentsHair),
           ),
-        ),
-        Text(
-          formatter.format(report.createdAt.toLocal()),
-          style: TextStyle(
-            fontSize: 10.sp,
-            fontWeight: FontWeight.w300,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Description extends StatelessWidget {
-  final IncidentReport report;
-  final AppTheme appTheme;
-
-  const _Description({Key? key, required this.report, required this.appTheme})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Text(
-            report.trimWhitespaceDescription,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: appTheme.sub1,
-            ),
-          ),
-        ),
-        const SizedBox(width: 20),
-        Icon(
-          Icons.arrow_forward_ios_sharp,
-          size: 14,
-          color: appTheme.secondary,
-        ),
-      ],
-    );
-  }
-}
-
-class _Options extends StatelessWidget {
-  final IncidentReport report;
-  final Widget? trailing;
-
-  const _Options({Key? key, required this.report, this.trailing})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
+          padding: const EdgeInsets.all(12),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (report.caseId != null) IncidentReportCaseTag(),
-              if (report.testFlag) const SizedBox(width: 5),
-              if (report.testFlag) IncidentReportTestTag(),
+              _Thumbnail(imagePath: imagePath),
+              const SizedBox(width: 12),
+              Expanded(child: _Content(report: report)),
+              const SizedBox(width: 12),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 28),
+                child: Icon(
+                  Icons.chevron_right,
+                  size: 18,
+                  color: incidentsTeal,
+                ),
+              ),
             ],
           ),
         ),
-        if (trailing != null) trailing!,
+      ),
+    );
+  }
+}
+
+class _Thumbnail extends StatelessWidget {
+  final String? imagePath;
+
+  const _Thumbnail({required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    if (imagePath == null) {
+      return const _HFallbackTile(size: 72);
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: SizedBox(
+        width: 72,
+        height: 72,
+        child: CachedNetworkImage(
+          imageUrl: imagePath!,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => Container(color: incidentsHair),
+          errorWidget: (context, url, error) => const _HFallbackTile(size: 72),
+        ),
+      ),
+    );
+  }
+}
+
+class _HFallbackTile extends StatelessWidget {
+  final double size;
+
+  const _HFallbackTile({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: CustomPaint(
+          painter: _HFallbackPainter(),
+          size: Size(size, size),
+        ),
+      ),
+    );
+  }
+}
+
+class _HFallbackPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bgPaint = Paint()..color = incidentsFallbackTile;
+    canvas.drawRect(Offset.zero & size, bgPaint);
+
+    final glyphSide = size.width * 0.55;
+    final origin = Offset(
+      (size.width - glyphSide) / 2,
+      (size.height - glyphSide) / 2,
+    );
+    final scale = glyphSide / 60.0;
+
+    final darkStem = Paint()..color = incidentsFallbackStemDark;
+    final lightStem = Paint()..color = incidentsFallbackStemLight;
+
+    final left = Rect.fromLTWH(origin.dx + 8 * scale, origin.dy + 6 * scale,
+        12 * scale, 48 * scale);
+    final right = Rect.fromLTWH(origin.dx + 26 * scale, origin.dy + 12 * scale,
+        12 * scale, 42 * scale);
+    final bar = Rect.fromLTWH(origin.dx + 20 * scale, origin.dy + 26 * scale,
+        6 * scale, 10 * scale);
+
+    canvas.drawRect(left, darkStem);
+    canvas.drawRect(right, lightStem);
+    canvas.drawRect(bar, darkStem);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _Content extends StatelessWidget {
+  final IncidentReport report;
+
+  const _Content({required this.report});
+
+  @override
+  Widget build(BuildContext context) {
+    final showCase = report.caseId != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Expanded(
+              child: Text(
+                report.reportTypeName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.1,
+                  color: incidentsTeal,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              _timestampFormatter.format(report.createdAt.toLocal()),
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 11,
+                color: incidentsMuted,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          report.trimWhitespaceDescription.isEmpty
+              ? report.reportTypeName
+              : report.trimWhitespaceDescription,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 12,
+            height: 1.45,
+            color: incidentsBody,
+          ),
+        ),
+        if (showCase) ...[
+          const SizedBox(height: 4),
+          const _CasePill(),
+        ],
+      ],
+    );
+  }
+}
+
+class _CasePill extends StatelessWidget {
+  const _CasePill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
+      decoration: BoxDecoration(
+        color: incidentsCasePillBg,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Text(
+        (AppLocalizations.of(context)?.caseTag ?? 'Case').toUpperCase(),
+        style: const TextStyle(
+          fontFamily: incidentsFontFamily,
+          fontFamilyFallback: incidentsFontFamilyFallback,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.4,
+          color: incidentsCasePillFg,
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(24, 56, 24, 90),
+      children: [
+        Center(
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: incidentsTeal.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.assignment_outlined,
+              color: incidentsTeal,
+              size: 36,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          localize.noReportsTitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: incidentsInk,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          localize.noReportsHelper,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 13,
+            height: 1.5,
+            color: incidentsMuted,
+          ),
+        ),
       ],
     );
   }

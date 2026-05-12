@@ -59,6 +59,86 @@
   "noComment": "No comment",
   "noGpsProvided": "No gps location provided",
   "zeroReportLabel": "របាយការណ៍​មិន​បាន​រក​ឃើញ​អ្វី​ខុស​ប្រក្រតី​ទេ។",
+  "zeroReportPillLabel": "Zero report",
+  "nothingToReportTitle": "មិនមានអ្វីត្រូវរាយការណ៍សប្តាហ៍នេះទេ",
+  "lastZeroReportLabel": "Zero report ចុងក្រោយ {datetime}",
+  "@lastZeroReportLabel": {
+    "placeholders": {
+      "datetime": {
+        "type": "String",
+        "example": "09/05 · 08:14"
+      }
+    }
+  },
+  "testModeLabel": "របៀបសាកល្បង",
+  "testModeBannerMessage": "របៀបសាកល្បងបើក — ការដាក់ស្នើនឹងទៅកាន់សាកល្បងតែប៉ុណ្ណោះ។",
+  "offlineCachedListMessage": "ក្រៅបណ្តាញ · បង្ហាញបញ្ជីដែលរក្សាទុកពី {date}",
+  "@offlineCachedListMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "09 May"
+      }
+    }
+  },
+  "noReportTypesTitle": "មិនមានប្រភេទរបាយការណ៍",
+  "noReportTypesHelper": "អ្នកសម្របសម្រួលរបស់អ្នកមិនទាន់បានចេញផ្សាយបញ្ជី ឬ​ការធ្វើសមកាលកម្មមិនទាន់បានបញ្ចប់​ទេ។ ទាញដើម្បីផ្ទុកឡើងវិញ ឬ​ទាក់ទងមេភូមិ។",
+  "tryAgainButton": "ព្យាយាមម្តងទៀត",
+  "adminToolsSectionLabel": "ឧបករណ៍អ្នកគ្រប់គ្រង",
+  "testDraftFormLabel": "សាកល្បងទម្រង់ព្រាង",
+  "testDraftFormHelper": "ស្កេន QR ពីផ្ទាំងគ្រប់គ្រងបណ្តាញដើម្បីមើលប្រភេទរបាយការណ៍មិនទាន់ផ្សាយ។",
+  "formChromeBackLabel": "ត្រឡប់",
+  "formChromeNextLabel": "បន្ទាប់",
+  "formChromeReviewLabel": "ពិនិត្យ",
+  "formChromeSubmitReportLabel": "ដាក់ស្នើរបាយការណ៍",
+  "formChromeSubmitFollowupLabel": "ដាក់ស្នើការតាមដាន",
+  "formStepLabel": "ជំហានទី {current} ក្នុងចំណោម {total}",
+  "@formStepLabel": {
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total":   { "type": "int", "example": "5" }
+    }
+  },
+  "formSaveDraftAction": "រក្សាទុកជាសេចក្តីព្រាង",
+  "formDraftSavedMessage": "បានរក្សាទុកសេចក្តីព្រាង — រូបភាព និងឯកសារ​នៅរក្សាទុក​លើឧបករណ៍នេះ",
+  "exitDialogTitle": "ចាកចេញដោយមិនដាក់ស្នើ?",
+  "exitDialogBody": "ចម្លើយ និងរូបភាពដែលភ្ជាប់នឹងត្រូវលុបចោល។ អ្នកអាចរក្សាទុកជាសេចក្តីព្រាងពីម៉ឺនុយដើម្បីរក្សាវាបាន។",
+  "exitDialogDiscardButton": "លុបចោល និងចាកចេញ",
+  "exitDialogKeepButton": "បន្តកែសម្រួល",
+  "choiceOtherPlaceholder": "សូមបញ្ជាក់",
+  "attachFileButton": "ភ្ជាប់ឯកសារ",
+  "addAnotherSubformButton": "បន្ថែមមួយទៀត",
+  "subformDeleteConfirmTitle": "លុបធាតុនេះ?",
+  "subformDeleteConfirmBody": "ធាតុនេះនឹងត្រូវលុបចេញពីទម្រង់។",
+  "subformDeleteConfirmAction": "លុប",
+  "reviewHeaderEyebrow": "ពិនិត្យ និងផ្ញើ",
+  "reviewHeaderTitle": "ពិនិត្យរបាយការណ៍មុនពេលផ្ញើ",
+  "authorityEyebrow": "មួយរឿងទៀត",
+  "authorityHelper": "យើងប្រើវាដើម្បីបញ្ជូនរបាយការណ៍ទៅក្រុមដែលទទួលខុសត្រូវ។",
+  "reviewEditButton": "កែ",
+  "reviewReminderBody": "នៅពេលផ្ញើរួច របាយការណ៍នេះមិនអាចកែបានទេ។ សូមពិនិត្យសេចក្តីសង្ខេបខាងលើមុនពេលផ្ញើ។",
+  "reviewBackToFormButton": "ត្រឡប់ទៅទម្រង់",
+  "recentSectionLabel": "ថ្មីៗ",
+  "earlierSectionLabel": "មុននេះ",
+  "noReportsTitle": "មិនទាន់មានរបាយការណ៍",
+  "noReportsHelper": "ចុចលើ + ពណ៌បៃតងខាងក្រោមដើម្បីបង្កើតរបាយការណ៍ដំបូងរបស់អ្នក ឬ​ដាក់ស្នើ​របាយការណ៍​សូន្យ​ប្រសិន​បើ​មិន​មាន​អ្វី​ដែល​ត្រូវ​រាយការណ៍​ក្នុង​សប្តាហ៍​នេះ​ទេ។",
+  "descriptionSectionLabel": "ការ​ពិពណ៌នា",
+  "noDescriptionProvided": "មិន​មាន​ការ​ពិពណ៌នា",
+  "photosSectionLabel": "រូបថត",
+  "attachmentsSectionLabel": "ឯកសារ​ភ្ជាប់",
+  "locationSectionLabel": "ទីតាំង",
+  "followUpFabLabel": "ការតាមដាន",
+  "commentPlaceholder": "សរសេរ​មតិ…",
+  "noCommentsTitle": "មិន​ទាន់​មាន​មតិ​ទេ",
+  "noCommentsHelper": "បន្ថែម​មតិ​មុន​គេ ក្រុម​របស់​អ្នក​នឹង​ទទួល​បាន​ការ​ជូន​ដំណឹង",
+  "noFollowupsTitle": "មិន​ទាន់​មាន​ការតាមដាន",
+  "noFollowupsHelper": "ចុច​ + ដើម្បី​បន្ថែម​ការតាមដាន​ដំបូង — ការ​ចុះ​ពិនិត្យ​មូលដ្ឋាន លទ្ធផល​មន្ទីរ​ពិសោធន៍ ឬ​ការ​ធ្វើ​បច្ចុប្បន្នភាព​ស្ថានភាព",
+  "followupsCount": "{count, plural, other{ការតាមដាន {count}}}",
+  "reportNotFoundTitle": "មិន​ឃើញ​របាយការណ៍",
+  "reportNotFoundHelper": "របាយការណ៍​នេះ​អាច​ត្រូវ​បាន​លុប ឬ​អ្នក​មិន​មាន​អ៊ីនធឺណិត ទាញ​ដើម្បី​ផ្ទុក​ឡើង​វិញ ឬ​ត្រឡប់​ទៅ​បញ្ជី",
+  "backToIncidentsButton": "ត្រឡប់​ទៅ​បញ្ជី",
+  "loadingLabel": "កំពុង​ផ្ទុក…",
+  "testTag": "សាកល្បង",
   "zeroReportLastReportedMessage": "រាយការណ៍ចុងក្រោយនៅ {datetime}",
   "zeroReportSubmitSuccess": "បានផ្ញើរបាយការណ៍ដោយជោគជ័យ",
   "fieldUndefinedLocation": "មិនបានជ្រើសរើសទីតាំងទេ។",

@@ -486,6 +486,354 @@ abstract class AppLocalizations {
   /// **'Zero report'**
   String get zeroReportLabel;
 
+  /// No description provided for @zeroReportPillLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Zero report'**
+  String get zeroReportPillLabel;
+
+  /// No description provided for @nothingToReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to report this week'**
+  String get nothingToReportTitle;
+
+  /// No description provided for @lastZeroReportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last zero report {datetime}'**
+  String lastZeroReportLabel(String datetime);
+
+  /// No description provided for @testModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Test mode'**
+  String get testModeLabel;
+
+  /// No description provided for @testModeBannerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Test mode is on — submissions land in the sandbox only.'**
+  String get testModeBannerMessage;
+
+  /// No description provided for @offlineCachedListMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline · showing cached list from {date}'**
+  String offlineCachedListMessage(String date);
+
+  /// No description provided for @noReportTypesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No report types available'**
+  String get noReportTypesTitle;
+
+  /// No description provided for @noReportTypesHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coordinator hasn\'t published a list yet, or the sync hasn\'t finished. Pull to refresh, or contact your village leader.'**
+  String get noReportTypesHelper;
+
+  /// No description provided for @tryAgainButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgainButton;
+
+  /// No description provided for @adminToolsSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin tools'**
+  String get adminToolsSectionLabel;
+
+  /// No description provided for @testDraftFormLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Test a draft form'**
+  String get testDraftFormLabel;
+
+  /// No description provided for @testDraftFormHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a QR from the web dashboard to preview an unpublished report type.'**
+  String get testDraftFormHelper;
+
+  /// No description provided for @formChromeBackLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get formChromeBackLabel;
+
+  /// No description provided for @formChromeNextLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get formChromeNextLabel;
+
+  /// No description provided for @formChromeReviewLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get formChromeReviewLabel;
+
+  /// No description provided for @formChromeSubmitReportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit report'**
+  String get formChromeSubmitReportLabel;
+
+  /// No description provided for @formChromeSubmitFollowupLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit follow-up'**
+  String get formChromeSubmitFollowupLabel;
+
+  /// No description provided for @formStepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String formStepLabel(int current, int total);
+
+  /// No description provided for @formSaveDraftAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as draft'**
+  String get formSaveDraftAction;
+
+  /// No description provided for @formDraftSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft saved — photos and files kept on this device.'**
+  String get formDraftSavedMessage;
+
+  /// No description provided for @exitDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave without submitting?'**
+  String get exitDialogTitle;
+
+  /// No description provided for @exitDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answers and attached photos will be discarded. You can save a draft from the menu to keep them.'**
+  String get exitDialogBody;
+
+  /// No description provided for @exitDialogDiscardButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard & leave'**
+  String get exitDialogDiscardButton;
+
+  /// No description provided for @exitDialogKeepButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get exitDialogKeepButton;
+
+  /// No description provided for @choiceOtherPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Please specify'**
+  String get choiceOtherPlaceholder;
+
+  /// No description provided for @attachFileButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach file'**
+  String get attachFileButton;
+
+  /// No description provided for @addAnotherSubformButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another'**
+  String get addAnotherSubformButton;
+
+  /// No description provided for @subformDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete entry?'**
+  String get subformDeleteConfirmTitle;
+
+  /// No description provided for @subformDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This entry will be removed from the form.'**
+  String get subformDeleteConfirmBody;
+
+  /// No description provided for @subformDeleteConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get subformDeleteConfirmAction;
+
+  /// No description provided for @reviewHeaderEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'REVIEW & SUBMIT'**
+  String get reviewHeaderEyebrow;
+
+  /// No description provided for @reviewHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your report before sending'**
+  String get reviewHeaderTitle;
+
+  /// No description provided for @authorityEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'ONE MORE THING'**
+  String get authorityEyebrow;
+
+  /// No description provided for @authorityHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'We use this to route the report to the right responding team.'**
+  String get authorityHelper;
+
+  /// No description provided for @reviewEditButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get reviewEditButton;
+
+  /// No description provided for @reviewReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Once submitted, this report can\'t be edited. Double-check the summary above before sending.'**
+  String get reviewReminderBody;
+
+  /// No description provided for @reviewBackToFormButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to form'**
+  String get reviewBackToFormButton;
+
+  /// No description provided for @recentSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get recentSectionLabel;
+
+  /// No description provided for @earlierSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get earlierSectionLabel;
+
+  /// No description provided for @noReportsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No reports yet'**
+  String get noReportsTitle;
+
+  /// No description provided for @noReportsHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the green + below to file your first report, or submit a Zero report if there\'s nothing to report this week.'**
+  String get noReportsHelper;
+
+  /// No description provided for @descriptionSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get descriptionSectionLabel;
+
+  /// No description provided for @noDescriptionProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No description provided'**
+  String get noDescriptionProvided;
+
+  /// No description provided for @photosSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photosSectionLabel;
+
+  /// No description provided for @attachmentsSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachmentsSectionLabel;
+
+  /// No description provided for @locationSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get locationSectionLabel;
+
+  /// No description provided for @followUpFabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow up'**
+  String get followUpFabLabel;
+
+  /// No description provided for @commentPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a comment…'**
+  String get commentPlaceholder;
+
+  /// No description provided for @noCommentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet'**
+  String get noCommentsTitle;
+
+  /// No description provided for @noCommentsHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to add a note. Your team gets a push notification.'**
+  String get noCommentsHelper;
+
+  /// No description provided for @noFollowupsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No follow-ups yet'**
+  String get noFollowupsTitle;
+
+  /// No description provided for @noFollowupsHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to add the first follow-up — typically a field visit, lab result, or status update.'**
+  String get noFollowupsHelper;
+
+  /// No description provided for @followupsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} follow-up} other{{count} follow-ups}}'**
+  String followupsCount(int count);
+
+  /// No description provided for @reportNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report not found'**
+  String get reportNotFoundTitle;
+
+  /// No description provided for @reportNotFoundHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'This report may have been removed, or you might be offline. Pull to refresh, or go back to the list.'**
+  String get reportNotFoundHelper;
+
+  /// No description provided for @backToIncidentsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to incidents'**
+  String get backToIncidentsButton;
+
+  /// No description provided for @loadingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get loadingLabel;
+
+  /// No description provided for @testTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get testTag;
+
   /// No description provided for @zeroReportLastReportedMessage.
   ///
   /// In en, this message translates to:

@@ -22,7 +22,6 @@ import 'package:mime/mime.dart';
 import 'package:app_settings/app_settings.dart';
 
 import 'package:podd_app/app_theme.dart';
-import 'package:podd_app/components/flat_button.dart';
 import 'package:podd_app/components/qr_scanner_parts.dart';
 import 'package:podd_app/components/subform_form_view.dart';
 import 'package:podd_app/models/entities/report_file.dart';
@@ -30,10 +29,13 @@ import 'package:podd_app/services/file_service.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/entities/report_image.dart';
 import 'package:podd_app/services/image_service.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 
 import '../opsv_form.dart' as opsv;
 
 part 'validation_wrapper.dart';
+part 'input_chrome.dart';
+part 'focus_scope.dart';
 part 'question.dart';
 part 'field.dart';
 part 'text_field.dart';

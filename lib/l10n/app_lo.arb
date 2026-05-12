@@ -61,6 +61,86 @@
   "noComment": "ບໍ່ມີຄວາມຄິດເຫັນ",
   "noGpsProvided": "ບໍ່ໄດ້ລະບຸສະຖານທີ່ gps",
   "zeroReportLabel": "ບົດ​ລາຍ​ງານ​ບໍ່​ໄດ້​ພົບ​ເຫັນ​ຄວາມ​ຜິດ​ປົກກະຕິ",
+  "zeroReportPillLabel": "Zero report",
+  "nothingToReportTitle": "ບໍ່ມີຫຍັງລາຍງານໃນອາທິດນີ້",
+  "lastZeroReportLabel": "Zero report ຄັ້ງສຸດທ້າຍ {datetime}",
+  "@lastZeroReportLabel": {
+    "placeholders": {
+      "datetime": {
+        "type": "String",
+        "example": "09/05 · 08:14"
+      }
+    }
+  },
+  "testModeLabel": "ໂໝດທົດສອບ",
+  "testModeBannerMessage": "ໂໝດທົດສອບເປີດຢູ່ — ການສົ່ງຂໍ້ມູນຈະໄປແຊນບອກເທົ່ານັ້ນ",
+  "offlineCachedListMessage": "ອອບລາຍ · ສະແດງລາຍການທີ່ບັນທຶກໄວ້ຈາກ {date}",
+  "@offlineCachedListMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "09 May"
+      }
+    }
+  },
+  "noReportTypesTitle": "ບໍ່ມີປະເພດລາຍງານ",
+  "noReportTypesHelper": "ຜູ້ປະສານງານຍັງບໍ່ໄດ້ເຜີຍແຜ່ລາຍການ ຫຼື ການຊິງຄ໌ຍັງບໍ່ສຳເລັດ. ດຶງເພື່ອໂຫຼດໃໝ່ ຫຼື ຕິດຕໍ່ຫົວໜ້າບ້ານ",
+  "tryAgainButton": "ລອງໃໝ່",
+  "adminToolsSectionLabel": "ເຄື່ອງມືຜູ້ດູແລ",
+  "testDraftFormLabel": "ທົດສອບແບບຟອມຮ່າງ",
+  "testDraftFormHelper": "ສະແກນ QR ຈາກແດສບອດເວັບເພື່ອເບິ່ງປະເພດລາຍງານທີ່ຍັງບໍ່ໄດ້ເຜີຍແຜ່",
+  "formChromeBackLabel": "ກັບຄືນ",
+  "formChromeNextLabel": "ຕໍ່ໄປ",
+  "formChromeReviewLabel": "ກວດສອບ",
+  "formChromeSubmitReportLabel": "ສົ່ງລາຍງານ",
+  "formChromeSubmitFollowupLabel": "ສົ່ງການຕິດຕາມ",
+  "formStepLabel": "ຂັ້ນຕອນທີ {current} ຈາກ {total}",
+  "@formStepLabel": {
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total":   { "type": "int", "example": "5" }
+    }
+  },
+  "formSaveDraftAction": "ບັນທຶກເປັນຮ່າງ",
+  "formDraftSavedMessage": "ບັນທຶກຮ່າງແລ້ວ — ຮູບແລະໄຟລ໌ຍັງຖືກເກັບໄວ້ໃນເຄື່ອງ",
+  "exitDialogTitle": "ອອກໂດຍບໍ່ສົ່ງບໍ?",
+  "exitDialogBody": "ຄຳຕອບແລະຮູບທີ່ແນບໄວ້ຈະຖືກລຶບ. ທ່ານສາມາດບັນທຶກເປັນຮ່າງຈາກເມນູເພື່ອເກັບໄວ້",
+  "exitDialogDiscardButton": "ລຶບ ແລະ ອອກ",
+  "exitDialogKeepButton": "ສືບຕໍ່ແກ້ໄຂ",
+  "choiceOtherPlaceholder": "ກະລຸນາລະບຸ",
+  "attachFileButton": "ແນບໄຟລ໌",
+  "addAnotherSubformButton": "ເພີ່ມອີກ",
+  "subformDeleteConfirmTitle": "ລຶບລາຍການນີ້?",
+  "subformDeleteConfirmBody": "ລາຍການນີ້ຈະຖືກລຶບອອກຈາກແບບຟອມ",
+  "subformDeleteConfirmAction": "ລຶບ",
+  "reviewHeaderEyebrow": "ກວດກາ ແລະ ສົ່ງ",
+  "reviewHeaderTitle": "ກວດກາລາຍງານກ່ອນສົ່ງ",
+  "authorityEyebrow": "ອີກໜຶ່ງເລື່ອງ",
+  "authorityHelper": "ໃຊ້ສຳລັບສົ່ງລາຍງານໄປຫາທີມທີ່ຮັບຜິດຊອບ",
+  "reviewEditButton": "ແກ້ໄຂ",
+  "reviewReminderBody": "ຫຼັງສົ່ງລາຍງານແລ້ວຈະບໍ່ສາມາດແກ້ໄຂໄດ້ ກະລຸນາກວດກາສະຫຼຸບຂ້າງເທິງກ່ອນສົ່ງ",
+  "reviewBackToFormButton": "ກັບໄປແບບຟອມ",
+  "recentSectionLabel": "ຫຼ້າສຸດ",
+  "earlierSectionLabel": "ກ່ອນໜ້ານີ້",
+  "noReportsTitle": "ຍັງບໍ່ມີລາຍງານ",
+  "noReportsHelper": "ກົດປຸ່ມ + ສີຂຽວດ້ານລຸ່ມເພື່ອສ້າງລາຍງານສະບັບທຳອິດ ຫຼື ສົ່ງລາຍງານປົກກະຕິຫາກບໍ່ມີເຫດການໃນອາທິດນີ້",
+  "descriptionSectionLabel": "ລາຍລະອຽດ",
+  "noDescriptionProvided": "ບໍ່ມີລາຍລະອຽດ",
+  "photosSectionLabel": "ຮູບພາບ",
+  "attachmentsSectionLabel": "ເອກະສານແນບ",
+  "locationSectionLabel": "ສະຖານທີ່",
+  "followUpFabLabel": "ຕິດຕາມຜົນ",
+  "commentPlaceholder": "ຂຽນຄຳເຫັນ…",
+  "noCommentsTitle": "ຍັງບໍ່ມີຄຳເຫັນ",
+  "noCommentsHelper": "ເປັນຄົນທຳອິດທີ່ຕື່ມຄຳເຫັນ ທີມງານຈະໄດ້ຮັບການແຈ້ງເຕືອນ",
+  "noFollowupsTitle": "ຍັງບໍ່ມີການຕິດຕາມຜົນ",
+  "noFollowupsHelper": "ກົດ + ເພື່ອເພີ່ມການຕິດຕາມຜົນຄັ້ງທຳອິດ ເຊັ່ນ ການລົງພື້ນທີ່ ຜົນກວດ ຫຼື ສະຖານະຫຼ້າສຸດ",
+  "followupsCount": "{count, plural, other{ຕິດຕາມຜົນ {count} ລາຍການ}}",
+  "reportNotFoundTitle": "ບໍ່ພົບລາຍງານນີ້",
+  "reportNotFoundHelper": "ລາຍງານອາດຖືກລົບໄປແລ້ວ ຫຼື ທ່ານອາດອອບລາຍຢູ່ ດຶງເພື່ອໂຫຼດໃໝ່ ຫຼື ກັບໄປລາຍການ",
+  "backToIncidentsButton": "ກັບໄປໜ້າລາຍງານ",
+  "loadingLabel": "ກຳລັງໂຫຼດ…",
+  "testTag": "ທົດສອບ",
   "zeroReportLastReportedMessage": "ລາຍງານຫຼ້າສຸດກ່ຽວກັບ {datetime}",
   "zeroReportSubmitSuccess": "ສົ່ງບົດ​ລາຍ​ງານ​ບໍ່​ໄດ້​ພົບ​ເຫັນ​ຄວາມ​ຜິດ​ປົກກະຕິສຳເລັດ",
   "fieldUndefinedLocation": "ພິກັດຍັງບໍ່ໄດ້ລະບຸເທື່ອ",

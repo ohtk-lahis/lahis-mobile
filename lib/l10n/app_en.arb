@@ -62,6 +62,93 @@
   "noComment": "No comment",
   "noGpsProvided": "No gps location provided",
   "zeroReportLabel": "Zero report",
+  "zeroReportPillLabel": "Zero report",
+  "nothingToReportTitle": "Nothing to report this week",
+  "lastZeroReportLabel": "Last zero report {datetime}",
+  "@lastZeroReportLabel": {
+    "placeholders": {
+      "datetime": {
+        "type": "String",
+        "example": "09/05 · 08:14"
+      }
+    }
+  },
+  "testModeLabel": "Test mode",
+  "testModeBannerMessage": "Test mode is on — submissions land in the sandbox only.",
+  "offlineCachedListMessage": "Offline · showing cached list from {date}",
+  "@offlineCachedListMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "09 May"
+      }
+    }
+  },
+  "noReportTypesTitle": "No report types available",
+  "noReportTypesHelper": "Your coordinator hasn't published a list yet, or the sync hasn't finished. Pull to refresh, or contact your village leader.",
+  "tryAgainButton": "Try again",
+  "adminToolsSectionLabel": "Admin tools",
+  "testDraftFormLabel": "Test a draft form",
+  "testDraftFormHelper": "Scan a QR from the web dashboard to preview an unpublished report type.",
+  "formChromeBackLabel": "Back",
+  "formChromeNextLabel": "Next",
+  "formChromeReviewLabel": "Review",
+  "formChromeSubmitReportLabel": "Submit report",
+  "formChromeSubmitFollowupLabel": "Submit follow-up",
+  "formStepLabel": "Step {current} of {total}",
+  "@formStepLabel": {
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total":   { "type": "int", "example": "5" }
+    }
+  },
+  "formSaveDraftAction": "Save as draft",
+  "formDraftSavedMessage": "Draft saved — photos and files kept on this device.",
+  "exitDialogTitle": "Leave without submitting?",
+  "exitDialogBody": "Your answers and attached photos will be discarded. You can save a draft from the menu to keep them.",
+  "exitDialogDiscardButton": "Discard & leave",
+  "exitDialogKeepButton": "Keep editing",
+  "choiceOtherPlaceholder": "Please specify",
+  "attachFileButton": "Attach file",
+  "addAnotherSubformButton": "Add another",
+  "subformDeleteConfirmTitle": "Delete entry?",
+  "subformDeleteConfirmBody": "This entry will be removed from the form.",
+  "subformDeleteConfirmAction": "Delete",
+  "reviewHeaderEyebrow": "REVIEW & SUBMIT",
+  "reviewHeaderTitle": "Check your report before sending",
+  "authorityEyebrow": "ONE MORE THING",
+  "authorityHelper": "We use this to route the report to the right responding team.",
+  "reviewEditButton": "Edit",
+  "reviewReminderBody": "Once submitted, this report can't be edited. Double-check the summary above before sending.",
+  "reviewBackToFormButton": "Back to form",
+  "recentSectionLabel": "Recent",
+  "earlierSectionLabel": "Earlier",
+  "noReportsTitle": "No reports yet",
+  "noReportsHelper": "Tap the green + below to file your first report, or submit a Zero report if there's nothing to report this week.",
+  "descriptionSectionLabel": "Description",
+  "noDescriptionProvided": "No description provided",
+  "photosSectionLabel": "Photos",
+  "attachmentsSectionLabel": "Attachments",
+  "locationSectionLabel": "Location",
+  "followUpFabLabel": "Follow up",
+  "commentPlaceholder": "Write a comment…",
+  "noCommentsTitle": "No comments yet",
+  "noCommentsHelper": "Be the first to add a note. Your team gets a push notification.",
+  "noFollowupsTitle": "No follow-ups yet",
+  "noFollowupsHelper": "Tap + to add the first follow-up — typically a field visit, lab result, or status update.",
+  "followupsCount": "{count, plural, =1{{count} follow-up} other{{count} follow-ups}}",
+  "@followupsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportNotFoundTitle": "Report not found",
+  "reportNotFoundHelper": "This report may have been removed, or you might be offline. Pull to refresh, or go back to the list.",
+  "backToIncidentsButton": "Back to incidents",
+  "loadingLabel": "Loading…",
+  "testTag": "Test",
   "zeroReportLastReportedMessage": "Last reported at {datetime}",
   "@zeroReportLastReportedMessage": {
     "placeholders": {

@@ -200,6 +200,206 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zeroReportLabel => 'Zero report';
 
   @override
+  String get zeroReportPillLabel => 'Zero report';
+
+  @override
+  String get nothingToReportTitle => 'Nothing to report this week';
+
+  @override
+  String lastZeroReportLabel(String datetime) {
+    return 'Last zero report $datetime';
+  }
+
+  @override
+  String get testModeLabel => 'Test mode';
+
+  @override
+  String get testModeBannerMessage =>
+      'Test mode is on — submissions land in the sandbox only.';
+
+  @override
+  String offlineCachedListMessage(String date) {
+    return 'Offline · showing cached list from $date';
+  }
+
+  @override
+  String get noReportTypesTitle => 'No report types available';
+
+  @override
+  String get noReportTypesHelper =>
+      'Your coordinator hasn\'t published a list yet, or the sync hasn\'t finished. Pull to refresh, or contact your village leader.';
+
+  @override
+  String get tryAgainButton => 'Try again';
+
+  @override
+  String get adminToolsSectionLabel => 'Admin tools';
+
+  @override
+  String get testDraftFormLabel => 'Test a draft form';
+
+  @override
+  String get testDraftFormHelper =>
+      'Scan a QR from the web dashboard to preview an unpublished report type.';
+
+  @override
+  String get formChromeBackLabel => 'Back';
+
+  @override
+  String get formChromeNextLabel => 'Next';
+
+  @override
+  String get formChromeReviewLabel => 'Review';
+
+  @override
+  String get formChromeSubmitReportLabel => 'Submit report';
+
+  @override
+  String get formChromeSubmitFollowupLabel => 'Submit follow-up';
+
+  @override
+  String formStepLabel(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get formSaveDraftAction => 'Save as draft';
+
+  @override
+  String get formDraftSavedMessage =>
+      'Draft saved — photos and files kept on this device.';
+
+  @override
+  String get exitDialogTitle => 'Leave without submitting?';
+
+  @override
+  String get exitDialogBody =>
+      'Your answers and attached photos will be discarded. You can save a draft from the menu to keep them.';
+
+  @override
+  String get exitDialogDiscardButton => 'Discard & leave';
+
+  @override
+  String get exitDialogKeepButton => 'Keep editing';
+
+  @override
+  String get choiceOtherPlaceholder => 'Please specify';
+
+  @override
+  String get attachFileButton => 'Attach file';
+
+  @override
+  String get addAnotherSubformButton => 'Add another';
+
+  @override
+  String get subformDeleteConfirmTitle => 'Delete entry?';
+
+  @override
+  String get subformDeleteConfirmBody =>
+      'This entry will be removed from the form.';
+
+  @override
+  String get subformDeleteConfirmAction => 'Delete';
+
+  @override
+  String get reviewHeaderEyebrow => 'REVIEW & SUBMIT';
+
+  @override
+  String get reviewHeaderTitle => 'Check your report before sending';
+
+  @override
+  String get authorityEyebrow => 'ONE MORE THING';
+
+  @override
+  String get authorityHelper =>
+      'We use this to route the report to the right responding team.';
+
+  @override
+  String get reviewEditButton => 'Edit';
+
+  @override
+  String get reviewReminderBody =>
+      'Once submitted, this report can\'t be edited. Double-check the summary above before sending.';
+
+  @override
+  String get reviewBackToFormButton => 'Back to form';
+
+  @override
+  String get recentSectionLabel => 'Recent';
+
+  @override
+  String get earlierSectionLabel => 'Earlier';
+
+  @override
+  String get noReportsTitle => 'No reports yet';
+
+  @override
+  String get noReportsHelper =>
+      'Tap the green + below to file your first report, or submit a Zero report if there\'s nothing to report this week.';
+
+  @override
+  String get descriptionSectionLabel => 'Description';
+
+  @override
+  String get noDescriptionProvided => 'No description provided';
+
+  @override
+  String get photosSectionLabel => 'Photos';
+
+  @override
+  String get attachmentsSectionLabel => 'Attachments';
+
+  @override
+  String get locationSectionLabel => 'Location';
+
+  @override
+  String get followUpFabLabel => 'Follow up';
+
+  @override
+  String get commentPlaceholder => 'Write a comment…';
+
+  @override
+  String get noCommentsTitle => 'No comments yet';
+
+  @override
+  String get noCommentsHelper =>
+      'Be the first to add a note. Your team gets a push notification.';
+
+  @override
+  String get noFollowupsTitle => 'No follow-ups yet';
+
+  @override
+  String get noFollowupsHelper =>
+      'Tap + to add the first follow-up — typically a field visit, lab result, or status update.';
+
+  @override
+  String followupsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count follow-ups',
+      one: '$count follow-up',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportNotFoundTitle => 'Report not found';
+
+  @override
+  String get reportNotFoundHelper =>
+      'This report may have been removed, or you might be offline. Pull to refresh, or go back to the list.';
+
+  @override
+  String get backToIncidentsButton => 'Back to incidents';
+
+  @override
+  String get loadingLabel => 'Loading…';
+
+  @override
+  String get testTag => 'Test';
+
+  @override
   String zeroReportLastReportedMessage(String datetime) {
     return 'Last reported at $datetime';
   }

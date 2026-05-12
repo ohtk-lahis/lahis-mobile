@@ -1,0 +1,448 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
+import 'package:podd_app/opsv_form/opsv_form.dart' as opsv;
+import 'package:podd_app/ui/home/incidents_theme.dart';
+
+const _appBarHeight = 56.0;
+
+class FormChromeAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final VoidCallback onBack;
+  final VoidCallback? onSaveDraft;
+
+  const FormChromeAppBar({
+    required this.title,
+    required this.onBack,
+    this.onSaveDraft,
+    super.key,
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(_appBarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return Container(
+      color: incidentsTealDeep,
+      child: SafeArea(
+        bottom: false,
+        child: SizedBox(
+          height: _appBarHeight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+        children: [
+          IconButton(
+            iconSize: 22,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: onBack,
+          ),
+          Expanded(
+            child: Padding(
+              padding:
+                  EdgeInsets.only(right: onSaveDraft != null ? 0 : 40),
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ),
+          ),
+          if (onSaveDraft != null)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              tooltip: localize.formSaveDraftAction,
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              onSelected: (key) {
+                if (key == 'draft') onSaveDraft!();
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem<String>(
+                  value: 'draft',
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.bookmark_outline,
+                        size: 18,
+                        color: incidentsTeal,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        localize.formSaveDraftAction,
+                        style: const TextStyle(
+                          fontFamily: incidentsFontFamily,
+                          fontFamilyFallback: incidentsFontFamilyFallback,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: incidentsInk,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FormChromeTestBanner extends StatelessWidget {
+  final bool testFlag;
+
+  const FormChromeTestBanner({required this.testFlag, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!testFlag) return const SizedBox.shrink();
+    final localize = AppLocalizations.of(context)!;
+    return Container(
+      decoration: const BoxDecoration(
+        color: incidentsTestBannerBg,
+        border: Border(
+          bottom: BorderSide(color: incidentsTestBannerBorder, width: 1),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.warning_amber_rounded,
+            size: 14,
+            color: incidentsTestPillFg,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              localize.testModeBannerMessage,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: incidentsTestPillFg,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FormChromeProgressStrip extends StatelessWidget {
+  final opsv.Form form;
+
+  const FormChromeProgressStrip({required this.form, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (_) {
+        final total = form.numberOfSections;
+        if (total <= 1) return const SizedBox.shrink();
+        final localize = AppLocalizations.of(context)!;
+        final current = form.currentSectionIdx;
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              bottom: BorderSide(color: incidentsHair, width: 1),
+            ),
+          ),
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    localize
+                        .formStepLabel(current + 1, total)
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      fontFamily: incidentsFontFamily,
+                      fontFamilyFallback: incidentsFontFamilyFallback,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.5,
+                      color: incidentsMuted,
+                    ),
+                  ),
+                  const Spacer(),
+                  Flexible(
+                    child: Text(
+                      form.currentSection.label,
+                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: incidentsInk,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: List.generate(total, (i) {
+                  final isPast = i < current;
+                  final isCurrent = i == current;
+                  final color = isCurrent
+                      ? incidentsTeal
+                      : isPast
+                          ? incidentsTeal.withValues(alpha: 0.6)
+                          : incidentsHair;
+                  return Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: i == total - 1 ? 0 : 4,
+                      ),
+                      child: Container(
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class FormChromeFooter extends StatelessWidget {
+  final bool canGoBack;
+  final bool isLastSection;
+  final bool isReviewing;
+  final VoidCallback onBack;
+  final VoidCallback onNext;
+
+  const FormChromeFooter({
+    required this.canGoBack,
+    required this.isLastSection,
+    required this.isReviewing,
+    required this.onBack,
+    required this.onNext,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    final media = MediaQuery.of(context);
+    final nextLabel =
+        isLastSection ? localize.formChromeReviewLabel : localize.formChromeNextLabel;
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: incidentsHair, width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0D000000),
+            offset: Offset(0, -6),
+            blurRadius: 18,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.fromLTRB(14, 10, 14, 10 + media.padding.bottom),
+      child: Row(
+        children: [
+          OutlinedButton(
+            onPressed: canGoBack ? onBack : null,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: incidentsInk,
+              disabledForegroundColor: incidentsHair,
+              side: BorderSide(
+                color: canGoBack ? incidentsHair : incidentsHair,
+                width: 1,
+              ),
+              shape: const StadiumBorder(),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+              minimumSize: const Size(0, 44),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              localize.formChromeBackLabel,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const Spacer(),
+          TextButton(
+            onPressed: onNext,
+            style: TextButton.styleFrom(
+              backgroundColor: incidentsTeal,
+              foregroundColor: Colors.white,
+              shape: const StadiumBorder(),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+              minimumSize: const Size(0, 44),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  nextLabel,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  isLastSection ? Icons.check : Icons.arrow_forward,
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Future<bool> showExitConfirmDialog(BuildContext context) async {
+  final localize = AppLocalizations.of(context)!;
+  final result = await showDialog<bool>(
+    context: context,
+    barrierColor: Colors.black54,
+    builder: (dialogContext) => Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: incidentsTestBannerBg,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.warning_amber_rounded,
+                size: 28,
+                color: incidentsTestPillFg,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              localize.exitDialogTitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: incidentsInk,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              localize.exitDialogBody,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 13,
+                color: incidentsMuted,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                style: TextButton.styleFrom(
+                  backgroundColor: incidentsErrorRed,
+                  foregroundColor: Colors.white,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Text(
+                  localize.exitDialogDiscardButton,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: incidentsInk,
+                  side: const BorderSide(color: incidentsHair, width: 1),
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Text(
+                  localize.exitDialogKeepButton,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+  return result ?? false;
+}

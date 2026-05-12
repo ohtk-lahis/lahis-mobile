@@ -62,6 +62,86 @@
   "noComment": "Aucun commentaire",
   "noGpsProvided": "No gps location provided",
   "zeroReportLabel": "Zéro rapport",
+  "zeroReportPillLabel": "Zéro rapport",
+  "nothingToReportTitle": "Rien à signaler cette semaine",
+  "lastZeroReportLabel": "Dernier zéro rapport {datetime}",
+  "@lastZeroReportLabel": {
+    "placeholders": {
+      "datetime": {
+        "type": "String",
+        "example": "09/05 · 08:14"
+      }
+    }
+  },
+  "testModeLabel": "Mode test",
+  "testModeBannerMessage": "Le mode test est activé — les soumissions vont uniquement dans le bac à sable.",
+  "offlineCachedListMessage": "Hors ligne · liste en cache du {date}",
+  "@offlineCachedListMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "09 May"
+      }
+    }
+  },
+  "noReportTypesTitle": "Aucun type de rapport disponible",
+  "noReportTypesHelper": "Votre coordinateur n'a pas encore publié de liste, ou la synchronisation n'est pas terminée. Tirez pour rafraîchir, ou contactez votre chef de village.",
+  "tryAgainButton": "Réessayer",
+  "adminToolsSectionLabel": "Outils d'administration",
+  "testDraftFormLabel": "Tester un formulaire brouillon",
+  "testDraftFormHelper": "Scannez un QR du tableau de bord web pour prévisualiser un type de rapport non publié.",
+  "formChromeBackLabel": "Retour",
+  "formChromeNextLabel": "Suivant",
+  "formChromeReviewLabel": "Revoir",
+  "formChromeSubmitReportLabel": "Envoyer le rapport",
+  "formChromeSubmitFollowupLabel": "Envoyer le suivi",
+  "formStepLabel": "Étape {current} sur {total}",
+  "@formStepLabel": {
+    "placeholders": {
+      "current": { "type": "int", "example": "2" },
+      "total":   { "type": "int", "example": "5" }
+    }
+  },
+  "formSaveDraftAction": "Enregistrer comme brouillon",
+  "formDraftSavedMessage": "Brouillon enregistré — les photos et fichiers restent sur l'appareil.",
+  "exitDialogTitle": "Quitter sans envoyer ?",
+  "exitDialogBody": "Vos réponses et photos jointes seront supprimées. Vous pouvez enregistrer un brouillon depuis le menu pour les conserver.",
+  "exitDialogDiscardButton": "Supprimer et quitter",
+  "exitDialogKeepButton": "Continuer à modifier",
+  "choiceOtherPlaceholder": "Veuillez préciser",
+  "attachFileButton": "Joindre un fichier",
+  "addAnotherSubformButton": "Ajouter un autre",
+  "subformDeleteConfirmTitle": "Supprimer l'entrée ?",
+  "subformDeleteConfirmBody": "Cette entrée sera retirée du formulaire.",
+  "subformDeleteConfirmAction": "Supprimer",
+  "reviewHeaderEyebrow": "VÉRIFIER ET ENVOYER",
+  "reviewHeaderTitle": "Vérifiez votre rapport avant l'envoi",
+  "authorityEyebrow": "UNE DERNIÈRE CHOSE",
+  "authorityHelper": "Nous l'utilisons pour acheminer le rapport à la bonne équipe.",
+  "reviewEditButton": "Modifier",
+  "reviewReminderBody": "Une fois envoyé, ce rapport ne peut plus être modifié. Vérifiez le résumé ci-dessus avant l'envoi.",
+  "reviewBackToFormButton": "Retour au formulaire",
+  "recentSectionLabel": "Récent",
+  "earlierSectionLabel": "Plus tôt",
+  "noReportsTitle": "Aucun rapport pour l'instant",
+  "noReportsHelper": "Appuyez sur le + vert ci-dessous pour créer votre premier rapport, ou envoyez un Zéro rapport s'il n'y a rien à signaler cette semaine.",
+  "descriptionSectionLabel": "Description",
+  "noDescriptionProvided": "Aucune description",
+  "photosSectionLabel": "Photos",
+  "attachmentsSectionLabel": "Pièces jointes",
+  "locationSectionLabel": "Lieu",
+  "followUpFabLabel": "Suivi",
+  "commentPlaceholder": "Écrire un commentaire…",
+  "noCommentsTitle": "Aucun commentaire",
+  "noCommentsHelper": "Soyez le premier à commenter. Votre équipe recevra une notification.",
+  "noFollowupsTitle": "Aucun suivi",
+  "noFollowupsHelper": "Appuyez sur + pour ajouter le premier suivi — visite sur le terrain, résultat de labo ou mise à jour de statut.",
+  "followupsCount": "{count, plural, =1{{count} suivi} other{{count} suivis}}",
+  "reportNotFoundTitle": "Rapport introuvable",
+  "reportNotFoundHelper": "Ce rapport a peut-être été supprimé, ou vous êtes hors ligne. Tirez pour rafraîchir, ou revenez à la liste.",
+  "backToIncidentsButton": "Retour aux incidents",
+  "loadingLabel": "Chargement…",
+  "testTag": "Test",
   "zeroReportLastReportedMessage": "Signalé pour la dernière fois à {datetime}",
   "@zeroReportLastReportedMessage": {
     "placeholders": {

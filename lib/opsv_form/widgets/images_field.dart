@@ -2,6 +2,9 @@ part of 'widgets.dart';
 
 var _uuid = const Uuid();
 
+const double _thumbSize = 76;
+const double _thumbRadius = 10;
+
 class FormImagesField extends StatefulWidget {
   final opsv.ImagesField field;
 
@@ -14,68 +17,24 @@ class FormImagesField extends StatefulWidget {
 class _FormImagesFieldState extends State<FormImagesField> {
   final IImageService _imageService = locator<IImageService>();
   final _logger = locator<Logger>();
-  final AppTheme apptheme = locator<AppTheme>();
 
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (BuildContext context) {
-      var numberOfCurrentImages = widget.field.length;
-
-      return ValidationWrapper(
-        widget.field,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.field.label != null && widget.field.label != "")
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  widget.field.label!,
-                  style: TextStyle(color: Colors.grey.shade700),
-                ),
-              ),
-            DottedBorder(
-              color: apptheme.sub3,
-              dashPattern: const [6, 6],
-              borderType: BorderType.RRect,
-              radius: Radius.circular(apptheme.borderRadius),
-              padding: const EdgeInsets.all(8),
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  // width / height: fixed for *all* items
-                  childAspectRatio: 1,
-                ),
-                itemCount: numberOfCurrentImages + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return _buildAddImageBox();
-                  }
-
-                  var imageId = widget.field.value[index -
-                      1]; // minus 1 because of dummy image is the first.
-
-                  return FutureBuilder<Image>(
-                      future: _getImage(imageId),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return RemoveableImage(
-                            image: snapshot.data!,
-                            imageId: widget.field.value[index -
-                                1], // because index 0 alway be dummy image
-                            onRemove: _removeImage,
-                          );
-                        }
-                        return const CircularProgressIndicator();
-                      });
-                },
-              ),
+      final ids = widget.field.value.toList(growable: false);
+      return Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          _AddImageTile(onTap: _showAddImageModal),
+          for (final id in ids)
+            _ImageThumb(
+              key: ValueKey(id),
+              imageId: id,
+              loader: _getImage,
+              onRemove: _removeImage,
             ),
-          ],
-        ),
+        ],
       );
     });
   }
@@ -83,67 +42,68 @@ class _FormImagesFieldState extends State<FormImagesField> {
   Future<Image> _getImage(String imageId) async {
     var reportImage = await _imageService.getImage(imageId);
     return Image.memory(
-      width: 200.w,
-      height: 200.w,
       reportImage.image,
+      width: _thumbSize,
+      height: _thumbSize,
       fit: BoxFit.cover,
+      gaplessPlayback: true,
     );
   }
 
-  _buildAddImageBox() {
-    return CircleAvatar(
-      backgroundColor: apptheme.sub4,
-      child: IconButton(
-        icon: Icon(Icons.add_a_photo, color: apptheme.primary),
-        onPressed: _showAddImageModal,
-      ),
-    );
-  }
-
-  _addImage(String id) {
+  void _addImage(String id) {
     widget.field.add(id);
   }
 
-  _removeImage(String id) {
+  void _removeImage(String id) {
     widget.field.remove(id);
     _imageService.removeImage(id);
   }
 
-  _showAddImageModal() {
+  void _showAddImageModal() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (context) {
-        var localize = AppLocalizations.of(context)!;
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_album),
-              title: Text(localize.pickFromGallery),
-              onTap: () async {
-                var reportImage = await _pickImage(ImageSource.gallery);
-                if (reportImage != null) {
-                  _addImage(reportImage.id);
-                }
-                if (context.mounted) {
+        final localize = AppLocalizations.of(context)!;
+        return SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: incidentsHair,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _PickerRow(
+                icon: Icons.photo_library_outlined,
+                label: localize.pickFromGallery,
+                onTap: () async {
                   Navigator.pop(context);
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_camera),
-              title: Text(localize.takeAPhoto),
-              onTap: () async {
-                var reportImage = await _pickImage(ImageSource.camera);
-                if (reportImage != null) {
-                  _addImage(reportImage.id);
-                }
-                if (context.mounted) {
+                  final reportImage = await _pickImage(ImageSource.gallery);
+                  if (reportImage != null) _addImage(reportImage.id);
+                },
+              ),
+              _PickerRow(
+                icon: Icons.photo_camera_outlined,
+                label: localize.takeAPhoto,
+                onTap: () async {
                   Navigator.pop(context);
-                }
-              },
-            ),
-          ],
+                  final reportImage = await _pickImage(ImageSource.camera);
+                  if (reportImage != null) _addImage(reportImage.id);
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         );
       },
     );
@@ -167,49 +127,181 @@ class _FormImagesFieldState extends State<FormImagesField> {
   }
 }
 
-typedef RemoveCallback = void Function(String imageId);
-
-class RemoveableImage extends StatelessWidget {
-  final Image image;
-  final String imageId;
-  final RemoveCallback onRemove;
-  final AppTheme apptheme = locator<AppTheme>();
-
-  RemoveableImage(
-      {required this.image,
-      required this.imageId,
-      required this.onRemove,
-      Key? key})
-      : super(key: key);
+class _AddImageTile extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddImageTile({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(4),
-          child: DottedBorder(
-            color: apptheme.sub3,
-            radius: const Radius.circular(12),
-            dashPattern: const [4, 4],
-            padding: const EdgeInsets.all(4),
-            child: image,
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: DottedBorder(
+        color: incidentsTeal,
+        strokeWidth: 1.5,
+        dashPattern: const [5, 4],
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(_thumbRadius),
+        padding: EdgeInsets.zero,
+        child: Container(
+          width: _thumbSize,
+          height: _thumbSize,
+          decoration: BoxDecoration(
+            color: incidentsTeal.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(_thumbRadius),
+          ),
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.photo_camera_outlined,
+                size: 22,
+                color: incidentsTeal,
+              ),
+              SizedBox(height: 2),
+              Text(
+                'ADD',
+                style: TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                  color: incidentsTeal,
+                ),
+              ),
+            ],
           ),
         ),
-        Positioned(
-          top: 0,
-          right: 0,
-          child: GestureDetector(
-            onTap: () {
-              onRemove(imageId);
-            },
-            child: CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 9,
-                child: Icon(Icons.cancel, color: apptheme.primary, size: 18)),
+      ),
+    );
+  }
+}
+
+class _ImageThumb extends StatelessWidget {
+  final String imageId;
+  final Future<Image> Function(String) loader;
+  final void Function(String) onRemove;
+
+  const _ImageThumb({
+    Key? key,
+    required this.imageId,
+    required this.loader,
+    required this.onRemove,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: _thumbSize,
+      height: _thumbSize,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                color: incidentsSand,
+                borderRadius: BorderRadius.circular(_thumbRadius),
+                border: Border.all(color: incidentsHair, width: 1),
+              ),
+              child: FutureBuilder<Image>(
+                future: loader(imageId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) return snapshot.data!;
+                  return const Center(
+                    child: SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: incidentsTeal,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
+          Positioned(
+            right: 4,
+            top: 4,
+            child: _RemoveBadge(onTap: () => onRemove(imageId)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RemoveBadge extends StatelessWidget {
+  final VoidCallback onTap;
+  const _RemoveBadge({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 22,
+        height: 22,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: incidentsHair, width: 1),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1F000000),
+              offset: Offset(0, 1),
+              blurRadius: 3,
+            ),
+          ],
         ),
-      ],
+        child: const Icon(
+          Icons.close,
+          size: 13,
+          color: incidentsInk,
+        ),
+      ),
+    );
+  }
+}
+
+class _PickerRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _PickerRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: incidentsTeal),
+            const SizedBox(width: 14),
+            Text(
+              label,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: incidentsInk,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

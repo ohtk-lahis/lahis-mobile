@@ -8,7 +8,11 @@ import 'package:podd_app/components/display_field.dart';
 import 'package:podd_app/components/flat_button.dart';
 import 'package:podd_app/components/restart_widget.dart';
 import 'package:podd_app/locator.dart';
+import 'package:podd_app/models/entities/report_type.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/profile/profile_view_model.dart';
+import 'package:podd_app/ui/report_type/form_simulator_view.dart';
+import 'package:podd_app/ui/report_type/qr_report_type_view.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
@@ -130,6 +134,8 @@ class ProfileView extends StatelessWidget {
                             color: Colors.red.shade400,
                           ),
                           _DownloadLoginQrCodeButton(),
+                          const SizedBox(height: 10),
+                          const _AdminToolsSection(),
                           const SizedBox(height: 10),
                           SizedBox(
                             width: double.infinity,
@@ -459,5 +465,129 @@ class _Avatar extends StackedHookView<ProfileViewModel> {
       debugPrint("$e");
     }
     return null;
+  }
+}
+
+// TODO: role-gate behind `user.role in (admin, author)` once the User model
+// exposes that field. Today it renders for everyone, matching legacy QR
+// scanner visibility on the report-type chooser.
+class _AdminToolsSection extends StatelessWidget {
+  const _AdminToolsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 12, 4, 6),
+          child: Text(
+            localize.adminToolsSectionLabel.toUpperCase(),
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+              color: incidentsMuted,
+            ),
+          ),
+        ),
+        Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => _scanDraftForm(context),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: incidentsTeal.withValues(alpha: 0.30),
+                  width: 1.5,
+                ),
+              ),
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: incidentsTeal.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    child: const Icon(
+                      Icons.qr_code_scanner,
+                      size: 22,
+                      color: incidentsTeal,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          localize.testDraftFormLabel,
+                          style: const TextStyle(
+                            fontFamily: incidentsFontFamily,
+                            fontFamilyFallback: incidentsFontFamilyFallback,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: incidentsInk,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          localize.testDraftFormHelper,
+                          style: const TextStyle(
+                            fontFamily: incidentsFontFamily,
+                            fontFamilyFallback: incidentsFontFamilyFallback,
+                            fontSize: 11.5,
+                            color: incidentsMuted,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.chevron_right,
+                    size: 22,
+                    color: incidentsTeal,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _scanDraftForm(BuildContext context) async {
+    final localize = AppLocalizations.of(context)!;
+    final result = await Navigator.push<ReportType>(
+      context,
+      MaterialPageRoute(builder: (_) => const QrReportTypeView()),
+    );
+    if (!context.mounted) return;
+    if (result != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => FormSimulatorView(result)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localize.invalidReportTypeQrcode),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
