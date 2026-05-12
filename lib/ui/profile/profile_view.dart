@@ -1,29 +1,23 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
-import 'package:podd_app/l10n/app_localizations.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/rendering.dart';
+import 'package:gal/gal.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:podd_app/app_theme.dart';
-import 'package:podd_app/components/display_field.dart';
-import 'package:podd_app/components/flat_button.dart';
+import 'package:podd_app/components/language_dropdown.dart';
 import 'package:podd_app/components/restart_widget.dart';
-import 'package:podd_app/locator.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/report_type.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
+import 'package:podd_app/ui/login/picker_sheets.dart';
 import 'package:podd_app/ui/profile/profile_view_model.dart';
+import 'package:podd_app/ui/profile/profile_widgets.dart';
 import 'package:podd_app/ui/report_type/form_simulator_view.dart';
 import 'package:podd_app/ui/report_type/qr_report_type_view.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
-
-import '../../components/language_dropdown.dart';
-
-var decoration = BoxDecoration(
-  border: Border.all(color: Colors.grey.shade300),
-  borderRadius: BorderRadius.circular(4.0),
-  color: Colors.white,
-);
 
 class ProfileView extends StatelessWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -32,331 +26,211 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<ProfileViewModel>.reactive(
       viewModelBuilder: () => ProfileViewModel(),
-      builder: (context, viewModel, child) => Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.grey.shade50,
-        body: SafeArea(
+      builder: (context, viewModel, child) {
+        return Container(
+          color: incidentsSand,
           child: GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: Padding(
-                padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ListView(
-                        children: [
-                          Column(
-                            children: [
-                              _Avatar(),
-                              if (viewModel.hasErrorForKey("uploadFail"))
-                                Text(
-                                  viewModel.error("uploadFail"),
-                                  style: const TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              const SizedBox(height: 20),
-                              _Language(),
-                              const SizedBox(height: 8),
-                              DisplayField(
-                                label: AppLocalizations.of(context)!
-                                    .authorityNameLabel,
-                                value: viewModel.authorityName,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                              ),
-                              if (viewModel.assignedVillageNames != null) ...[
-                                const SizedBox(height: 12),
-                                DisplayField(
-                                  label: 'Villages',
-                                  value: viewModel.assignedVillageNames,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                ),
-                              ],
-                              if (viewModel.hasMultipleAssignedVillages) ...[
-                                const SizedBox(height: 12),
-                                DropdownButtonFormField<int>(
-                                  initialValue: viewModel.selectedVillageId,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Active village',
-                                  ),
-                                  items: viewModel.assignedVillages
-                                      .map(
-                                        (village) => DropdownMenuItem<int>(
-                                          value: village.id,
-                                          child: Text(village.displayName),
-                                        ),
-                                      )
-                                      .toList(),
-                                  onChanged: viewModel.selectVillage,
-                                ),
-                              ],
-                            ],
-                          ),
-                          Divider(
-                            height: 20,
-                            thickness: 1,
-                            indent: 0,
-                            endIndent: 0,
-                            color: Colors.red.shade400,
-                          ),
-                          DisplayField(
-                              label:
-                                  AppLocalizations.of(context)!.usernameLabel,
-                              value: viewModel.username),
-                          const SizedBox(height: 15),
-                          DisplayField(
-                              label:
-                                  AppLocalizations.of(context)!.firstNameLabel,
-                              value: viewModel.firstName),
-                          const SizedBox(height: 15),
-                          DisplayField(
-                              label:
-                                  AppLocalizations.of(context)!.lastNameLabel,
-                              value: viewModel.lastName),
-                          const SizedBox(height: 15),
-                          DisplayField(
-                              label: AppLocalizations.of(context)!.emailLabel,
-                              value: viewModel.email),
-                          const SizedBox(height: 15),
-                          DisplayField(
-                              label:
-                                  AppLocalizations.of(context)!.telephoneLabel,
-                              value: viewModel.telephone),
-                          const SizedBox(height: 15),
-                          DisplayField(
-                              label: AppLocalizations.of(context)!.addressLabel,
-                              value: viewModel.address),
-                          Divider(
-                            height: 20,
-                            thickness: 1,
-                            indent: 0,
-                            endIndent: 0,
-                            color: Colors.red.shade400,
-                          ),
-                          _DownloadLoginQrCodeButton(),
-                          const SizedBox(height: 10),
-                          const _AdminToolsSection(),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: FlatButton.primary(
-                              onPressed: () {
-                                GoRouter.of(context).push('/profile/form').then(
-                                    (value) => value == true
-                                        ? viewModel.initValue()
-                                        : null);
-                              },
-                              child: viewModel.isBusy
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.settings_outlined,
-                                          size: 24,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                            AppLocalizations.of(context)!
-                                                .updateProfileButton,
-                                            style: TextStyle(fontSize: 15.sp)),
-                                      ],
-                                    ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: FlatButton.primary(
-                              onPressed: () {
-                                GoRouter.of(context).push('/profile/password');
-                              },
-                              child: viewModel.isBusy
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.lock_outline,
-                                          size: 24,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .changePasswordButton,
-                                          style: TextStyle(fontSize: 15.sp),
-                                        ),
-                                      ],
-                                    ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: FlatButton.primary(
-                              backgroundColor: Colors.red[600],
-                              onPressed: () async {
-                                await viewModel.logout();
-                              },
-                              child: Text(
-                                AppLocalizations.of(context)!.logoutButton,
-                                style: TextStyle(fontSize: 15.sp),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(0, 14, 0, 0),
+              children: [
+                _IdentityHeader(viewModel: viewModel),
+                const SizedBox(height: 16),
+                _ConsolidatedCard(viewModel: viewModel),
+                _ContactInfoCard(viewModel: viewModel),
+                _AdminToolsCard(),
+                const SizedBox(height: 8),
+                ProfileSignOutRow(
+                  label: AppLocalizations.of(context)!.logoutButton,
+                  onTap: () => _confirmSignOut(context, viewModel),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
-}
 
-class _DownloadLoginQrCodeButton extends StackedHookView<ProfileViewModel> {
-  final AppTheme appTheme = locator<AppTheme>();
-
-  @override
-  Widget builder(BuildContext context, ProfileViewModel viewModel) {
-    return viewModel.busy('downloadQrcode')
-        ? Padding(
-            padding: EdgeInsets.all(12.0.w),
-            child: Center(
-              child: SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  color: appTheme.primary,
+  Future<void> _confirmSignOut(
+      BuildContext context, ProfileViewModel viewModel) async {
+    final localize = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierColor: Colors.black54,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                localize.signOutConfirmTitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: incidentsInk,
+                  height: 1.3,
                 ),
               ),
-            ),
-          )
-        : SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: () async {
-                final token = await viewModel.downloadLoginQrCode();
-                if (context.mounted) {
-                  showQrCodeDialog(context, token);
-                }
-              },
-              child: Text(AppLocalizations.of(context)!.getLoginQrcodeButton),
-            ),
-          );
-  }
-
-  showQrCodeDialog(BuildContext context, String data) {
-    showGeneralDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierLabel:
-            MaterialLocalizations.of(context).modalBarrierDismissLabel,
-        barrierColor: Colors.black45,
-        transitionDuration: const Duration(milliseconds: 500),
-        pageBuilder: (BuildContext buildContext, Animation<double> animation,
-            Animation secondaryAnimation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, -1),
-                end: Offset.zero,
-              ).animate(animation),
-              child: SafeArea(
-                child: Center(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.95,
-                    height: MediaQuery.of(context).size.height * 0.95,
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.getLoginQrcodeButton,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        QrImageView(
-                          data: data,
-                          version: QrVersions.auto,
-                          size: 300,
-                        ),
-                        FlatButton.outline(
-                          onPressed: () => GoRouter.of(context).pop(),
-                          child: const Text('close'),
-                        ),
-                      ],
+              const SizedBox(height: 8),
+              Text(
+                localize.signOutConfirmBody,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 13,
+                  color: incidentsMuted,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  style: TextButton.styleFrom(
+                    backgroundColor: incidentsErrorRed,
+                    foregroundColor: Colors.white,
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    localize.logoutButton,
+                    style: const TextStyle(
+                      fontFamily: incidentsFontFamily,
+                      fontFamilyFallback: incidentsFontFamilyFallback,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
               ),
-            ),
-          );
-        });
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: incidentsInk,
+                    side: const BorderSide(color: incidentsHair, width: 1),
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    localize.cancel,
+                    style: const TextStyle(
+                      fontFamily: incidentsFontFamily,
+                      fontFamilyFallback: incidentsFontFamilyFallback,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (confirmed == true) {
+      viewModel.logout();
+    }
   }
 }
 
-class _Language extends StackedHookView<ProfileViewModel> {
+class _IdentityHeader extends StatelessWidget {
+  final ProfileViewModel viewModel;
+  const _IdentityHeader({required this.viewModel});
+
   @override
-  Widget builder(BuildContext context, ProfileViewModel viewModel) {
-    return SizedBox(
-      width: 200,
-      height: 30,
-      child: LanguageDropdown(
-        value: viewModel.language,
-        onChanged: (String? value) async {
-          await showDialog<bool>(
-            barrierDismissible: false,
-            context: context,
-            builder: (_) => AlertDialog(
-              content: Text(
-                AppLocalizations.of(context)!.restartApp,
-                textAlign: TextAlign.center,
+  Widget build(BuildContext context) {
+    final fullName = _displayName(viewModel);
+    final usernameLine = _usernameLine(viewModel);
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 0, 14, 0),
+      padding: const EdgeInsets.fromLTRB(14, 16, 14, 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: incidentsHair, width: 1),
+      ),
+      child: Column(
+        children: [
+          _Avatar(),
+          if (viewModel.hasErrorForKey('uploadFail')) ...[
+            const SizedBox(height: 10),
+            Text(
+              viewModel.error('uploadFail'),
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                color: incidentsErrorRed,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
               ),
-              contentTextStyle: const TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
-              contentPadding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
-              actionsAlignment: MainAxisAlignment.center,
-              actionsPadding:
-                  const EdgeInsets.only(right: 20, left: 20, bottom: 20),
-              actions: <Widget>[
-                FlatButton.primary(
-                  child: Text(AppLocalizations.of(context)!.ok),
-                  onPressed: () async {
-                    await viewModel.changeLanguage(value ?? "en");
-                    if (context.mounted) {
-                      RestartWidget.restartApp(context);
-                    }
-                  },
-                )
-              ],
             ),
-          );
-        },
+          ],
+          const SizedBox(height: 12),
+          Text(
+            fullName,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: incidentsInk,
+              height: 1.25,
+            ),
+          ),
+          if (usernameLine != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              usernameLine,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: incidentsMuted,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ],
       ),
     );
+  }
+
+  String _displayName(ProfileViewModel vm) {
+    final parts = [
+      (vm.firstName ?? '').trim(),
+      (vm.lastName ?? '').trim(),
+    ].where((s) => s.isNotEmpty).toList();
+    if (parts.isEmpty) {
+      return vm.username ?? '—';
+    }
+    return parts.join(' ');
+  }
+
+  String? _usernameLine(ProfileViewModel vm) {
+    final username = (vm.username ?? '').trim();
+    final authority = (vm.authorityName ?? '').trim();
+    final bits = <String>[];
+    if (username.isNotEmpty) bits.add('@$username');
+    if (authority.isNotEmpty) bits.add(authority);
+    if (bits.isEmpty) return null;
+    return bits.join('  ·  ');
   }
 }
 
@@ -364,213 +238,1012 @@ class _Avatar extends StackedHookView<ProfileViewModel> {
   @override
   Widget builder(BuildContext context, ProfileViewModel viewModel) {
     return SizedBox(
-      height: 115,
-      width: 115,
-      child: viewModel.isBusy
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Stack(
-              clipBehavior: Clip.none,
-              fit: StackFit.expand,
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 55,
-                  child: ClipOval(
-                    child: viewModel.avatarUrl == null
-                        ? Image.asset(
-                            'assets/images/default-avatar-profile.png')
+      width: 92,
+      height: 92,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: incidentsTeal.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+                border: Border.all(color: incidentsHair, width: 1),
+              ),
+              child: ClipOval(
+                child: viewModel.isBusy
+                    ? const Center(
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: incidentsTeal,
+                          ),
+                        ),
+                      )
+                    : viewModel.avatarUrl == null
+                        ? const _AvatarFallback()
                         : Image.network(
                             viewModel.avatarUrl!,
-                            errorBuilder: (BuildContext context,
-                                Object exception, StackTrace? stackTrace) {
-                              return const Text('เลือกรูปภาพ');
-                            },
-                            width: 115,
-                            height: 115,
-                            fit: BoxFit.fill,
+                            width: 92,
+                            height: 92,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                const _AvatarFallback(),
                           ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: -25,
-                  child: RawMaterialButton(
-                    onPressed: () {
-                      _showAddImageModal(context, viewModel);
-                    },
-                    elevation: 2.0,
-                    fillColor: Colors.white,
-                    padding: const EdgeInsets.all(10.0),
-                    shape: CircleBorder(
-                        side: BorderSide(
-                            width: 2, color: Theme.of(context).primaryColor)),
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
+          ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Material(
+              color: incidentsTeal,
+              shape: const CircleBorder(
+                side: BorderSide(color: Colors.white, width: 2.5),
+              ),
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: viewModel.isBusy
+                    ? null
+                    : () => _showAvatarSheet(context, viewModel),
+                child: const SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: Icon(
+                    Icons.photo_camera_outlined,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  _showAddImageModal(BuildContext context, ProfileViewModel viewModel) {
-    showModalBottomSheet(
+  void _showAvatarSheet(BuildContext context, ProfileViewModel viewModel) {
+    showModalBottomSheet<void>(
       context: context,
-      builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_album),
-              title: const Text('Pick from Gallery'),
-              onTap: () async {
-                var image = await _pickImage(ImageSource.gallery);
-                if (image != null) {
-                  await viewModel.setPhoto(image);
-                }
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_camera),
-              title: const Text('Take a Photo'),
-              onTap: () async {
-                var image = await _pickImage(ImageSource.camera);
-                if (image != null) {
-                  viewModel.setPhoto(image);
-                }
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          ],
-        );
-      },
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => _AvatarPickerSheet(
+        onPickCamera: () async {
+          Navigator.pop(sheetContext);
+          final image = await _pickImage(ImageSource.camera);
+          if (image != null) await viewModel.setPhoto(image);
+        },
+        onPickGallery: () async {
+          Navigator.pop(sheetContext);
+          final image = await _pickImage(ImageSource.gallery);
+          if (image != null) await viewModel.setPhoto(image);
+        },
+      ),
     );
   }
 
   Future<XFile?> _pickImage(ImageSource source) async {
-    var picker = ImagePicker();
+    final picker = ImagePicker();
     try {
-      final image = await picker.pickImage(source: source);
-      return image;
+      return await picker.pickImage(source: source);
     } catch (e) {
-      debugPrint("$e");
+      debugPrint('$e');
+      return null;
     }
-    return null;
+  }
+}
+
+class _AvatarFallback extends StatelessWidget {
+  const _AvatarFallback();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: incidentsTeal.withValues(alpha: 0.08),
+      alignment: Alignment.center,
+      child: const Icon(
+        Icons.person_outline,
+        size: 40,
+        color: incidentsTeal,
+      ),
+    );
+  }
+}
+
+class _AvatarPickerSheet extends StatelessWidget {
+  final VoidCallback onPickCamera;
+  final VoidCallback onPickGallery;
+
+  const _AvatarPickerSheet({
+    required this.onPickCamera,
+    required this.onPickGallery,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: incidentsHair,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  localize.avatarSheetTitle,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    color: incidentsInk,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  localize.avatarSheetSubtitle,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    color: incidentsMuted,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ),
+            const Divider(height: 1, color: incidentsHair),
+            _SheetRow(
+              icon: Icons.photo_camera_outlined,
+              label: localize.avatarSheetTakePhoto,
+              onTap: onPickCamera,
+            ),
+            _SheetRow(
+              icon: Icons.photo_library_outlined,
+              label: localize.avatarSheetChooseGallery,
+              onTap: onPickGallery,
+              isLast: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SheetRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool isLast;
+  const _SheetRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.isLast = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const fg = incidentsInk;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          border: isLast
+              ? null
+              : const Border(
+                  bottom: BorderSide(color: incidentsHair, width: 1)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: fg),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w600,
+                  color: fg,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ConsolidatedCard extends StatelessWidget {
+  final ProfileViewModel viewModel;
+  const _ConsolidatedCard({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    final isMulti = viewModel.hasMultipleAssignedVillages;
+    final activeVillage = viewModel.selectedVillage?.displayName ??
+        viewModel.assignedVillageNames;
+    final hasVillage = (activeVillage ?? '').trim().isNotEmpty;
+    final languageLabel = _resolveLanguageNativeName(viewModel.language);
+
+    return ProfileSectionCard(
+      children: [
+        if (isMulti)
+          ProfileActionRow(
+            icon: Icons.location_city_outlined,
+            title: localize.profileLabelActiveVillage,
+            value: hasVillage ? activeVillage : null,
+            onTap: () => _showVillageSheet(context),
+          )
+        else
+          ProfileDataRow(
+            label: localize.registerVillageLabel,
+            value: hasVillage ? activeVillage : null,
+            emptyValueText: localize.profileValueNotAssigned,
+          ),
+        ProfileActionRow(
+          icon: Icons.edit_outlined,
+          title: localize.updateProfileButton,
+          onTap: () => GoRouter.of(context).push('/profile/form').then((value) {
+            if (value == true) viewModel.initValue();
+          }),
+        ),
+        ProfileActionRow(
+          icon: Icons.lock_outline,
+          title: localize.changePasswordButton,
+          onTap: () => GoRouter.of(context).push('/profile/password'),
+        ),
+        ProfileActionRow(
+          icon: Icons.language_outlined,
+          title: localize.signInChangeLanguageTitle,
+          value: languageLabel,
+          onTap: () => _openLanguageSheet(context),
+        ),
+        ProfileActionRow(
+          icon: Icons.qr_code_2_outlined,
+          title: localize.getLoginQrcodeButton,
+          onTap: () => _openQrDialog(context),
+          isLast: true,
+        ),
+      ],
+    );
+  }
+
+  String _resolveLanguageNativeName(String code) {
+    final match = supportedLanguages.firstWhere(
+      (e) => e[1] == code,
+      orElse: () => const ['English', 'en'],
+    );
+    return match[0];
+  }
+
+  void _showVillageSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => _ActiveVillageSheet(
+        viewModel: viewModel,
+        onPicked: (id) async {
+          Navigator.pop(sheetContext);
+          await viewModel.selectVillage(id);
+        },
+      ),
+    );
+  }
+
+  void _openLanguageSheet(BuildContext context) {
+    LanguagePickerSheet.show(
+      context,
+      currentLanguage: viewModel.language,
+      onPicked: (code) async {
+        Navigator.of(context).pop();
+        if (code == viewModel.language) return;
+        await _confirmRestart(context, code);
+      },
+    );
+  }
+
+  Future<void> _confirmRestart(BuildContext context, String code) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: Text(
+          AppLocalizations.of(context)?.restartApp ??
+              'The app needs to restart to apply the new language.',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 14,
+            color: incidentsInk,
+            height: 1.45,
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await viewModel.changeLanguage(code);
+              if (dialogContext.mounted) {
+                RestartWidget.restartApp(dialogContext);
+              }
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: incidentsTeal,
+              foregroundColor: Colors.white,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            ),
+            child: Text(
+              AppLocalizations.of(context)?.ok ?? 'OK',
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openQrDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'qr',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (_, __, ___) => _QrLoginDialog(viewModel: viewModel),
+    );
+  }
+}
+
+class _ActiveVillageSheet extends StatelessWidget {
+  final ProfileViewModel viewModel;
+  final ValueChanged<int> onPicked;
+  const _ActiveVillageSheet({
+    required this.viewModel,
+    required this.onPicked,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: incidentsHair,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  localize.villageSheetTitle,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    color: incidentsInk,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  localize.villageSheetBody,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    color: incidentsMuted,
+                    fontSize: 12,
+                    height: 1.45,
+                  ),
+                ),
+              ),
+            ),
+            const Divider(height: 1, color: incidentsHair),
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: viewModel.assignedVillages.length,
+                itemBuilder: (context, index) {
+                  final village = viewModel.assignedVillages[index];
+                  final selected = viewModel.selectedVillageId == village.id;
+                  return _VillageRow(
+                    name: village.displayName,
+                    selected: selected,
+                    isLast: index == viewModel.assignedVillages.length - 1,
+                    onTap: () => onPicked(village.id),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _VillageRow extends StatelessWidget {
+  final String name;
+  final bool selected;
+  final bool isLast;
+  final VoidCallback onTap;
+  const _VillageRow({
+    required this.name,
+    required this.selected,
+    required this.isLast,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? incidentsTeal.withValues(alpha: 0.06) : Colors.white,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            border: isLast
+                ? null
+                : const Border(
+                    bottom: BorderSide(color: incidentsHair, width: 1)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.location_city_outlined,
+                size: 20,
+                color: incidentsTeal,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: incidentsInk,
+                  ),
+                ),
+              ),
+              _RadioRing(selected: selected),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RadioRing extends StatelessWidget {
+  final bool selected;
+  const _RadioRing({required this.selected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 22,
+      height: 22,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: selected ? incidentsTeal : Colors.transparent,
+        border: Border.all(
+          color: selected ? incidentsTeal : incidentsHair,
+          width: 2,
+        ),
+      ),
+      child: selected
+          ? Center(
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            )
+          : null,
+    );
+  }
+}
+
+class _QrLoginDialog extends StatefulWidget {
+  final ProfileViewModel viewModel;
+  const _QrLoginDialog({required this.viewModel});
+
+  @override
+  State<_QrLoginDialog> createState() => _QrLoginDialogState();
+}
+
+class _QrLoginDialogState extends State<_QrLoginDialog> {
+  final GlobalKey _captureKey = GlobalKey();
+  bool _saving = false;
+
+  Future<void> _saveToGallery(AppLocalizations localize) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      final boundary = _captureKey.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+      if (boundary == null) throw Exception('capture boundary missing');
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) throw Exception('encode failed');
+      await Gal.putImageBytes(
+        byteData.buffer.asUint8List(),
+        album: 'OHTK',
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: incidentsTeal,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            localize.qrSaveSuccess,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint('QR save failed: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: incidentsErrorRed,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+          content: Text(
+            localize.qrSaveFailed,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return FutureBuilder<String>(
+      future: widget.viewModel.downloadLoginQrCode(),
+      builder: (context, snapshot) {
+        final qrReady = snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData &&
+            (snapshot.data ?? '').isNotEmpty;
+        return Dialog(
+          backgroundColor: Colors.white,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 14),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      localize.qrDialogEyebrow.toUpperCase(),
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
+                        color: incidentsTeal,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      localize.qrDialogTitle,
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: incidentsInk,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      localize.qrDialogBody,
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 12.5,
+                        color: incidentsMuted,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: incidentsHair),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _QrPanel(
+                      snapshot: snapshot,
+                      viewModel: widget.viewModel,
+                      captureKey: _captureKey,
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+                      decoration: BoxDecoration(
+                        color: incidentsTeal.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.shield_outlined,
+                            size: 13,
+                            color: incidentsTealDark,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            localize.qrKeepPrivate,
+                            style: const TextStyle(
+                              fontFamily: incidentsFontFamily,
+                              fontFamilyFallback: incidentsFontFamilyFallback,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: incidentsTealDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 0, 14, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: (qrReady && !_saving)
+                        ? () => _saveToGallery(localize)
+                        : null,
+                    icon: _saving
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Icon(Icons.download_outlined, size: 16),
+                    label: Text(
+                      localize.qrSaveToGallery.toUpperCase(),
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: incidentsTeal,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor:
+                          incidentsTeal.withValues(alpha: 0.5),
+                      disabledForegroundColor: Colors.white,
+                      shape: const StadiumBorder(),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      minimumSize: const Size(0, 48),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _QrPanel extends StatelessWidget {
+  final AsyncSnapshot<String> snapshot;
+  final ProfileViewModel viewModel;
+  final GlobalKey captureKey;
+  const _QrPanel({
+    required this.snapshot,
+    required this.viewModel,
+    required this.captureKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    const size = 220.0;
+    if (snapshot.connectionState != ConnectionState.done ||
+        !snapshot.hasData ||
+        (snapshot.data ?? '').isEmpty) {
+      return Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: incidentsTeal.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        alignment: Alignment.center,
+        child: CustomPaint(
+          painter: _DashedRectPainter(
+            color: incidentsTeal.withValues(alpha: 0.3),
+            radius: 14,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: 30,
+                height: 30,
+                child: CircularProgressIndicator(
+                  color: incidentsTeal,
+                  strokeWidth: 2.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                localize.qrLoading.toUpperCase(),
+                style: const TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.4,
+                  color: incidentsTeal,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    final caption = [
+      if ((viewModel.username ?? '').isNotEmpty) '@${viewModel.username}',
+      if ((viewModel.authorityName ?? '').isNotEmpty) viewModel.authorityName!,
+    ].join('  ·  ');
+    return RepaintBoundary(
+      key: captureKey,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: incidentsHair, width: 1),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0F000000),
+              offset: Offset(0, 2),
+              blurRadius: 6,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: size - 28,
+              height: size - 28,
+              child: QrImageView(
+                data: snapshot.data!,
+                version: QrVersions.auto,
+                backgroundColor: Colors.white,
+              ),
+            ),
+          if (caption.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              caption,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: incidentsMuted,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DashedRectPainter extends CustomPainter {
+  final Color color;
+  final double radius;
+  _DashedRectPainter({required this.color, required this.radius});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(radius));
+    final path = Path()..addRRect(rrect);
+    const dashWidth = 6.0;
+    const dashGap = 4.0;
+    for (final metric in path.computeMetrics()) {
+      double distance = 0;
+      while (distance < metric.length) {
+        final end = (distance + dashWidth).clamp(0, metric.length).toDouble();
+        canvas.drawPath(metric.extractPath(distance, end), paint);
+        distance = end + dashGap;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedRectPainter old) =>
+      old.color != color || old.radius != radius;
+}
+
+class _ContactInfoCard extends StatelessWidget {
+  final ProfileViewModel viewModel;
+  const _ContactInfoCard({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    final email = (viewModel.email ?? '').trim();
+    final phone = (viewModel.telephone ?? '').trim();
+    final address = (viewModel.address ?? '').trim();
+    final allEmpty = email.isEmpty && phone.isEmpty && address.isEmpty;
+    final notProvided = localize.profileValueNotProvided;
+
+    return Column(
+      children: [
+        if (allEmpty)
+          ProfileDashedPrompt(
+            title: localize.profileCompleteContactTitle,
+            body: localize.profileCompleteContactBody,
+          ),
+        ProfileSectionCard(
+          eyebrow: localize.profileSectionContactInfo,
+          children: [
+            ProfileDataRow(
+              label: localize.emailLabel,
+              value: email.isEmpty ? null : email,
+              emptyValueText: notProvided,
+            ),
+            ProfileDataRow(
+              label: localize.telephoneLabel,
+              value: phone.isEmpty ? null : phone,
+              emptyValueText: notProvided,
+            ),
+            ProfileDataRow(
+              label: localize.addressLabel,
+              value: address.isEmpty ? null : address,
+              emptyValueText: notProvided,
+              isLast: true,
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 
 // TODO: role-gate behind `user.role in (admin, author)` once the User model
 // exposes that field. Today it renders for everyone, matching legacy QR
 // scanner visibility on the report-type chooser.
-class _AdminToolsSection extends StatelessWidget {
-  const _AdminToolsSection();
-
+class _AdminToolsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localize = AppLocalizations.of(context)!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ProfileSectionCard(
+      eyebrow: localize.adminToolsSectionLabel,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 12, 4, 6),
-          child: Text(
-            localize.adminToolsSectionLabel.toUpperCase(),
-            style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.5,
-              color: incidentsMuted,
-            ),
-          ),
-        ),
-        Material(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () => _scanDraftForm(context),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: incidentsTeal.withValues(alpha: 0.30),
-                  width: 1.5,
-                ),
-              ),
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: incidentsTeal.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                    child: const Icon(
-                      Icons.qr_code_scanner,
-                      size: 22,
-                      color: incidentsTeal,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          localize.testDraftFormLabel,
-                          style: const TextStyle(
-                            fontFamily: incidentsFontFamily,
-                            fontFamilyFallback: incidentsFontFamilyFallback,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: incidentsInk,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          localize.testDraftFormHelper,
-                          style: const TextStyle(
-                            fontFamily: incidentsFontFamily,
-                            fontFamilyFallback: incidentsFontFamilyFallback,
-                            fontSize: 11.5,
-                            color: incidentsMuted,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.chevron_right,
-                    size: 22,
-                    color: incidentsTeal,
-                  ),
-                ],
-              ),
-            ),
-          ),
+        ProfileActionRow(
+          icon: Icons.shield_outlined,
+          title: localize.testDraftFormLabel,
+          onTap: () => _scanDraftForm(context),
+          isLast: true,
         ),
       ],
     );
   }
 
   Future<void> _scanDraftForm(BuildContext context) async {
-    final localize = AppLocalizations.of(context)!;
+    final localize = AppLocalizations.of(context);
     final result = await Navigator.push<ReportType>(
       context,
       MaterialPageRoute(builder: (_) => const QrReportTypeView()),
@@ -584,8 +1257,8 @@ class _AdminToolsSection extends StatelessWidget {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(localize.invalidReportTypeQrcode),
-          backgroundColor: Colors.red,
+          content: Text(localize?.invalidReportTypeQrcode ?? 'Invalid QR'),
+          backgroundColor: incidentsErrorRed,
         ),
       );
     }

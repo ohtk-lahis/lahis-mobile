@@ -36,6 +36,8 @@
 	<string>The app collects your location while submitting a report, to help officials respond directly to your report.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>The app collects photos to help officials determine the urgency of your report.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>The app saves your sign-in QR code to your photo library so you can use it on another device.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

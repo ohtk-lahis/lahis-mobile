@@ -761,4 +761,90 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get registerCreating => 'Creating account…';
+
+  @override
+  String get profileSectionContactInfo => 'Contact info';
+
+  @override
+  String get profileLabelActiveVillage => 'Active village';
+
+  @override
+  String get profileValueNotProvided => 'Not provided';
+
+  @override
+  String get profileValueNotAssigned => 'Not assigned';
+
+  @override
+  String get profileCompleteContactTitle => 'Complete your contact info';
+
+  @override
+  String get profileCompleteContactBody =>
+      'So responders can reach you about your reports.';
+
+  @override
+  String get signOutConfirmTitle => 'Sign out of OHTK?';
+
+  @override
+  String get signOutConfirmBody =>
+      'You\'ll need to sign in again to see your reports.';
+
+  @override
+  String get qrDialogEyebrow => 'Your login code';
+
+  @override
+  String get qrDialogTitle => 'Save this to use later';
+
+  @override
+  String get qrDialogBody =>
+      'Save this image to your phone. Next time you sign in — on this phone or a new one — pick \"Sign in with QR\" and show this code to the camera.';
+
+  @override
+  String get qrLoading => 'Loading';
+
+  @override
+  String get qrKeepPrivate => 'Keep this image private';
+
+  @override
+  String get qrSaveToGallery => 'Save to gallery';
+
+  @override
+  String get qrSaveSuccess => 'Saved to gallery';
+
+  @override
+  String get qrSaveFailed => 'Couldn\'t save QR code';
+
+  @override
+  String get avatarSheetTitle => 'Update profile photo';
+
+  @override
+  String get avatarSheetSubtitle =>
+      'Pick a square image — others will see it on your reports.';
+
+  @override
+  String get avatarSheetTakePhoto => 'Take a photo';
+
+  @override
+  String get avatarSheetChooseGallery => 'Choose from gallery';
+
+  @override
+  String get villageSheetTitle => 'Choose active village';
+
+  @override
+  String get villageSheetBody =>
+      'New reports will be filed against this village.';
+
+  @override
+  String get profileFormReadonlyEyebrow => 'Set by your admin · not editable';
+
+  @override
+  String get profilePhoneOptionalHelper =>
+      'Used to reach you about your reports';
+
+  @override
+  String get passwordIntroBody =>
+      'Pick something easy for you to remember — you only use this once in a while.';
+
+  @override
+  String get passwordHelperTip =>
+      'Tip: pick a word or number you\'ll remember.';
 }

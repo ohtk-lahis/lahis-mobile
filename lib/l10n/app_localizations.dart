@@ -1469,6 +1469,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creating account…'**
   String get registerCreating;
+
+  /// No description provided for @profileSectionContactInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact info'**
+  String get profileSectionContactInfo;
+
+  /// No description provided for @profileLabelActiveVillage.
+  ///
+  /// In en, this message translates to:
+  /// **'Active village'**
+  String get profileLabelActiveVillage;
+
+  /// No description provided for @profileValueNotProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'Not provided'**
+  String get profileValueNotProvided;
+
+  /// No description provided for @profileValueNotAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Not assigned'**
+  String get profileValueNotAssigned;
+
+  /// No description provided for @profileCompleteContactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your contact info'**
+  String get profileCompleteContactTitle;
+
+  /// No description provided for @profileCompleteContactBody.
+  ///
+  /// In en, this message translates to:
+  /// **'So responders can reach you about your reports.'**
+  String get profileCompleteContactBody;
+
+  /// No description provided for @signOutConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out of OHTK?'**
+  String get signOutConfirmTitle;
+
+  /// No description provided for @signOutConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll need to sign in again to see your reports.'**
+  String get signOutConfirmBody;
+
+  /// No description provided for @qrDialogEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Your login code'**
+  String get qrDialogEyebrow;
+
+  /// No description provided for @qrDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this to use later'**
+  String get qrDialogTitle;
+
+  /// No description provided for @qrDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this image to your phone. Next time you sign in — on this phone or a new one — pick \"Sign in with QR\" and show this code to the camera.'**
+  String get qrDialogBody;
+
+  /// No description provided for @qrLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading'**
+  String get qrLoading;
+
+  /// No description provided for @qrKeepPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this image private'**
+  String get qrKeepPrivate;
+
+  /// No description provided for @qrSaveToGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to gallery'**
+  String get qrSaveToGallery;
+
+  /// No description provided for @qrSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to gallery'**
+  String get qrSaveSuccess;
+
+  /// No description provided for @qrSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save QR code'**
+  String get qrSaveFailed;
+
+  /// No description provided for @avatarSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update profile photo'**
+  String get avatarSheetTitle;
+
+  /// No description provided for @avatarSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a square image — others will see it on your reports.'**
+  String get avatarSheetSubtitle;
+
+  /// No description provided for @avatarSheetTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get avatarSheetTakePhoto;
+
+  /// No description provided for @avatarSheetChooseGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get avatarSheetChooseGallery;
+
+  /// No description provided for @villageSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose active village'**
+  String get villageSheetTitle;
+
+  /// No description provided for @villageSheetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'New reports will be filed against this village.'**
+  String get villageSheetBody;
+
+  /// No description provided for @profileFormReadonlyEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Set by your admin · not editable'**
+  String get profileFormReadonlyEyebrow;
+
+  /// No description provided for @profilePhoneOptionalHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Used to reach you about your reports'**
+  String get profilePhoneOptionalHelper;
+
+  /// No description provided for @passwordIntroBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick something easy for you to remember — you only use this once in a while.'**
+  String get passwordIntroBody;
+
+  /// No description provided for @passwordHelperTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: pick a word or number you\'ll remember.'**
+  String get passwordHelperTip;
 }
 
 class _AppLocalizationsDelegate

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:podd_app/components/back_appbar_action.dart';
-import 'package:podd_app/components/flat_button.dart';
+import 'package:podd_app/components/form_chrome.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/profile_result.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
+import 'package:podd_app/ui/profile/profile_widgets.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 import 'profile_view_model.dart';
-import 'package:podd_app/l10n/app_localizations.dart';
 
 class ProfileFormView extends StatelessWidget {
-  static const String route = '/register';
+  static const String route = '/profile/form';
 
   const ProfileFormView({Key? key}) : super(key: key);
 
@@ -19,117 +19,382 @@ class ProfileFormView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<ProfileViewModel>.reactive(
       viewModelBuilder: () => ProfileViewModel(),
-      builder: (context, viewModel, child) => Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.profileTitle),
-          leading: const BackAppBarAction(),
-        ),
-        body: _ProfileForm(),
-      ),
+      builder: (context, viewModel, child) {
+        return Scaffold(
+          backgroundColor: incidentsSand,
+          resizeToAvoidBottomInset: true,
+          appBar: FormChromeAppBar(
+            title: AppLocalizations.of(context)?.updateProfileButton ??
+                'Edit profile',
+            onBack: () => Navigator.of(context).pop(false),
+          ),
+          body: SafeArea(
+            top: false,
+            child: Column(
+              children: [
+                Expanded(
+                  child: _ProfileForm(viewModel: viewModel),
+                ),
+                _StickyFooter(viewModel: viewModel),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
 class _ProfileForm extends StackedHookView<ProfileViewModel> {
-  @override
-  Widget builder(BuildContext context, ProfileViewModel viewModel) {
-    var firstName = useTextEditingController();
-    firstName.text = viewModel.firstName ?? "";
-    var lastName = useTextEditingController();
-    lastName.text = viewModel.lastName ?? "";
-    var telephone = useTextEditingController();
-    telephone.text = viewModel.telephone ?? "";
-    var address = useTextEditingController();
-    address.text = viewModel.address ?? "";
+  // ignore: prefer_const_constructors_in_immutables
+  _ProfileForm({required this.viewModel});
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          TextField(
-            textInputAction: TextInputAction.next,
-            onChanged: viewModel.setFirstName,
+  final ProfileViewModel viewModel;
+
+  @override
+  Widget builder(BuildContext context, ProfileViewModel vm) {
+    final localize = AppLocalizations.of(context);
+
+    final firstName = useTextEditingController(text: vm.firstName ?? '');
+    final lastName = useTextEditingController(text: vm.lastName ?? '');
+    final telephone = useTextEditingController(text: vm.telephone ?? '');
+    final address = useTextEditingController(text: vm.address ?? '');
+
+    final firstNameNode = useFocusNode();
+    final lastNameNode = useFocusNode();
+    final telephoneNode = useFocusNode();
+    final addressNode = useFocusNode();
+
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
+        children: [
+          _Recap(viewModel: vm),
+          const SizedBox(height: 16),
+          if (vm.hasErrorForKey('general'))
+            _GeneralErrorBanner(message: vm.error('general')),
+          ProfileTextField(
             controller: firstName,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.firstNameLabel,
-              errorText: viewModel.error("firstName"),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
+            focusNode: firstNameNode,
+            label: localize?.firstNameLabel ?? 'First name',
+            isRequired: true,
             textInputAction: TextInputAction.next,
-            onChanged: viewModel.setLastName,
+            onChanged: vm.setFirstName,
+            onSubmitted: (_) => lastNameNode.requestFocus(),
+            errorText: vm.error('firstName'),
+          ),
+          const SizedBox(height: 12),
+          ProfileTextField(
             controller: lastName,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.lastNameLabel,
-              errorText: viewModel.error("lastName"),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
+            focusNode: lastNameNode,
+            label: localize?.lastNameLabel ?? 'Last name',
+            isRequired: true,
             textInputAction: TextInputAction.next,
-            onChanged: viewModel.setTelephone,
+            onChanged: vm.setLastName,
+            onSubmitted: (_) => telephoneNode.requestFocus(),
+            errorText: vm.error('lastName'),
+          ),
+          const SizedBox(height: 12),
+          ProfileTextField(
             controller: telephone,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.telephoneLabel,
-              errorText: viewModel.error("telephone"),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
+            focusNode: telephoneNode,
+            label: localize?.telephoneLabel ?? 'Telephone',
+            keyboardType: TextInputType.phone,
             textInputAction: TextInputAction.next,
-            onChanged: viewModel.setAddress,
+            helper: localize?.profilePhoneOptionalHelper ??
+                'Used to reach you about your reports',
+            optionalLabel: localize?.registerOptional ?? 'Optional',
+            onChanged: vm.setTelephone,
+            onSubmitted: (_) => addressNode.requestFocus(),
+            errorText: vm.error('telephone'),
+          ),
+          const SizedBox(height: 12),
+          ProfileTextField(
             controller: address,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.addressLabel,
-              errorText: viewModel.error("address"),
+            focusNode: addressNode,
+            label: localize?.addressLabel ?? 'Address',
+            optionalLabel: localize?.registerOptional ?? 'Optional',
+            maxLines: 3,
+            textInputAction: TextInputAction.newline,
+            onChanged: vm.setAddress,
+            errorText: vm.error('address'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Recap extends StatelessWidget {
+  final ProfileViewModel viewModel;
+  const _Recap({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final username = (viewModel.username ?? '').trim();
+    final email = (viewModel.email ?? '').trim();
+    final fullName = _displayName(viewModel);
+    final caption = [
+      if (username.isNotEmpty) '@$username',
+      if (email.isNotEmpty) email,
+    ].join('  ·  ');
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: incidentsHair, width: 1),
+      ),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _RecapAvatar(url: viewModel.avatarUrl),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  fullName,
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: incidentsInk,
+                    height: 1.25,
+                  ),
+                ),
+                if (caption.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    caption,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontFamily: incidentsFontFamily,
+                      fontFamilyFallback: incidentsFontFamilyFallback,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w500,
+                      color: incidentsMuted,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                Text(
+                  (AppLocalizations.of(context)?.profileFormReadonlyEyebrow ??
+                          'Set by your admin · not editable')
+                      .toUpperCase(),
+                  style: const TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: incidentsMuted,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 10),
-          if (viewModel.hasErrorForKey("general"))
-            Text(
-              viewModel.error("general"),
+        ],
+      ),
+    );
+  }
+
+  String _displayName(ProfileViewModel vm) {
+    final parts = [
+      (vm.firstName ?? '').trim(),
+      (vm.lastName ?? '').trim(),
+    ].where((s) => s.isNotEmpty).toList();
+    if (parts.isEmpty) return vm.username ?? '—';
+    return parts.join(' ');
+  }
+}
+
+class _RecapAvatar extends StatelessWidget {
+  final String? url;
+  const _RecapAvatar({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: incidentsTeal.withValues(alpha: 0.10),
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 1.5),
+      ),
+      child: ClipOval(
+        child: url == null
+            ? const Icon(Icons.person_outline, size: 22, color: incidentsTeal)
+            : Image.network(
+                url!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.person_outline,
+                  size: 22,
+                  color: incidentsTeal,
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+class _GeneralErrorBanner extends StatelessWidget {
+  final String message;
+  const _GeneralErrorBanner({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFBEAE5),
+        border: Border.all(color: const Color(0xFFE8B6AB), width: 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, size: 18, color: incidentsErrorRed),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
               style: const TextStyle(
-                color: Colors.red,
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: incidentsErrorRed,
+                height: 1.4,
               ),
             ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: FlatButton.primary(
-              onPressed: viewModel.isBusy
-                  ? null
-                  : () async {
-                      var result = await viewModel.updateProfile();
-                      if (result is ProfileSuccess && result.success) {
-                        if (context.mounted) {
-                          var showSuccessMessage = SnackBar(
-                            content: Text(AppLocalizations.of(context)
-                                    ?.profileUpdateSuccess ??
-                                'Profile update success'),
-                            backgroundColor: Colors.green,
-                          );
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(showSuccessMessage);
-                          GoRouter.of(context).pop(true);
-                        }
-                      }
-                    },
-              child: viewModel.isBusy
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+class _StickyFooter extends StackedHookView<ProfileViewModel> {
+  // ignore: prefer_const_constructors_in_immutables
+  _StickyFooter({required this.viewModel});
+
+  final ProfileViewModel viewModel;
+
+  @override
+  Widget builder(BuildContext context, ProfileViewModel vm) {
+    final media = MediaQuery.of(context);
+    final localize = AppLocalizations.of(context);
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: incidentsHair, width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0D000000),
+            offset: Offset(0, -6),
+            blurRadius: 18,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.fromLTRB(14, 10, 14, 10 + media.padding.bottom),
+      child: Row(
+        children: [
+          OutlinedButton(
+            onPressed: vm.isBusy
+                ? null
+                : () => Navigator.of(context).pop(false),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: incidentsInk,
+              side: const BorderSide(color: incidentsHair, width: 1),
+              shape: const StadiumBorder(),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+              minimumSize: const Size(0, 44),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const Spacer(),
+          Expanded(
+            child: TextButton(
+              onPressed: vm.isBusy ? null : () => _save(context, vm),
+              style: TextButton.styleFrom(
+                backgroundColor: incidentsTeal,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor:
+                    incidentsTeal.withValues(alpha: 0.5),
+                disabledForegroundColor: Colors.white,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                minimumSize: const Size(0, 48),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: vm.isBusy
                   ? const SizedBox(
-                      height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(color: Colors.white),
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
                   : Text(
-                      AppLocalizations.of(context)!.confirmUpdate,
-                      style: TextStyle(fontSize: 16.sp),
+                      localize?.confirmUpdate ?? 'Save',
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _save(BuildContext context, ProfileViewModel vm) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final result = await vm.updateProfile();
+    if (!context.mounted) return;
+    if (result is ProfileSuccess && result.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: incidentsTeal,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          content: Text(
+            AppLocalizations.of(context)?.profileUpdateSuccess ??
+                'Profile saved',
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
+      GoRouter.of(context).pop(true);
+    }
   }
 }

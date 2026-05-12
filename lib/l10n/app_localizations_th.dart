@@ -124,8 +124,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get profileUpdateSuccess => 'แก้ไขโปรไฟล์สำเร็จ';
 
   @override
-  String get passwordUpdatedSuccess =>
-      'Your password has been successfully changed!';
+  String get passwordUpdatedSuccess => 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว';
 
   @override
   String get changePasswordButton => 'แก้ไขรหัสผ่าน';
@@ -757,4 +756,88 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get registerCreating => 'กำลังสร้างบัญชี…';
+
+  @override
+  String get profileSectionContactInfo => 'ข้อมูลติดต่อ';
+
+  @override
+  String get profileLabelActiveVillage => 'หมู่บ้านที่ใช้งานอยู่';
+
+  @override
+  String get profileValueNotProvided => 'ยังไม่ได้กรอก';
+
+  @override
+  String get profileValueNotAssigned => 'ยังไม่ได้มอบหมาย';
+
+  @override
+  String get profileCompleteContactTitle => 'กรอกข้อมูลติดต่อ';
+
+  @override
+  String get profileCompleteContactBody =>
+      'เพื่อให้ทีมผู้รับผิดชอบติดต่อกลับเกี่ยวกับรายงานของคุณได้';
+
+  @override
+  String get signOutConfirmTitle => 'ออกจากระบบ OHTK?';
+
+  @override
+  String get signOutConfirmBody =>
+      'คุณจะต้องเข้าสู่ระบบใหม่เพื่อดูรายงานของคุณ';
+
+  @override
+  String get qrDialogEyebrow => 'รหัส QR ของคุณ';
+
+  @override
+  String get qrDialogTitle => 'บันทึกเพื่อใช้ภายหลัง';
+
+  @override
+  String get qrDialogBody =>
+      'บันทึกภาพนี้ลงในโทรศัพท์ของคุณ ครั้งหน้าที่คุณเข้าสู่ระบบ — บนเครื่องนี้หรือเครื่องใหม่ — เลือก \"เข้าสู่ระบบด้วย QR\" และแสดงรหัสนี้ให้กล้อง';
+
+  @override
+  String get qrLoading => 'กำลังโหลด';
+
+  @override
+  String get qrKeepPrivate => 'เก็บภาพนี้เป็นส่วนตัว';
+
+  @override
+  String get qrSaveToGallery => 'บันทึกในแกลเลอรี';
+
+  @override
+  String get qrSaveSuccess => 'บันทึกลงแกลเลอรีเรียบร้อย';
+
+  @override
+  String get qrSaveFailed => 'บันทึกรหัส QR ไม่สำเร็จ';
+
+  @override
+  String get avatarSheetTitle => 'อัปเดตรูปโปรไฟล์';
+
+  @override
+  String get avatarSheetSubtitle =>
+      'เลือกภาพสี่เหลี่ยม — คนอื่นจะเห็นในรายงานของคุณ';
+
+  @override
+  String get avatarSheetTakePhoto => 'ถ่ายภาพ';
+
+  @override
+  String get avatarSheetChooseGallery => 'เลือกจากแกลเลอรี';
+
+  @override
+  String get villageSheetTitle => 'เลือกหมู่บ้านที่ใช้งาน';
+
+  @override
+  String get villageSheetBody => 'รายงานใหม่จะถูกบันทึกไว้ที่หมู่บ้านนี้';
+
+  @override
+  String get profileFormReadonlyEyebrow => 'ผู้ดูแลกำหนด · แก้ไขไม่ได้';
+
+  @override
+  String get profilePhoneOptionalHelper =>
+      'ใช้สำหรับติดต่อเกี่ยวกับรายงานของคุณ';
+
+  @override
+  String get passwordIntroBody =>
+      'ใช้รหัสที่จำง่ายก็พอ — คุณใช้ไม่บ่อย ขอแค่ไม่ลืม';
+
+  @override
+  String get passwordHelperTip => 'เคล็ดลับ: ใช้คำหรือตัวเลขที่คุณจำได้ง่าย';
 }
