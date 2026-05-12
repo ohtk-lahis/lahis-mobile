@@ -106,19 +106,9 @@ class OhtkRouter {
           routes: <RouteBase>[
             GoRoute(
               path: '/reports',
-              pageBuilder: (context, state) => CustomTransitionPage<void>(
+              pageBuilder: (context, state) => NoTransitionPage<void>(
                 key: state.pageKey,
                 child: const ReportHomeView(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(-1, 0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
               ),
               routes: <RouteBase>[
                 GoRoute(
@@ -254,19 +244,9 @@ class OhtkRouter {
             ),
             GoRoute(
               path: '/profile',
-              pageBuilder: (context, state) => CustomTransitionPage<void>(
+              pageBuilder: (context, state) => NoTransitionPage<void>(
                 key: state.pageKey,
                 child: const ProfileView(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
               ),
               routes: [
                 GoRoute(
