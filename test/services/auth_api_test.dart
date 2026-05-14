@@ -102,14 +102,6 @@ void main() {
             'role': 'reporter',
             'consent': true,
             'features': <String>[],
-            'assignedVillages': [
-              {
-                '__typename': 'VillageType',
-                'id': 11,
-                'code': 'V001',
-                'name': 'Village One',
-              }
-            ],
             'avatarUrl': null,
           }
         }
@@ -121,7 +113,37 @@ void main() {
       expect(profile, isA<UserProfile>());
       expect(profile.username, 'alice');
       expect(profile.authorityId, 7);
-      expect(profile.assignedVillageNames, 'V001 - Village One');
+      expect(profile.assignedVillages, isEmpty);
+      expect(
+        link.requests.single.operation.document.toString(),
+        isNot(contains('assignedVillages')),
+      );
+    });
+
+    test('getAssignedVillages parses separate village query response',
+        () async {
+      final link = QueueLink([
+        {
+          '__typename': 'Query',
+          'me': {
+            '__typename': 'UserNode',
+            'assignedVillages': [
+              {
+                '__typename': 'VillageType',
+                'id': 11,
+                'code': 'V001',
+                'name': 'Village One',
+              }
+            ],
+          }
+        }
+      ]);
+      final api = authApiFor(link);
+
+      final villages = await api.getAssignedVillages();
+
+      expect(villages, hasLength(1));
+      expect(villages.single.displayName, 'V001 - Village One');
     });
   });
 }

@@ -16,8 +16,6 @@
       "type": "dart",
       "args": [
         "--dart-define",
-        "GRAPHQL_ENDPOINT=https://backend.ohtk.org/graphql/",
-        "--dart-define",
         "TENANT_API_ENDPOINT=https://admin.ohtk.org/api/servers/",
       ]
     },
@@ -39,8 +37,6 @@
       "deviceId": "BB4B942C-583C-45EE-9D51-7C65243D2C4F",
       "args": [
         "--dart-define",
-        "GRAPHQL_ENDPOINT=https://backend.ohtk.org/graphql/",
-        "--dart-define",
         "TENANT_API_ENDPOINT=https://admin.ohtk.org/api/servers/",
       ]
     },
@@ -50,8 +46,6 @@
       "type": "dart",
       "deviceId": "8793A212-C4CA-456C-A7EE-30DE09F4A216",
       "args": [
-        "--dart-define",
-        "GRAPHQL_ENDPOINT=https://backend.ohtk.org/graphql/",
         "--dart-define",
         "TENANT_API_ENDPOINT=https://admin.ohtk.org/api/servers/",
       ]
@@ -63,8 +57,6 @@
       "deviceId": "BBB1FA8E-B4CE-4D92-AE9D-EA1519241385",
       "args": [
         "--dart-define",
-        "GRAPHQL_ENDPOINT=https://backend.ohtk.org/graphql/",
-        "--dart-define",
         "TENANT_API_ENDPOINT=https://admin.ohtk.org/api/servers/",
       ]
     },
@@ -75,8 +67,6 @@
       "deviceId": "emulator-5554",
       "args": [
         "--dart-define",
-        "GRAPHQL_ENDPOINT=https://backend.ohtk.org/graphql/",
-        "--dart-define",
         "TENANT_API_ENDPOINT=https://admin.ohtk.org/api/servers/",
       ]
     },
@@ -86,8 +76,6 @@
       "type": "dart",
       "deviceId": "emulator-5556",
       "args": [
-        "--dart-define",
-        "GRAPHQL_ENDPOINT=https://backend.ohtk.org/graphql/",
         "--dart-define",
         "TENANT_API_ENDPOINT=https://admin.ohtk.org/api/servers/",
       ]

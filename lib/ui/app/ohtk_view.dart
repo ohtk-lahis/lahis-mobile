@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:podd_app/app_theme.dart';
 import 'package:podd_app/components/error_screen.dart';
+import 'package:podd_app/components/restart_widget.dart';
 import 'package:podd_app/components/waiting_screen.dart';
 import 'package:podd_app/constants.dart';
 import 'package:podd_app/locator.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/router.dart';
+import 'package:podd_app/services/gql_service.dart';
+import 'package:podd_app/ui/welcome/welcome_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ohtk_view_model.dart';
@@ -25,11 +28,7 @@ class OhtkApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: Future.wait([
-          locator.allReady(timeout: const Duration(seconds: 10)),
-          fetchLocaleFromPreference(),
-          fetchSetupComplete(),
-        ]),
+        future: _resolveStartup(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           setupAppLocalization();
           if (snapshot.hasError) {
@@ -38,9 +37,20 @@ class OhtkApp extends StatelessWidget {
           if (!snapshot.hasData) {
             return MaterialApp(home: WaitingScreen(progressStream));
           }
+          final startup = snapshot.data as _StartupState;
+          var locale = startup.locale;
+          var setupComplete = startup.setupComplete;
+          if (!setupComplete) {
+            return _buildApp(
+              locale: locale,
+              child: WelcomeView(
+                onContinue: () {
+                  if (context.mounted) RestartWidget.restartApp(context);
+                },
+              ),
+            );
+          }
           final appViewModel = AppViewModel();
-          var locale = snapshot.data[1] as Locale;
-          var setupComplete = snapshot.data[2] as bool;
           return OverlaySupport.global(
             child: ListenableBuilder(
               listenable: appViewModel,
@@ -72,6 +82,49 @@ class OhtkApp extends StatelessWidget {
         });
   }
 
+  Future<_StartupState> _resolveStartup() async {
+    final locale = await fetchLocaleFromPreference();
+    final setupComplete = await fetchSetupComplete();
+    if (!setupComplete) {
+      await Future.wait([
+        locator.isReady<GqlService>(timeout: const Duration(seconds: 15)),
+        locator.isReady<AppTheme>(timeout: const Duration(seconds: 15)),
+      ]);
+      return _StartupState(locale: locale, setupComplete: false);
+    }
+
+    await locator.allReady(timeout: const Duration(seconds: 60));
+    return _StartupState(locale: locale, setupComplete: true);
+  }
+
+  Widget _buildApp({
+    required Locale locale,
+    required Widget child,
+  }) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'OHTK Mobile',
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', ''),
+        Locale('th', ''),
+        Locale('km', ''),
+        Locale('lo', ''),
+        Locale('fr', ''),
+        Locale('es', ''),
+        Locale('my', ''),
+      ],
+      locale: locale,
+      theme: locator<AppTheme>().themeData,
+      home: child,
+    );
+  }
+
   /*
   To get local from SharedPreferences if exists
    */
@@ -90,4 +143,14 @@ class OhtkApp extends StatelessWidget {
     return prefs.getString(languageKey) != null &&
         prefs.getString(serverDomainKey) != null;
   }
+}
+
+class _StartupState {
+  final Locale locale;
+  final bool setupComplete;
+
+  const _StartupState({
+    required this.locale,
+    required this.setupComplete,
+  });
 }

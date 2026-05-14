@@ -8,6 +8,7 @@ import 'package:podd_app/services/api/auth_api.dart';
 import 'package:podd_app/services/api/census_api.dart';
 import 'package:podd_app/services/api/comment_api.dart';
 import 'package:podd_app/services/api/configuration_api.dart';
+import 'package:podd_app/services/api/feature_capability_api.dart';
 import 'package:podd_app/services/api/file_api.dart';
 import 'package:podd_app/services/api/forgot_password_api.dart';
 import 'package:podd_app/services/api/image_api.dart';
@@ -22,6 +23,7 @@ import 'package:podd_app/services/census_service.dart';
 import 'package:podd_app/services/comment_service.dart';
 import 'package:podd_app/services/config_service.dart';
 import 'package:podd_app/services/db_service.dart';
+import 'package:podd_app/services/feature_capability_service.dart';
 import 'package:podd_app/services/file_service.dart';
 import 'package:podd_app/services/forgot_password_service.dart';
 import 'package:podd_app/services/gql_service.dart';
@@ -102,6 +104,21 @@ StreamController<String> setupLocator(String environment) {
 
   registerApiLocators(controller);
 
+  if (locator.isRegistered<IFeatureCapabilityService>()) {
+    locator.unregister<IFeatureCapabilityService>();
+  }
+  locator.registerSingletonAsync<IFeatureCapabilityService>(() async {
+    final service = FeatureCapabilityService();
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString(serverDomainKey) != null) {
+      await service.refresh();
+    }
+    controller.add("init feature capability service");
+    return service;
+  }, dependsOn: [
+    FeatureCapabilityApi,
+  ]);
+
   if (locator.isRegistered<IDbService>()) {
     locator.unregister<IDbService>();
   }
@@ -166,7 +183,10 @@ StreamController<String> setupLocator(String environment) {
   }
   locator.registerSingletonAsync<INotificationService>(() async {
     final service = NotificationService();
-    service.fetchMyMessages(true);
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString(serverDomainKey) != null) {
+      service.fetchMyMessages(true);
+    }
     controller.add("init notification service");
     return service;
   }, dependsOn: [
@@ -227,6 +247,7 @@ StreamController<String> setupLocator(String environment) {
   }, dependsOn: [
     ISecureStorageService,
     AuthApi,
+    IFeatureCapabilityService,
     IReportTypeService,
     IReportService,
     IObservationDefinitionService,
@@ -316,6 +337,15 @@ registerApiLocators(StreamController<String> controller) {
     var gqlService = locator<GqlService>();
     controller.add("init auth api");
     return AuthApi(gqlService.resolveClientFunction);
+  }, dependsOn: [GqlService]);
+
+  if (locator.isRegistered<FeatureCapabilityApi>()) {
+    locator.unregister<FeatureCapabilityApi>();
+  }
+  locator.registerSingletonAsync<FeatureCapabilityApi>(() async {
+    var gqlService = locator<GqlService>();
+    controller.add("init feature capability api");
+    return FeatureCapabilityApi(gqlService.resolveClientFunction);
   }, dependsOn: [GqlService]);
 
   if (locator.isRegistered<RegisterApi>()) {

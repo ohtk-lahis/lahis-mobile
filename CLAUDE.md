@@ -34,9 +34,10 @@ flutter gen-l10n         # uses l10n.yaml
 # Run against local backend (opensur.test, see README for hosts + adb reverse setup)
 flutter run
 
-# Run against a remote tenant — endpoints come from --dart-define
+# Run against OHTK production server discovery. The app calls
+# TENANT_API_ENDPOINT, stores the selected tenant domain, then uses
+# https://<domain>/graphql/ for GraphQL.
 flutter run \
-  --dart-define=GRAPHQL_ENDPOINT=https://backend.ohtk.org/graphql/ \
   --dart-define=TENANT_API_ENDPOINT=https://admin.ohtk.org/api/servers/
 
 # Production builds (android bundle + ios ipa against ohtk.org)
@@ -47,10 +48,10 @@ flutter run \
 
 ## Configuration surface
 
-All runtime endpoints are compiled in via `--dart-define`, read in `lib/services/config_service.dart`:
+Runtime discovery endpoints are compiled in via `--dart-define`, read in `lib/services/config_service.dart`, while the active GraphQL endpoint is normally derived from the selected tenant domain:
 
-- `GRAPHQL_ENDPOINT` (default `https://opensur.test/graphql/`)
-- `TENANT_API_ENDPOINT` (default `https://opensur.test/api/servers/`) — used to look up per-tenant GraphQL endpoints by invitation code
+- `GRAPHQL_ENDPOINT` (default `https://opensur.test/graphql/`) — local/dev fallback when no tenant domain has been stored
+- `TENANT_API_ENDPOINT` (default `https://opensur.test/api/servers/`) — used to look up per-tenant domains; the selected domain is stored and used as `https://<domain>/graphql/`
 - `CONSENT_CONFIGURATION_KEY`, `CONSENT_ACCEPT_TEXT_KEY`
 - `ENVIRONMENT` (`dev` tightens Firebase Remote Config fetch settings in `main.dart`)
 

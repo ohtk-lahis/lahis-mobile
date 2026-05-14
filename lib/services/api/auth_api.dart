@@ -1,6 +1,7 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:podd_app/models/login_result.dart';
 import 'package:podd_app/models/user_profile.dart';
+import 'package:podd_app/models/village.dart';
 import 'package:podd_app/services/api/graph_ql_base_api.dart';
 
 class AuthApi extends GraphQlBaseApi {
@@ -73,11 +74,6 @@ class AuthApi extends GraphQlBaseApi {
           role
           consent
           features
-          assignedVillages {
-            id
-            code
-            name
-          }
           avatarUrl
         }
       }
@@ -85,6 +81,27 @@ class AuthApi extends GraphQlBaseApi {
     return runGqlQuery(
       query: query,
       typeConverter: (resp) => UserProfile.fromJson(resp),
+    );
+  }
+
+  Future<List<Village>> getAssignedVillages() async {
+    const query = r'''
+      query {
+        me {
+          assignedVillages {
+            id
+            code
+            name
+          }
+        }
+      }
+    ''';
+    return runGqlQuery<List<Village>>(
+      query: query,
+      typeConverter: (resp) {
+        final villages = resp['assignedVillages'] as List? ?? const [];
+        return villages.map((village) => Village.fromJson(village)).toList();
+      },
     );
   }
 

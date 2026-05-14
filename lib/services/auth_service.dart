@@ -6,6 +6,7 @@ import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/login_result.dart';
 import 'package:podd_app/models/user_profile.dart';
 import 'package:podd_app/models/village.dart';
+import 'package:podd_app/services/feature_capability_service.dart';
 import 'package:podd_app/services/gql_service.dart';
 import 'package:podd_app/services/jwt.dart';
 import 'package:podd_app/services/observation_definition_service.dart';
@@ -54,6 +55,8 @@ class AuthService with ListenableServiceMixin implements IAuthService {
   final _logger = locator<Logger>();
 
   final _authApi = locator<AuthApi>();
+
+  final _featureCapabilityService = locator<IFeatureCapabilityService>();
 
   final _reportTypeService = locator<IReportTypeService>();
 
@@ -150,6 +153,7 @@ class AuthService with ListenableServiceMixin implements IAuthService {
     await _observationDefinitionService.removeAll();
     await _gqlService.clearCookies();
     await _gqlService.clearGraphqlCache();
+    _featureCapabilityService.reset();
   }
 
   @override
@@ -166,6 +170,14 @@ class AuthService with ListenableServiceMixin implements IAuthService {
 
   _fetchProfile() async {
     var profile = await _authApi.getUserProfile();
+    await _featureCapabilityService.refresh();
+    if (_featureCapabilityService.villageEnabled) {
+      try {
+        profile.assignedVillages = await _authApi.getAssignedVillages();
+      } catch (e) {
+        _logger.w('Cannot fetch assigned villages: $e');
+      }
+    }
     _userProfile = profile;
     await _syncSelectedVillage();
 

@@ -4,11 +4,14 @@ import 'package:podd_app/models/village.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/auth_service.dart';
 import 'package:podd_app/services/census_service.dart';
+import 'package:podd_app/services/feature_capability_service.dart';
 import 'package:stacked/stacked.dart';
 
 class CensusViewModel extends BaseViewModel {
   final IAuthService authService = locator<IAuthService>();
   final ICensusService censusService = locator<ICensusService>();
+  final IFeatureCapabilityService featureCapabilityService =
+      locator<IFeatureCapabilityService>();
 
   List<AnimalSpecies> species = [];
   VillageCensusSnapshot? latestCensus;
@@ -23,6 +26,7 @@ class CensusViewModel extends BaseViewModel {
   Village? get selectedVillage => authService.selectedVillage;
 
   bool get hasCensusAccess =>
+      featureCapabilityService.villageEnabled &&
       (authService.userProfile?.hasFeatureEnabled('animal_census_enabled') ??
           false) &&
       selectedVillage != null;

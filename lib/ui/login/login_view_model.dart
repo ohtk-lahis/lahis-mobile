@@ -5,6 +5,7 @@ import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/login_result.dart';
 import 'package:podd_app/services/auth_service.dart';
 import 'package:podd_app/services/config_service.dart';
+import 'package:podd_app/services/feature_capability_service.dart';
 import 'package:podd_app/services/gql_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
@@ -12,6 +13,8 @@ import 'package:stacked/stacked.dart';
 class LoginViewModel extends BaseViewModel {
   IAuthService authService = locator<IAuthService>();
   ConfigService configService = locator<ConfigService>();
+  IFeatureCapabilityService featureCapabilityService =
+      locator<IFeatureCapabilityService>();
   GqlService gqlService = locator<GqlService>();
 
   final _dio = Dio();
@@ -59,10 +62,14 @@ class LoginViewModel extends BaseViewModel {
 
   changeServer(String value) async {
     if (value == "") {
+      subDomain = value;
+      featureCapabilityService.reset();
       return;
     }
     subDomain = value;
     await gqlService.setBackendSubDomain(value);
+    await gqlService.renewClient();
+    await featureCapabilityService.refresh();
   }
 
   changeLanguage(String value) async {

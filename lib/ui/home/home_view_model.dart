@@ -1,6 +1,7 @@
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/user_profile.dart';
 import 'package:podd_app/services/auth_service.dart';
+import 'package:podd_app/services/feature_capability_service.dart';
 import 'package:podd_app/services/file_service.dart';
 import 'package:podd_app/services/image_service.dart';
 import 'package:podd_app/services/notification_service.dart';
@@ -12,6 +13,8 @@ class HomeViewModel extends IndexTrackingViewModel {
   final INotificationService notificationService =
       locator<INotificationService>();
   IAuthService authService = locator<IAuthService>();
+  IFeatureCapabilityService featureCapabilityService =
+      locator<IFeatureCapabilityService>();
   IReportService reportService = locator<IReportService>();
   IObservationRecordService recordService =
       locator<IObservationRecordService>();
@@ -58,8 +61,13 @@ class HomeViewModel extends IndexTrackingViewModel {
   }
 
   @override
-  List<ListenableServiceMixin> get listenableServices =>
-      [reportService, recordService, imageService, fileService];
+  List<ListenableServiceMixin> get listenableServices => [
+        reportService,
+        recordService,
+        imageService,
+        fileService,
+        featureCapabilityService,
+      ];
 
   UserProfile? get userProfile => authService.userProfile;
 
@@ -71,6 +79,7 @@ class HomeViewModel extends IndexTrackingViewModel {
       userProfile?.hasFeatureEnabled("observation") ?? false;
 
   bool get hasAnimalCensusFeature =>
+      featureCapabilityService.villageEnabled &&
       (userProfile?.hasFeatureEnabled("animal_census_enabled") ?? false) &&
       (userProfile?.hasAssignedVillages ?? false);
 
