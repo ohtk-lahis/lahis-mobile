@@ -63,6 +63,8 @@ class LoginViewModel extends BaseViewModel {
   changeServer(String value) async {
     if (value == "") {
       subDomain = value;
+      await gqlService.setBackendSubDomain(value);
+      await gqlService.renewClient();
       featureCapabilityService.reset();
       return;
     }

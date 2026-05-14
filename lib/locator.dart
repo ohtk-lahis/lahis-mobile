@@ -109,10 +109,6 @@ StreamController<String> setupLocator(String environment) {
   }
   locator.registerSingletonAsync<IFeatureCapabilityService>(() async {
     final service = FeatureCapabilityService();
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.getString(serverDomainKey) != null) {
-      await service.refresh();
-    }
     controller.add("init feature capability service");
     return service;
   }, dependsOn: [

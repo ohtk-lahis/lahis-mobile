@@ -103,6 +103,11 @@ class AuthService with ListenableServiceMixin implements IAuthService {
       if (isExpired) {
         _isLogin.value = false;
       } else {
+        if (_userProfile != null) {
+          await _refreshFeatureCapabilitiesAndAssignedVillages(_userProfile!);
+          await _syncSelectedVillage();
+          await _secureStorageService.setUserProfile(_userProfile!);
+        }
         _isLogin.value = true;
       }
     } else {
@@ -170,6 +175,17 @@ class AuthService with ListenableServiceMixin implements IAuthService {
 
   _fetchProfile() async {
     var profile = await _authApi.getUserProfile();
+    await _refreshFeatureCapabilitiesAndAssignedVillages(profile);
+    _userProfile = profile;
+    await _syncSelectedVillage();
+
+    await _secureStorageService.setUserProfile(profile);
+    await _reportTypeService.sync();
+    await _observationDefinitionService.sync();
+  }
+
+  Future<void> _refreshFeatureCapabilitiesAndAssignedVillages(
+      UserProfile profile) async {
     await _featureCapabilityService.refresh();
     if (_featureCapabilityService.villageEnabled) {
       try {
@@ -178,12 +194,6 @@ class AuthService with ListenableServiceMixin implements IAuthService {
         _logger.w('Cannot fetch assigned villages: $e');
       }
     }
-    _userProfile = profile;
-    await _syncSelectedVillage();
-
-    await _secureStorageService.setUserProfile(profile);
-    await _reportTypeService.sync();
-    await _observationDefinitionService.sync();
   }
 
   // return true if token is expired and cannot refresh

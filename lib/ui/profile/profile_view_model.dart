@@ -35,7 +35,6 @@ class ProfileViewModel extends BaseViewModel {
 
   initValue() async {
     final userProfile = authService.userProfile;
-    final prefs = await SharedPreferences.getInstance();
 
     if (userProfile != null) {
       firstName = userProfile.firstName;
@@ -54,6 +53,7 @@ class ProfileViewModel extends BaseViewModel {
       address = userProfile.address;
       notifyListeners();
     }
+    final prefs = await SharedPreferences.getInstance();
     language = prefs.getString(languageKey) ?? "en";
   }
 
