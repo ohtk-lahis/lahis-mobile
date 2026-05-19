@@ -14,7 +14,7 @@ class DbService extends IDbService {
     // follow this migration pattern https://github.com/tekartik/sqflite/blob/master/sqflite/doc/migration_example.md
     _db = await openDatabase(
       'podd.db',
-      version: 11,
+      version: 12,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onDowngrade: onDatabaseDowngradeDelete,
@@ -32,6 +32,7 @@ class DbService extends IDbService {
     _createTableSubjectRecordV1(batch);
     _createTableMonitoringRecordV2(batch);
     _createTableReportFileV1(batch);
+    _createTableCensusDefinitionCacheV1(batch);
     await batch.commit();
   }
 
@@ -69,6 +70,9 @@ class DbService extends IDbService {
     }
     if (oldVersion == 10) {
       await _createTableReportFileV1(batch);
+    }
+    if (oldVersion < 12) {
+      await _createTableCensusDefinitionCacheV1(batch);
     }
     await batch.commit();
   }
@@ -117,6 +121,17 @@ class DbService extends IDbService {
       file_extension TEXT,
       file_type TEXT,
       submitted INT
+    )''');
+  }
+
+  _createTableCensusDefinitionCacheV1(Batch batch) {
+    batch.execute('''CREATE TABLE IF NOT EXISTS census_definition_cache (
+      kind TEXT PRIMARY KEY,
+      definition_version_id INT,
+      version INT,
+      status TEXT,
+      runtime_schema_json TEXT,
+      fetched_at TEXT
     )''');
   }
 

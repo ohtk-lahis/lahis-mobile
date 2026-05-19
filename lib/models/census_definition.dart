@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:podd_app/models/animal_species.dart';
 
 class CensusDefinitionVersion {
@@ -22,6 +24,32 @@ class CensusDefinitionVersion {
           Map<String, dynamic>.from(json['runtimeSchema'] as Map? ?? const {}),
         ),
       );
+
+  factory CensusDefinitionVersion.fromCacheMap(Map<String, dynamic> map) =>
+      CensusDefinitionVersion(
+        id: _parseInt(map['definition_version_id']) ?? 0,
+        version: _parseInt(map['version']) ?? 0,
+        status: map['status']?.toString() ?? '',
+        runtimeSchema: CensusRuntimeSchema.fromJson(
+          Map<String, dynamic>.from(
+            jsonDecode(map['runtime_schema_json']?.toString() ?? '{}') as Map,
+          ),
+        ),
+      );
+
+  Map<String, dynamic> toCacheMap({
+    required String kind,
+    required DateTime fetchedAt,
+  }) {
+    return {
+      'kind': kind,
+      'definition_version_id': id,
+      'version': version,
+      'status': status,
+      'runtime_schema_json': jsonEncode(runtimeSchema.toJson()),
+      'fetched_at': fetchedAt.toIso8601String(),
+    };
+  }
 }
 
 class CensusRuntimeSchema {
@@ -55,6 +83,14 @@ class CensusRuntimeSchema {
             .toList(),
       );
 
+  Map<String, dynamic> toJson() {
+    return {
+      'rows': rows.map((row) => row.toJson()).toList(),
+      'measures': measures.map((measure) => measure.toJson()).toList(),
+      'extra_dimensions': extraDimensions,
+    };
+  }
+
   bool get supportsLegacyAnimalSubmit {
     final measureKeys = measures.map((measure) => measure.key).toSet();
     final speciesIds = rows.map((row) => row.speciesId).whereType<int>();
@@ -65,6 +101,16 @@ class CensusRuntimeSchema {
         measureKeys.length == 2 &&
         measureKeys.contains('animal_quantity') &&
         measureKeys.contains('household_quantity');
+  }
+
+  bool get supportsMobileAnimalSubmit {
+    final speciesIds = rows.map((row) => row.speciesId).whereType<int>();
+    return rows.isNotEmpty &&
+        measures.isNotEmpty &&
+        extraDimensions.isEmpty &&
+        rows.every((row) => row.speciesId != null) &&
+        speciesIds.length == speciesIds.toSet().length &&
+        measures.every((measure) => measure.isInteger);
   }
 
   List<AnimalSpecies> toAnimalSpeciesRows() {
@@ -108,6 +154,16 @@ class CensusSchemaRow {
       sortOrder: _parseInt(json['sort_order']) ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'row_key': rowKey,
+      'label': label,
+      'species_id': speciesId,
+      'species_code': speciesCode,
+      'sort_order': sortOrder,
+    };
+  }
 }
 
 class CensusSchemaMeasure {
@@ -130,6 +186,17 @@ class CensusSchemaMeasure {
         type: json['type']?.toString() ?? '',
         required: json['required'] as bool? ?? false,
       );
+
+  bool get isInteger => type.isEmpty || type == 'integer';
+
+  Map<String, dynamic> toJson() {
+    return {
+      'key': key,
+      'label': label,
+      'type': type,
+      'required': required,
+    };
+  }
 }
 
 int? _parseInt(dynamic value) {

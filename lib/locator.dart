@@ -279,6 +279,7 @@ StreamController<String> setupLocator(String environment) {
     return CensusService();
   }, dependsOn: [
     CensusApi,
+    IDbService,
   ]);
 
   if (locator.isRegistered<IProfileService>()) {

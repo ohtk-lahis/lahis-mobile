@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:podd_app/locator.dart';
+import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/api/census_api.dart';
 
@@ -41,6 +42,45 @@ void main() {
   });
 
   group('CensusApi GraphQL contract', () {
+    test('CensusDefinitionVersion cache map round trips runtime schema', () {
+      final version = CensusDefinitionVersion.fromJson({
+        'id': '7',
+        'version': 2,
+        'status': 'PUBLISHED',
+        'runtimeSchema': {
+          'rows': [
+            {
+              'row_key': 'species:CATTLE',
+              'label': 'Cattle',
+              'species_id': 1,
+              'species_code': 'CATTLE',
+              'sort_order': 1,
+            }
+          ],
+          'measures': [
+            {
+              'key': 'animal_quantity',
+              'label': 'Heads',
+              'type': 'integer',
+              'required': true,
+            }
+          ],
+        },
+      });
+
+      final cached = CensusDefinitionVersion.fromCacheMap(
+        version.toCacheMap(
+          kind: 'ANIMAL',
+          fetchedAt: DateTime.parse('2026-05-19T00:00:00Z'),
+        ),
+      );
+
+      expect(cached.id, 7);
+      expect(cached.version, 2);
+      expect(cached.runtimeSchema.rows.single.label, 'Cattle');
+      expect(cached.runtimeSchema.measures.single.key, 'animal_quantity');
+    });
+
     test('fetchActiveSpecies parses active species list', () async {
       final link = QueueLink([
         {
@@ -257,6 +297,100 @@ void main() {
       expect(result, isA<VillageCensusSubmitValidationFailure>());
       final failure = result as VillageCensusSubmitValidationFailure;
       expect(failure.messages, ['reporter is not official for this village']);
+    });
+
+    test('submitVillageCensusSnapshotV2 sends definition version and form data',
+        () async {
+      final formData = {
+        'rows': [
+          {
+            'species_id': 1,
+            'measures': {
+              'animal_quantity': 5,
+              'household_quantity': 2,
+            },
+          }
+        ],
+      };
+      final link = QueueLink([
+        {
+          '__typename': 'Mutation',
+          'submitVillageCensusSnapshotV2': {
+            '__typename': 'SubmitVillageCensusSnapshotV2Mutation',
+            'result': {
+              '__typename': 'VillageCensusSnapshotType',
+              'id': '100',
+              'censusDate': '2026-05-05',
+              'submittedAt': '2026-05-05T10:00:00Z',
+              'village': {
+                '__typename': 'VillageType',
+                'id': 11,
+                'code': 'V001',
+                'name': 'Village One',
+              },
+              'facts': [
+                {
+                  'species': {
+                    '__typename': 'AnimalSpeciesType',
+                    'id': 1,
+                    'code': 'CATTLE',
+                    'name': 'Cattle',
+                    'active': true,
+                    'sortOrder': 1,
+                  },
+                  'animalQuantity': 5,
+                  'householdQuantity': 2,
+                }
+              ],
+            }
+          }
+        }
+      ]);
+      final api = censusApiFor(link);
+
+      final result = await api.submitVillageCensusSnapshotV2(
+        villageId: 11,
+        definitionVersionId: 7,
+        censusDate: '2026-05-05',
+        formData: formData,
+      );
+
+      expect(result, isA<VillageCensusSubmitSuccess>());
+      expect(link.requests.single.variables['villageId'], 11);
+      expect(link.requests.single.variables['definitionVersionId'], 7);
+      expect(link.requests.single.variables['formData'], formData);
+    });
+
+    test('submitVillageCensusSnapshotV2 reports unsupported legacy server',
+        () async {
+      final link = QueueLink([
+        Response(
+          errors: const [
+            GraphQLError(
+              message:
+                  "Cannot query field 'submitVillageCensusSnapshotV2' on type 'Mutation'",
+            )
+          ],
+          response: const {
+            'errors': [
+              {
+                'message':
+                    "Cannot query field 'submitVillageCensusSnapshotV2' on type 'Mutation'"
+              }
+            ]
+          },
+        ),
+      ]);
+      final api = censusApiFor(link);
+
+      final result = await api.submitVillageCensusSnapshotV2(
+        villageId: 11,
+        definitionVersionId: 7,
+        censusDate: '2026-05-05',
+        formData: const {'rows': []},
+      );
+
+      expect(result, isA<VillageCensusSubmitUnsupported>());
     });
   });
 }

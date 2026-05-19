@@ -89,3 +89,5 @@ class VillageCensusSubmitValidationFailure extends VillageCensusSubmitResult {
 
   VillageCensusSubmitValidationFailure(this.messages);
 }
+
+class VillageCensusSubmitUnsupported extends VillageCensusSubmitResult {}

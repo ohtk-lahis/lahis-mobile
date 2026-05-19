@@ -189,7 +189,7 @@ class CensusApi extends GraphQlBaseApi {
     ''';
 
     try {
-      return runGqlMutation<VillageCensusSubmitResult>(
+      return await runGqlMutation<VillageCensusSubmitResult>(
         mutation: mutation,
         variables: {
           'villageId': villageId,
@@ -217,6 +217,97 @@ class CensusApi extends GraphQlBaseApi {
     } on OperationException catch (e) {
       return VillageCensusSubmitFailure(e);
     }
+  }
+
+  Future<VillageCensusSubmitResult> submitVillageCensusSnapshotV2({
+    required int villageId,
+    required int definitionVersionId,
+    required String censusDate,
+    required Map<String, dynamic> formData,
+  }) async {
+    const mutation = r'''
+      mutation SubmitVillageCensusSnapshotV2(
+        $villageId: Int!,
+        $definitionVersionId: Int!,
+        $censusDate: Date!,
+        $formData: GenericScalar!
+      ) {
+        submitVillageCensusSnapshotV2(
+          villageId: $villageId,
+          definitionVersionId: $definitionVersionId,
+          censusDate: $censusDate,
+          formData: $formData
+        ) {
+          result {
+            __typename
+            ... on VillageCensusSnapshotType {
+              id
+              censusDate
+              submittedAt
+              village {
+                id
+                code
+                name
+              }
+              facts {
+                species {
+                  id
+                  code
+                  name
+                  active
+                  sortOrder
+                }
+                animalQuantity
+                householdQuantity
+              }
+            }
+            ... on VillageCensusSnapshotProblem {
+              fields {
+                name
+                message
+              }
+              message
+            }
+          }
+        }
+      }
+    ''';
+
+    try {
+      return await runGqlMutation<VillageCensusSubmitResult>(
+        mutation: mutation,
+        variables: {
+          'villageId': villageId,
+          'definitionVersionId': definitionVersionId,
+          'censusDate': censusDate,
+          'formData': formData,
+        },
+        parseData: _parseSubmitResult,
+      );
+    } on OperationException catch (e) {
+      if (_hasUnsupportedField(e, 'submitVillageCensusSnapshotV2')) {
+        return VillageCensusSubmitUnsupported();
+      }
+      return VillageCensusSubmitFailure(e);
+    }
+  }
+
+  VillageCensusSubmitResult _parseSubmitResult(Map<String, dynamic>? resp) {
+    final result = resp?['result'];
+    if (result?['__typename'] == 'VillageCensusSnapshotType') {
+      return VillageCensusSubmitSuccess(
+        VillageCensusSnapshot.fromJson(result),
+      );
+    }
+
+    final fieldMessages = (result?['fields'] as List? ?? const [])
+        .map((field) => field['message'].toString())
+        .toList();
+    final message = result?['message']?.toString();
+    return VillageCensusSubmitValidationFailure([
+      ...fieldMessages,
+      if (message != null && message.isNotEmpty) message,
+    ]);
   }
 
   bool _hasUnsupportedField(OperationException? exception, String fieldName) {

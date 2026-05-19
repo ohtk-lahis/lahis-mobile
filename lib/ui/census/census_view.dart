@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:podd_app/components/flat_button.dart';
-import 'package:podd_app/models/animal_species.dart';
-import 'package:podd_app/models/village_census.dart';
+import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/ui/census/census_view_model.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:stacked/stacked.dart';
 
 class CensusView extends StatelessWidget {
@@ -16,126 +14,619 @@ class CensusView extends StatelessWidget {
       viewModelBuilder: () => CensusViewModel(),
       builder: (context, viewModel, _) {
         if (viewModel.isBusy) {
-          return const Center(child: CircularProgressIndicator());
+          return const _CensusLoading();
         }
 
-        return RefreshIndicator(
-          onRefresh: viewModel.init,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-            children: [
-              Text(
-                'Village census',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(viewModel.selectedVillage?.displayName ?? 'No village'),
-              const SizedBox(height: 20),
-              if (!viewModel.hasCensusAccess)
-                const Text('Census is not available for this account.'),
-              if (viewModel.hasError)
-                Text(
-                  viewModel.modelError.toString(),
-                  style: const TextStyle(color: Colors.red),
+        if (!viewModel.hasCensusAccess) {
+          return const _FullState(
+            icon: Icons.lock_outline,
+            title: 'Census is not available',
+            message: 'This account is not assigned to update a village census.',
+          );
+        }
+
+        if (viewModel.hasError && !viewModel.hasRows) {
+          return _FullState(
+            icon: Icons.cloud_off_outlined,
+            title: "Couldn't load the census",
+            message: viewModel.modelError.toString(),
+            actionLabel: 'Try again',
+            onAction: viewModel.init,
+          );
+        }
+
+        if (viewModel.unsupportedSchema) {
+          return const _FullState(
+            icon: Icons.warning_amber_rounded,
+            iconColor: Color(0xFFA07015),
+            iconBackground: Color(0x1AA07015),
+            title: 'This census needs a newer app',
+            message:
+                "The village census has been updated and isn't supported on this version of OHTK Mobile. Please update the app, then try again.",
+          );
+        }
+
+        return Column(
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                color: incidentsTeal,
+                onRefresh: viewModel.init,
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _VillageHeader(viewModel: viewModel),
+                    if (viewModel.usingCachedDefinition)
+                      const _NoticeBanner(
+                        tone: _NoticeTone.warn,
+                        icon: Icons.warning_amber_rounded,
+                        text:
+                            "Using a saved version of this form — couldn't refresh from server.",
+                      ),
+                    if (viewModel.message != null)
+                      _NoticeBanner(
+                        tone: _NoticeTone.ok,
+                        icon: Icons.check_circle_outline,
+                        text: viewModel.message!,
+                      ),
+                    if (viewModel.hasErrorForKey('submit'))
+                      _NoticeBanner(
+                        tone: _NoticeTone.error,
+                        icon: Icons.error_outline,
+                        text: viewModel.error('submit').toString(),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            viewModel.latestCensus == null
+                                ? 'No census has been submitted yet. Enter the current count for each animal.'
+                                : 'Update anything that has changed. Numbers from the last submission are pre-filled.',
+                            style: const TextStyle(
+                              fontFamily: incidentsFontFamily,
+                              fontFamilyFallback: incidentsFontFamilyFallback,
+                              fontSize: 13,
+                              height: 1.45,
+                              color: incidentsBody,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          if (!viewModel.hasRows)
+                            const Text(
+                              'No active animal species are configured.',
+                              style: TextStyle(
+                                fontFamily: incidentsFontFamily,
+                                fontFamilyFallback: incidentsFontFamilyFallback,
+                                color: incidentsBody,
+                              ),
+                            )
+                          else
+                            for (final row in viewModel.rows)
+                              _CensusRowSection(
+                                row: row,
+                                viewModel: viewModel,
+                              ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              if (viewModel.hasCensusAccess) ...[
-                _LatestCensus(snapshot: viewModel.latestCensus),
-                const SizedBox(height: 24),
-                if (!viewModel.hasSpecies)
-                  const Text('No active animal species are configured.'),
-                if (viewModel.hasSpecies) _CensusForm(viewModel: viewModel),
-              ],
-            ],
-          ),
+              ),
+            ),
+            _StickyFooter(viewModel: viewModel),
+          ],
         );
       },
     );
   }
 }
 
-class _LatestCensus extends StatelessWidget {
-  final VillageCensusSnapshot? snapshot;
+class _VillageHeader extends StatelessWidget {
+  final CensusViewModel viewModel;
 
-  const _LatestCensus({required this.snapshot});
+  const _VillageHeader({required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Latest census', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
-        if (snapshot == null)
-          const Text('No census has been submitted yet.')
-        else ...[
-          Text('Date: ${_dateLabel(snapshot!.censusDate)}'),
-          const SizedBox(height: 8),
-          for (final fact in snapshot!.facts)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Text(
-                '${fact.species.displayName}: '
-                '${fact.animalQuantity} animals, '
-                '${fact.householdQuantity} households',
+    final village = viewModel.selectedVillage;
+    final freshness = viewModel.freshnessLabel;
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: incidentsTeal.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: const Icon(
+                  Icons.holiday_village_outlined,
+                  color: incidentsTeal,
+                  size: 20,
+                ),
               ),
-            ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'UPDATING VILLAGE',
+                      style: TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
+                        color: incidentsMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      village?.displayName ?? 'No village',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: incidentsInk,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _FreshnessChip(
+            icon: freshness == null
+                ? Icons.edit_outlined
+                : Icons.access_time_rounded,
+            text: freshness == null
+                ? 'No census submitted yet'
+                : 'Last updated $freshness',
+          ),
         ],
-      ],
+      ),
     );
-  }
-
-  String _dateLabel(DateTime? date) {
-    if (date == null) {
-      return '-';
-    }
-    final year = date.year.toString().padLeft(4, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '$year-$month-$day';
   }
 }
 
-class _CensusForm extends StatelessWidget {
-  final CensusViewModel viewModel;
+class _FreshnessChip extends StatelessWidget {
+  final IconData icon;
+  final String text;
 
-  const _CensusForm({required this.viewModel});
+  const _FreshnessChip({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: incidentsTeal.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: incidentsTeal, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: const TextStyle(
+              fontFamily: incidentsFontFamily,
+              fontFamilyFallback: incidentsFontFamilyFallback,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+              color: incidentsTeal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CensusRowSection extends StatelessWidget {
+  final CensusSchemaRow row;
+  final CensusViewModel viewModel;
+
+  const _CensusRowSection({
+    required this.row,
+    required this.viewModel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dirty = viewModel.isRowDirty(row);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    row.label,
+                    style: const TextStyle(
+                      fontFamily: incidentsFontFamily,
+                      fontFamilyFallback: incidentsFontFamilyFallback,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: incidentsInk,
+                    ),
+                  ),
+                ),
+                if (dirty)
+                  const Text(
+                    'EDITED',
+                    style: TextStyle(
+                      fontFamily: incidentsFontFamily,
+                      fontFamilyFallback: incidentsFontFamilyFallback,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1,
+                      color: incidentsTeal,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: dirty ? incidentsTeal : incidentsHair),
+              boxShadow: dirty
+                  ? [
+                      BoxShadow(
+                        color: incidentsTeal.withValues(alpha: 0.10),
+                        spreadRadius: 3,
+                        blurRadius: 0,
+                      )
+                    ]
+                  : null,
+            ),
+            child: Column(
+              children: [
+                for (var i = 0; i < viewModel.measures.length; i++)
+                  _MeasureInputRow(
+                    row: row,
+                    measure: viewModel.measures[i],
+                    viewModel: viewModel,
+                    last: i == viewModel.measures.length - 1,
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MeasureInputRow extends StatelessWidget {
+  final CensusSchemaRow row;
+  final CensusSchemaMeasure measure;
+  final CensusViewModel viewModel;
+  final bool last;
+
+  const _MeasureInputRow({
+    required this.row,
+    required this.measure,
+    required this.viewModel,
+    required this.last,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final label = measure.label.isNotEmpty ? measure.label : measure.key;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      decoration: BoxDecoration(
+        border: last
+            ? null
+            : const Border(bottom: BorderSide(color: incidentsHair)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 13,
+                height: 1.2,
+                fontWeight: FontWeight.w500,
+                color: incidentsBody,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 100,
+            child: TextFormField(
+              key: ValueKey('${row.rowKey}:${measure.key}'),
+              initialValue: viewModel.measureValue(row.rowKey, measure.key),
+              enabled: !viewModel.busy('submit'),
+              textAlign: TextAlign.right,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              onChanged: (value) =>
+                  viewModel.setMeasureValue(row.rowKey, measure.key, value),
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: incidentsInk,
+              ),
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                filled: viewModel.busy('submit'),
+                fillColor: incidentsSand,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide:
+                      const BorderSide(color: incidentsHair, width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide:
+                      const BorderSide(color: incidentsHair, width: 1.5),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide:
+                      const BorderSide(color: incidentsTeal, width: 1.5),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StickyFooter extends StatelessWidget {
+  final CensusViewModel viewModel;
+
+  const _StickyFooter({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: incidentsHair)),
+      ),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 18),
+      child: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: ElevatedButton(
+          onPressed: viewModel.busy('submit') || !viewModel.canSubmit
+              ? null
+              : () => viewModel.submit(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: incidentsTeal,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: incidentsHair,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          child: viewModel.busy('submit')
+              ? const SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.5,
+                  ),
+                )
+              : const Text(
+                  'SAVE CURRENT CENSUS',
+                  style: TextStyle(
+                    fontFamily: incidentsFontFamily,
+                    fontFamilyFallback: incidentsFontFamilyFallback,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+enum _NoticeTone { ok, warn, error }
+
+class _NoticeBanner extends StatelessWidget {
+  final _NoticeTone tone;
+  final IconData icon;
+  final String text;
+
+  const _NoticeBanner({
+    required this.tone,
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (tone) {
+      _NoticeTone.ok => incidentsTeal,
+      _NoticeTone.warn => const Color(0xFFA07015),
+      _NoticeTone.error => incidentsErrorRed,
+    };
+    final background = switch (tone) {
+      _NoticeTone.ok => incidentsTeal.withValues(alpha: 0.10),
+      _NoticeTone.warn => const Color(0x1AA07015),
+      _NoticeTone.error => incidentsErrorTint,
+    };
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 13,
+                height: 1.35,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FullState extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBackground;
+  final String title;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  const _FullState({
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.iconColor = incidentsErrorRed,
+    this.iconBackground = incidentsErrorTint,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: iconBackground,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Icon(icon, color: iconColor, size: 38),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: incidentsInk,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 13.5,
+                height: 1.55,
+                color: incidentsMuted,
+              ),
+            ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 22),
+              ElevatedButton.icon(
+                onPressed: onAction,
+                icon: const Icon(Icons.refresh, size: 15),
+                label: Text(actionLabel!.toUpperCase()),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: incidentsTeal,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CensusLoading extends StatelessWidget {
+  const _CensusLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: EdgeInsets.zero,
       children: [
-        Text('Submit census', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 12),
-        for (final item in viewModel.species)
-          _SpeciesQuantityRow(item, viewModel),
-        if (viewModel.hasErrorForKey('submit')) ...[
-          const SizedBox(height: 12),
-          Text(
-            viewModel.error('submit'),
-            style: const TextStyle(color: Colors.red),
+        Container(
+          color: Colors.white,
+          padding: const EdgeInsets.all(14),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _Skeleton(width: 120, height: 12),
+              SizedBox(height: 8),
+              _Skeleton(width: 240, height: 15),
+            ],
           ),
-        ],
-        if (viewModel.message != null) ...[
-          const SizedBox(height: 12),
-          Text(
-            viewModel.message!,
-            style: TextStyle(color: Colors.green.shade700),
-          ),
-        ],
-        const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: FlatButton.primary(
-            onPressed:
-                viewModel.busy('submit') ? null : () => viewModel.submit(),
-            child: viewModel.busy('submit')
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(color: Colors.white),
-                  )
-                : Text('Submit census', style: TextStyle(fontSize: 15.sp)),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            children: const [
+              _SkeletonCard(),
+              SizedBox(height: 12),
+              _SkeletonCard(),
+              SizedBox(height: 12),
+              _SkeletonCard(),
+            ],
           ),
         ),
       ],
@@ -143,51 +634,46 @@ class _CensusForm extends StatelessWidget {
   }
 }
 
-class _SpeciesQuantityRow extends StatelessWidget {
-  final AnimalSpecies species;
-  final CensusViewModel viewModel;
-
-  const _SpeciesQuantityRow(this.species, this.viewModel);
+class _SkeletonCard extends StatelessWidget {
+  const _SkeletonCard();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: incidentsHair),
+      ),
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(species.displayName),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  onChanged: (value) =>
-                      viewModel.setAnimalQuantity(species.id, value),
-                  decoration: const InputDecoration(
-                    labelText: 'Animals',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  onChanged: (value) =>
-                      viewModel.setHouseholdQuantity(species.id, value),
-                  decoration: const InputDecoration(
-                    labelText: 'Households',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _Skeleton(width: 120, height: 14),
+          SizedBox(height: 14),
+          _Skeleton(width: double.infinity, height: 42),
+          SizedBox(height: 8),
+          _Skeleton(width: double.infinity, height: 42),
         ],
+      ),
+    );
+  }
+}
+
+class _Skeleton extends StatelessWidget {
+  final double width;
+  final double height;
+
+  const _Skeleton({required this.width, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: incidentsHair.withValues(alpha: 0.75),
+        borderRadius: BorderRadius.circular(6),
       ),
     );
   }
