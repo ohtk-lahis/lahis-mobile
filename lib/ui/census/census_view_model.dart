@@ -18,6 +18,7 @@ class CensusViewModel extends BaseViewModel {
   final animalQuantities = <int, String>{};
   final householdQuantities = <int, String>{};
   String? message;
+  bool _canSubmitWithLegacyMutation = true;
 
   CensusViewModel() {
     init();
@@ -44,11 +45,7 @@ class CensusViewModel extends BaseViewModel {
     }
 
     try {
-      species = await censusService.fetchActiveSpecies();
-      for (final item in species) {
-        animalQuantities.putIfAbsent(item.id, () => '');
-        householdQuantities.putIfAbsent(item.id, () => '');
-      }
+      await _loadAnimalCensusRows();
       latestCensus =
           await censusService.getLatestVillageCensus(selectedVillage!.id);
     } catch (e) {
@@ -74,6 +71,13 @@ class CensusViewModel extends BaseViewModel {
 
     if (!hasCensusAccess) {
       setErrorForObject('submit', 'Village census is not available.');
+      return null;
+    }
+    if (!_canSubmitWithLegacyMutation) {
+      setErrorForObject(
+        'submit',
+        'This census schema is not supported by the current mobile app.',
+      );
       return null;
     }
 
@@ -133,6 +137,27 @@ class CensusViewModel extends BaseViewModel {
       );
     }
     return facts;
+  }
+
+  Future<void> _loadAnimalCensusRows() async {
+    _canSubmitWithLegacyMutation = true;
+    final definition = await censusService.getActiveCensusDefinitionVersion(
+      kind: 'ANIMAL',
+    );
+
+    if (definition == null) {
+      species = await censusService.fetchActiveSpecies();
+    } else if (definition.runtimeSchema.supportsLegacyAnimalSubmit) {
+      species = definition.runtimeSchema.toAnimalSpeciesRows();
+    } else {
+      species = definition.runtimeSchema.toAnimalSpeciesRows();
+      _canSubmitWithLegacyMutation = false;
+    }
+
+    for (final item in species) {
+      animalQuantities.putIfAbsent(item.id, () => '');
+      householdQuantities.putIfAbsent(item.id, () => '');
+    }
   }
 
   int? _parseQuantity(String? value) {

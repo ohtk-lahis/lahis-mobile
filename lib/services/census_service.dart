@@ -1,10 +1,15 @@
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/animal_species.dart';
+import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/api/census_api.dart';
 
 abstract class ICensusService {
   Future<List<AnimalSpecies>> fetchActiveSpecies();
+
+  Future<CensusDefinitionVersion?> getActiveCensusDefinitionVersion({
+    required String kind,
+  });
 
   Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId);
 
@@ -21,6 +26,13 @@ class CensusService implements ICensusService {
   @override
   Future<List<AnimalSpecies>> fetchActiveSpecies() {
     return _censusApi.fetchActiveSpecies();
+  }
+
+  @override
+  Future<CensusDefinitionVersion?> getActiveCensusDefinitionVersion({
+    required String kind,
+  }) {
+    return _censusApi.getActiveCensusDefinitionVersion(kind);
   }
 
   @override

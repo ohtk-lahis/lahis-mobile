@@ -1,5 +1,6 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:podd_app/models/animal_species.dart';
+import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/api/graph_ql_base_api.dart';
 
@@ -25,6 +26,57 @@ class CensusApi extends GraphQlBaseApi {
           .map((species) => AnimalSpecies.fromJson(species))
           .toList(),
     );
+  }
+
+  Future<CensusDefinitionVersion?> getActiveCensusDefinitionVersion(
+    String kind,
+  ) async {
+    const query = r'''
+      query ActiveCensusDefinitionVersion($kind: String!) {
+        activeCensusDefinitionVersion(kind: $kind) {
+          id
+          version
+          status
+          runtimeSchema
+        }
+      }
+    ''';
+
+    if (!await ensureAuthCookieIsSet()) {
+      throw GraphQlException(
+        message: 'Cookies are invalid',
+        query: query,
+        queryName: 'ActiveCensusDefinitionVersion',
+      );
+    }
+
+    final response = await resolveClient().query(
+      QueryOptions(
+        document: gql(query),
+        variables: {'kind': kind},
+        fetchPolicy: FetchPolicy.networkOnly,
+        cacheRereadPolicy: CacheRereadPolicy.ignoreAll,
+      ),
+    );
+
+    if (response.hasException) {
+      if (_hasUnsupportedField(
+        response.exception,
+        'activeCensusDefinitionVersion',
+      )) {
+        return null;
+      }
+      if (response.exception?.linkException != null) {
+        throw response.exception!.linkException!;
+      }
+      throw response.exception!;
+    }
+
+    final version = response.data?['activeCensusDefinitionVersion'];
+    if (version == null) {
+      return null;
+    }
+    return CensusDefinitionVersion.fromJson(version);
   }
 
   Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId) async {
@@ -165,5 +217,19 @@ class CensusApi extends GraphQlBaseApi {
     } on OperationException catch (e) {
       return VillageCensusSubmitFailure(e);
     }
+  }
+
+  bool _hasUnsupportedField(OperationException? exception, String fieldName) {
+    final errors = exception?.graphqlErrors ?? const [];
+    if (errors.any(
+      (error) => error.message.contains("Cannot query field '$fieldName'"),
+    )) {
+      return true;
+    }
+
+    return exception?.linkException
+            ?.toString()
+            .contains("Cannot query field '$fieldName'") ??
+        false;
   }
 }

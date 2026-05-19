@@ -6,7 +6,7 @@ import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/api/census_api.dart';
 
 class QueueLink extends Link {
-  final List<Map<String, dynamic>> responses;
+  final List<dynamic> responses;
   final requests = <Request>[];
 
   QueueLink(this.responses);
@@ -14,7 +14,11 @@ class QueueLink extends Link {
   @override
   Stream<Response> request(Request request, [NextLink? forward]) {
     requests.add(request);
-    final data = responses.removeAt(0);
+    final response = responses.removeAt(0);
+    if (response is Response) {
+      return Stream.value(response);
+    }
+    final data = response as Map<String, dynamic>;
     return Stream.value(Response(data: data, response: {'data': data}));
   }
 }
@@ -70,6 +74,84 @@ void main() {
         'BUFFALO - Buffalo',
       ]);
       expect(link.requests.single.variables, isEmpty);
+    });
+
+    test('getActiveCensusDefinitionVersion parses runtime schema', () async {
+      final link = QueueLink([
+        {
+          '__typename': 'Query',
+          'activeCensusDefinitionVersion': {
+            '__typename': 'CensusDefinitionVersionType',
+            'id': '7',
+            'version': 1,
+            'status': 'PUBLISHED',
+            'runtimeSchema': {
+              'row_source': 'ACTIVE_ANIMAL_SPECIES',
+              'rows': [
+                {
+                  'species_id': '1',
+                  'species_code': 'CATTLE',
+                  'label': 'Cattle',
+                  'row_key': 'species:CATTLE',
+                }
+              ],
+              'measures': [
+                {
+                  'key': 'animal_quantity',
+                  'label': 'Animal quantity',
+                  'type': 'integer',
+                  'required': true,
+                },
+                {
+                  'key': 'household_quantity',
+                  'label': 'Households',
+                  'type': 'integer',
+                  'required': true,
+                },
+              ],
+            },
+          }
+        }
+      ]);
+      final api = censusApiFor(link);
+
+      final version = await api.getActiveCensusDefinitionVersion('ANIMAL');
+
+      expect(version?.id, 7);
+      expect(version?.runtimeSchema.supportsLegacyAnimalSubmit, isTrue);
+      expect(
+        version?.runtimeSchema.toAnimalSpeciesRows().single.displayName,
+        'CATTLE - Cattle',
+      );
+      expect(link.requests.single.variables, {'kind': 'ANIMAL'});
+    });
+
+    test('getActiveCensusDefinitionVersion returns null on legacy server',
+        () async {
+      final link = QueueLink([
+        Response(
+          errors: const [
+            GraphQLError(
+              message:
+                  "Cannot query field 'activeCensusDefinitionVersion' on type 'Query'",
+            )
+          ],
+          response: const {
+            'errors': [
+              {
+                'message':
+                    "Cannot query field 'activeCensusDefinitionVersion' on type 'Query'"
+              }
+            ]
+          },
+        ),
+      ]);
+      final api = censusApiFor(link);
+
+      final version = await api.getActiveCensusDefinitionVersion('ANIMAL');
+
+      expect(version, isNull);
+      expect(link.requests.single.variables, {'kind': 'ANIMAL'});
     });
 
     test('getLatestVillageCensus returns null when no snapshot exists',
