@@ -194,6 +194,87 @@ void main() {
       expect(link.requests.single.variables, {'kind': 'ANIMAL'});
     });
 
+    test('getActiveVillageCensusDefinitions parses kind summaries', () async {
+      final link = QueueLink([
+        {
+          '__typename': 'Query',
+          'activeVillageCensusDefinitions': [
+            {
+              '__typename': 'CensusKindSummaryType',
+              'kind': 'ANIMAL',
+              'name': 'Animal census',
+              'enabled': true,
+              'activeVersion': {
+                '__typename': 'CensusDefinitionVersionType',
+                'id': '7',
+                'version': 1,
+                'status': 'PUBLISHED',
+                'runtimeSchema': {
+                  'rows': [
+                    {
+                      'row_key': 'species:CATTLE',
+                      'label': 'Cattle',
+                      'species_id': 1,
+                    }
+                  ],
+                  'measures': [
+                    {
+                      'key': 'animal_quantity',
+                      'label': 'Heads',
+                      'type': 'integer',
+                      'required': true,
+                    }
+                  ],
+                },
+              },
+              'latestSnapshot': {
+                '__typename': 'VillageCensusSnapshotType',
+                'id': '12',
+                'censusDate': '2026-05-19',
+                'submittedAt': '2026-05-19T10:00:00Z',
+              },
+            },
+          ],
+        }
+      ]);
+      final api = censusApiFor(link);
+
+      final summaries = await api.getActiveVillageCensusDefinitions(11);
+
+      expect(summaries.single.kind, 'ANIMAL');
+      expect(summaries.single.displayName, 'Animal census');
+      expect(summaries.single.activeVersion?.id, 7);
+      expect(summaries.single.latestSnapshot?.censusDate?.day, 19);
+      expect(link.requests.single.variables, {'villageId': 11});
+    });
+
+    test('getActiveVillageCensusDefinitions returns empty on legacy server',
+        () async {
+      final link = QueueLink([
+        Response(
+          errors: const [
+            GraphQLError(
+              message:
+                  "Cannot query field 'activeVillageCensusDefinitions' on type 'Query'",
+            )
+          ],
+          response: const {
+            'errors': [
+              {
+                'message':
+                    "Cannot query field 'activeVillageCensusDefinitions' on type 'Query'"
+              }
+            ]
+          },
+        ),
+      ]);
+      final api = censusApiFor(link);
+
+      final summaries = await api.getActiveVillageCensusDefinitions(11);
+
+      expect(summaries, isEmpty);
+    });
+
     test('getLatestVillageCensus returns null when no snapshot exists',
         () async {
       final link = QueueLink([
@@ -205,6 +286,44 @@ void main() {
 
       expect(latest, isNull);
       expect(link.requests.single.variables, {'villageId': 11});
+    });
+
+    test('getLatestVillageCensusV2 parses generic form data', () async {
+      final link = QueueLink([
+        {
+          '__typename': 'Query',
+          'latestVillageCensusV2': {
+            '__typename': 'VillageCensusSnapshotType',
+            'id': '13',
+            'censusDate': '2026-05-19',
+            'submittedAt': '2026-05-19T10:00:00Z',
+            'formData': {
+              'rows': [
+                {
+                  'row_key': 'age:under5',
+                  'measures': {'people': 12}
+                }
+              ],
+            },
+            'village': {
+              '__typename': 'VillageType',
+              'id': 11,
+              'code': 'V001',
+              'name': 'Village One',
+            },
+            'facts': [],
+          }
+        }
+      ]);
+      final api = censusApiFor(link);
+
+      final latest = await api.getLatestVillageCensusV2(11, 'HUMAN');
+
+      expect(latest?.formData['rows'], isA<List>());
+      expect(link.requests.single.variables, {
+        'villageId': 11,
+        'kind': 'HUMAN',
+      });
     });
 
     test('submitVillageCensusSnapshot parses success union', () async {

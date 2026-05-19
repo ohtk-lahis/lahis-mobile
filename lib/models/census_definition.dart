@@ -1,6 +1,53 @@
 import 'dart:convert';
 
 import 'package:podd_app/models/animal_species.dart';
+import 'package:podd_app/models/village_census.dart';
+
+class CensusKindSummary {
+  final String kind;
+  final String name;
+  final bool enabled;
+  final CensusDefinitionVersion? activeVersion;
+  final VillageCensusSnapshot? latestSnapshot;
+
+  const CensusKindSummary({
+    required this.kind,
+    required this.name,
+    required this.enabled,
+    this.activeVersion,
+    this.latestSnapshot,
+  });
+
+  factory CensusKindSummary.fromJson(Map<String, dynamic> json) =>
+      CensusKindSummary(
+        kind: json['kind']?.toString() ?? '',
+        name: json['name']?.toString() ?? '',
+        enabled: json['enabled'] as bool? ?? false,
+        activeVersion: json['activeVersion'] != null
+            ? CensusDefinitionVersion.fromJson(
+                Map<String, dynamic>.from(json['activeVersion'] as Map),
+              )
+            : null,
+        latestSnapshot: json['latestSnapshot'] != null
+            ? VillageCensusSnapshot.fromJson(
+                Map<String, dynamic>.from(json['latestSnapshot'] as Map),
+              )
+            : null,
+      );
+
+  String get displayName {
+    if (name.isNotEmpty) {
+      return name;
+    }
+    if (kind == 'ANIMAL') {
+      return 'Animal census';
+    }
+    if (kind == 'HUMAN') {
+      return 'Human census';
+    }
+    return '${kind.toLowerCase()} census';
+  }
+}
 
 class CensusDefinitionVersion {
   final int id;
@@ -110,6 +157,17 @@ class CensusRuntimeSchema {
         extraDimensions.isEmpty &&
         rows.every((row) => row.speciesId != null) &&
         speciesIds.length == speciesIds.toSet().length &&
+        measures.every((measure) => measure.isInteger);
+  }
+
+  bool get supportsMobileHumanSubmit {
+    final rowKeys =
+        rows.map((row) => row.rowKey).where((key) => key.isNotEmpty);
+    return rows.isNotEmpty &&
+        measures.isNotEmpty &&
+        extraDimensions.isEmpty &&
+        rows.every((row) => row.rowKey.isNotEmpty) &&
+        rowKeys.length == rowKeys.toSet().length &&
         measures.every((measure) => measure.isInteger);
   }
 

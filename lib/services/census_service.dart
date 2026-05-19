@@ -17,7 +17,16 @@ abstract class ICensusService {
     required String kind,
   });
 
+  Future<List<CensusKindSummary>> getActiveVillageCensusDefinitions(
+    int villageId,
+  );
+
   Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId);
+
+  Future<VillageCensusSnapshot?> getLatestVillageCensusV2({
+    required int villageId,
+    required String kind,
+  });
 
   Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
     required int villageId,
@@ -71,8 +80,31 @@ class CensusService implements ICensusService {
   }
 
   @override
+  Future<List<CensusKindSummary>> getActiveVillageCensusDefinitions(
+    int villageId,
+  ) async {
+    final summaries =
+        await _censusApi.getActiveVillageCensusDefinitions(villageId);
+    for (final summary in summaries) {
+      final version = summary.activeVersion;
+      if (version != null) {
+        await _cacheDefinition(summary.kind, version);
+      }
+    }
+    return summaries;
+  }
+
+  @override
   Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId) {
     return _censusApi.getLatestVillageCensus(villageId);
+  }
+
+  @override
+  Future<VillageCensusSnapshot?> getLatestVillageCensusV2({
+    required int villageId,
+    required String kind,
+  }) {
+    return _censusApi.getLatestVillageCensusV2(villageId, kind);
   }
 
   @override

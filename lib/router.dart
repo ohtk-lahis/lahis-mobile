@@ -168,6 +168,14 @@ class OhtkRouter {
               pageBuilder: (context, state) => const NoTransitionPage<void>(
                 child: CensusView(),
               ),
+              routes: [
+                GoRoute(
+                  path: ':kind',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) =>
+                      CensusView(kind: state.pathParameters['kind']),
+                ),
+              ],
             ),
             GoRoute(
               path: '/observations',

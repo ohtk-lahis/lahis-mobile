@@ -79,6 +79,69 @@ class CensusApi extends GraphQlBaseApi {
     return CensusDefinitionVersion.fromJson(version);
   }
 
+  Future<List<CensusKindSummary>> getActiveVillageCensusDefinitions(
+    int villageId,
+  ) async {
+    const query = r'''
+      query ActiveVillageCensusDefinitions($villageId: Int!) {
+        activeVillageCensusDefinitions(villageId: $villageId) {
+          kind
+          name
+          enabled
+          activeVersion {
+            id
+            version
+            status
+            runtimeSchema
+          }
+          latestSnapshot {
+            id
+            censusDate
+            submittedAt
+          }
+        }
+      }
+    ''';
+
+    if (!await ensureAuthCookieIsSet()) {
+      throw GraphQlException(
+        message: 'Cookies are invalid',
+        query: query,
+        queryName: 'ActiveVillageCensusDefinitions',
+      );
+    }
+
+    final response = await resolveClient().query(
+      QueryOptions(
+        document: gql(query),
+        variables: {'villageId': villageId},
+        fetchPolicy: FetchPolicy.networkOnly,
+        cacheRereadPolicy: CacheRereadPolicy.ignoreAll,
+      ),
+    );
+
+    if (response.hasException) {
+      if (_hasUnsupportedField(
+        response.exception,
+        'activeVillageCensusDefinitions',
+      )) {
+        return const [];
+      }
+      if (response.exception?.linkException != null) {
+        throw response.exception!.linkException!;
+      }
+      throw response.exception!;
+    }
+
+    return (response.data?['activeVillageCensusDefinitions'] as List? ??
+            const [])
+        .whereType<Map>()
+        .map((summary) => CensusKindSummary.fromJson(
+              Map<String, dynamic>.from(summary),
+            ))
+        .toList();
+  }
+
   Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId) async {
     const query = r'''
       query LatestVillageCensus($villageId: Int!) {
@@ -131,6 +194,71 @@ class CensusApi extends GraphQlBaseApi {
     }
 
     final snapshot = response.data?['latestVillageCensus'];
+    if (snapshot == null) {
+      return null;
+    }
+    return VillageCensusSnapshot.fromJson(snapshot);
+  }
+
+  Future<VillageCensusSnapshot?> getLatestVillageCensusV2(
+    int villageId,
+    String kind,
+  ) async {
+    const query = r'''
+      query LatestVillageCensusV2($villageId: Int!, $kind: String!) {
+        latestVillageCensusV2(villageId: $villageId, kind: $kind) {
+          id
+          censusDate
+          submittedAt
+          formData
+          village {
+            id
+            code
+            name
+          }
+          facts {
+            species {
+              id
+              code
+              name
+              active
+              sortOrder
+            }
+            animalQuantity
+            householdQuantity
+          }
+        }
+      }
+    ''';
+
+    if (!await ensureAuthCookieIsSet()) {
+      throw GraphQlException(
+        message: 'Cookies are invalid',
+        query: query,
+        queryName: 'LatestVillageCensusV2',
+      );
+    }
+
+    final response = await resolveClient().query(
+      QueryOptions(
+        document: gql(query),
+        variables: {'villageId': villageId, 'kind': kind},
+        fetchPolicy: FetchPolicy.networkOnly,
+        cacheRereadPolicy: CacheRereadPolicy.ignoreAll,
+      ),
+    );
+
+    if (response.hasException) {
+      if (_hasUnsupportedField(response.exception, 'latestVillageCensusV2')) {
+        return null;
+      }
+      if (response.exception?.linkException != null) {
+        throw response.exception!.linkException!;
+      }
+      throw response.exception!;
+    }
+
+    final snapshot = response.data?['latestVillageCensusV2'];
     if (snapshot == null) {
       return null;
     }

@@ -47,6 +47,7 @@ class VillageCensusSnapshot {
   final DateTime? censusDate;
   final String? submittedAt;
   final List<AnimalCensusFact> facts;
+  final Map<String, dynamic> formData;
 
   const VillageCensusSnapshot({
     required this.id,
@@ -54,6 +55,7 @@ class VillageCensusSnapshot {
     this.censusDate,
     this.submittedAt,
     this.facts = const [],
+    this.formData = const {},
   });
 
   factory VillageCensusSnapshot.fromJson(Map<String, dynamic> json) =>
@@ -68,6 +70,7 @@ class VillageCensusSnapshot {
         facts: (json['facts'] as List? ?? const [])
             .map((fact) => AnimalCensusFact.fromJson(fact))
             .toList(),
+        formData: Map<String, dynamic>.from(json['formData'] as Map? ?? {}),
       );
 }
 

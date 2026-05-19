@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/census_definition.dart';
@@ -15,9 +17,11 @@ class CensusViewModel extends BaseViewModel {
       locator<IFeatureCapabilityService>();
 
   List<AnimalSpecies> species = [];
+  List<CensusKindSummary> censusKinds = [];
   List<CensusSchemaRow> rows = [];
   List<CensusSchemaMeasure> measures = [];
   CensusDefinitionVersion? activeDefinition;
+  CensusKindSummary? activeKindSummary;
   VillageCensusSnapshot? latestCensus;
   final measureValues = <String, Map<String, String>>{};
   final _initialMeasureValues = <String, Map<String, String>>{};
@@ -25,8 +29,12 @@ class CensusViewModel extends BaseViewModel {
   bool usingCachedDefinition = false;
   bool unsupportedSchema = false;
   bool _canSubmitWithLegacyMutation = true;
+  final String? requestedKind;
+  String? activeKind;
+  final Map<String, FocusNode> _inputFocusNodes = {};
+  List<String> _visibleInputKeys = const [];
 
-  CensusViewModel() {
+  CensusViewModel({String? kind}) : requestedKind = _normalizeKind(kind) {
     init();
   }
 
@@ -44,6 +52,11 @@ class CensusViewModel extends BaseViewModel {
 
   bool get canSubmit => hasRows && !unsupportedSchema;
 
+  bool get isHubMode => activeKind == null;
+
+  String get activeKindName =>
+      activeKindSummary?.displayName ?? _kindDisplayName(activeKind);
+
   String? get freshnessLabel {
     if (latestCensus == null) {
       return null;
@@ -55,6 +68,9 @@ class CensusViewModel extends BaseViewModel {
     setBusy(true);
     message = null;
     clearErrors();
+    if (requestedKind == null) {
+      _clearLoadedForm();
+    }
 
     if (!hasCensusAccess) {
       setBusy(false);
@@ -62,10 +78,11 @@ class CensusViewModel extends BaseViewModel {
     }
 
     try {
-      await _loadAnimalCensusRows();
-      latestCensus =
-          await censusService.getLatestVillageCensus(selectedVillage!.id);
-      _prefillFromLatestCensus();
+      if (requestedKind != null) {
+        await _loadFormForKind(requestedKind!);
+      } else {
+        await _loadHubOrSingleForm();
+      }
     } catch (e) {
       setError(e.toString());
     }
@@ -90,6 +107,49 @@ class CensusViewModel extends BaseViewModel {
     return measures.any(
       (measure) => (current[measure.key] ?? '') != (initial[measure.key] ?? ''),
     );
+  }
+
+  FocusNode focusNodeFor(CensusSchemaRow row, CensusSchemaMeasure measure) {
+    final key = _inputKey(row, measure);
+    return _inputFocusNodes.putIfAbsent(key, () {
+      final node = FocusNode(debugLabel: 'census_$key');
+      node.addListener(() {
+        if (node.hasFocus) {
+          _ensureFocusedInputVisible(node);
+        }
+      });
+      return node;
+    });
+  }
+
+  TextInputAction textInputActionFor(
+    CensusSchemaRow row,
+    CensusSchemaMeasure measure,
+  ) {
+    return _nextInputKeyAfter(_inputKey(row, measure)) == null
+        ? TextInputAction.done
+        : TextInputAction.next;
+  }
+
+  void completeEditing(
+    BuildContext context,
+    CensusSchemaRow row,
+    CensusSchemaMeasure measure,
+  ) {
+    final key = _inputKey(row, measure);
+    final nextKey = _nextInputKeyAfter(key);
+    if (nextKey == null) {
+      _inputFocusNodes[key]?.unfocus();
+      return;
+    }
+
+    final nextNode = _inputFocusNodes[nextKey];
+    if (nextNode == null) {
+      FocusScope.of(context).nextFocus();
+      return;
+    }
+    FocusScope.of(context).requestFocus(nextNode);
+    _ensureFocusedInputVisible(nextNode);
   }
 
   Future<VillageCensusSubmitResult?> submit() async {
@@ -173,7 +233,14 @@ class CensusViewModel extends BaseViewModel {
         measureMap[measure.key] = quantity;
       }
 
-      if (row.speciesId == null) {
+      final payload = <String, dynamic>{
+        'measures': measureMap,
+      };
+      if (activeKind == 'HUMAN') {
+        payload['row_key'] = row.rowKey;
+      } else if (row.speciesId != null) {
+        payload['species_id'] = row.speciesId;
+      } else {
         setErrorForObject(
           'submit',
           'This census form is not supported by this app version.',
@@ -181,46 +248,108 @@ class CensusViewModel extends BaseViewModel {
         return null;
       }
 
-      formRows.add({
-        'species_id': row.speciesId,
-        'measures': measureMap,
-      });
+      formRows.add(payload);
     }
     return {'rows': formRows};
   }
 
-  Future<void> _loadAnimalCensusRows() async {
+  Future<void> _loadHubOrSingleForm() async {
+    censusKinds = await censusService
+        .getActiveVillageCensusDefinitions(selectedVillage!.id);
+    if (censusKinds.length == 1) {
+      await _loadFormForKind(censusKinds.single.kind,
+          summary: censusKinds.single);
+    } else {
+      _clearLoadedForm();
+    }
+  }
+
+  Future<void> loadKind(String kind) async {
+    setBusy(true);
+    message = null;
+    clearErrors();
+    try {
+      await _loadFormForKind(kind);
+    } catch (e) {
+      setError(e.toString());
+    }
+    setBusy(false);
+  }
+
+  Future<void> _loadFormForKind(
+    String kind, {
+    CensusKindSummary? summary,
+  }) async {
+    final normalizedKind = _normalizeKind(kind);
+    if (normalizedKind == null) {
+      throw Exception('Unknown census kind.');
+    }
+
+    activeKind = normalizedKind;
+    activeKindSummary = summary;
+    await _loadCensusRows(normalizedKind, summary: summary);
+    if (activeDefinition != null) {
+      latestCensus = await censusService.getLatestVillageCensusV2(
+        villageId: selectedVillage!.id,
+        kind: normalizedKind,
+      );
+    } else if (normalizedKind == 'ANIMAL') {
+      latestCensus =
+          await censusService.getLatestVillageCensus(selectedVillage!.id);
+    }
+    _prefillFromLatestCensus();
+  }
+
+  Future<void> _loadCensusRows(
+    String kind, {
+    CensusKindSummary? summary,
+  }) async {
     _canSubmitWithLegacyMutation = true;
     usingCachedDefinition = false;
     unsupportedSchema = false;
-    activeDefinition = null;
+    _clearFormData();
     CensusDefinitionVersion? definition;
 
-    try {
-      definition = await censusService.getActiveCensusDefinitionVersion(
-        kind: 'ANIMAL',
-      );
-    } catch (_) {
-      definition = await censusService.getCachedCensusDefinitionVersion(
-        kind: 'ANIMAL',
-      );
-      usingCachedDefinition = definition != null;
-      if (definition == null) {
-        rethrow;
+    if (summary?.activeVersion != null) {
+      definition = summary!.activeVersion;
+    } else {
+      try {
+        definition = await censusService.getActiveCensusDefinitionVersion(
+          kind: kind,
+        );
+      } catch (_) {
+        definition = await censusService.getCachedCensusDefinitionVersion(
+          kind: kind,
+        );
+        usingCachedDefinition = definition != null;
+        if (definition == null) {
+          rethrow;
+        }
       }
     }
 
-    if (definition == null) {
+    if (definition == null && kind == 'ANIMAL') {
       species = await censusService.fetchActiveSpecies();
       _useLegacySpeciesRows(species);
+    } else if (definition == null) {
+      unsupportedSchema = true;
     } else {
       activeDefinition = definition;
       rows = definition.runtimeSchema.rows;
       measures = definition.runtimeSchema.measures;
-      species = definition.runtimeSchema.toAnimalSpeciesRows();
-      unsupportedSchema = !definition.runtimeSchema.supportsMobileAnimalSubmit;
-      _canSubmitWithLegacyMutation =
-          definition.runtimeSchema.supportsLegacyAnimalSubmit;
+      if (kind == 'ANIMAL') {
+        species = definition.runtimeSchema.toAnimalSpeciesRows();
+        unsupportedSchema =
+            !definition.runtimeSchema.supportsMobileAnimalSubmit;
+        _canSubmitWithLegacyMutation =
+            definition.runtimeSchema.supportsLegacyAnimalSubmit;
+      } else if (kind == 'HUMAN') {
+        unsupportedSchema = !definition.runtimeSchema.supportsMobileHumanSubmit;
+        _canSubmitWithLegacyMutation = false;
+      } else {
+        unsupportedSchema = true;
+        _canSubmitWithLegacyMutation = false;
+      }
     }
 
     _ensureValueSlots();
@@ -306,11 +435,43 @@ class CensusViewModel extends BaseViewModel {
         measureValues[row.rowKey]!.putIfAbsent(measure.key, () => '');
       }
     }
+    _syncInputFocusNodes();
     _captureInitialValues();
   }
 
   void _prefillFromLatestCensus() {
     if (latestCensus == null) {
+      _captureInitialValues();
+      return;
+    }
+
+    final submittedRows = latestCensus!.formData['rows'];
+    if (submittedRows is List && submittedRows.isNotEmpty) {
+      for (final submittedRow in submittedRows.whereType<Map>()) {
+        final rowKey = submittedRow['row_key']?.toString();
+        final speciesId = submittedRow['species_id'];
+        final row = rows.where((candidate) {
+          if (rowKey != null && rowKey.isNotEmpty) {
+            return candidate.rowKey == rowKey;
+          }
+          return candidate.speciesId == speciesId;
+        }).firstOrNull;
+        if (row == null) {
+          continue;
+        }
+
+        final submittedMeasures = submittedRow['measures'];
+        if (submittedMeasures is! Map) {
+          continue;
+        }
+        measureValues.putIfAbsent(row.rowKey, () => {});
+        for (final measure in measures) {
+          final value = submittedMeasures[measure.key];
+          if (value != null) {
+            measureValues[row.rowKey]![measure.key] = value.toString();
+          }
+        }
+      }
       _captureInitialValues();
       return;
     }
@@ -365,5 +526,99 @@ class CensusViewModel extends BaseViewModel {
       setErrorForObject('submit', null);
     }
     message = null;
+  }
+
+  void _clearLoadedForm() {
+    activeKind = null;
+    activeKindSummary = null;
+    _clearFormData();
+  }
+
+  void _clearFormData() {
+    activeDefinition = null;
+    latestCensus = null;
+    species = [];
+    rows = [];
+    measures = [];
+    measureValues.clear();
+    _initialMeasureValues.clear();
+    _syncInputFocusNodes();
+  }
+
+  void _syncInputFocusNodes() {
+    final nextKeys = [
+      for (final row in rows)
+        for (final measure in measures) _inputKey(row, measure),
+    ];
+    final nextKeySet = nextKeys.toSet();
+    final removedKeys = _inputFocusNodes.keys
+        .where((key) => !nextKeySet.contains(key))
+        .toList();
+    for (final key in removedKeys) {
+      final node = _inputFocusNodes.remove(key);
+      if (node == null) {
+        continue;
+      }
+      if (node.hasFocus) {
+        node.unfocus();
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        node.dispose();
+      });
+    }
+    _visibleInputKeys = nextKeys;
+  }
+
+  String _inputKey(CensusSchemaRow row, CensusSchemaMeasure measure) {
+    return '${row.rowKey}:${measure.key}';
+  }
+
+  String? _nextInputKeyAfter(String key) {
+    final index = _visibleInputKeys.indexOf(key);
+    if (index == -1 || index + 1 >= _visibleInputKeys.length) {
+      return null;
+    }
+    return _visibleInputKeys[index + 1];
+  }
+
+  void _ensureFocusedInputVisible(FocusNode node) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = node.context;
+      if (context == null || !node.hasFocus) {
+        return;
+      }
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 180),
+        alignment: 0.12,
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    for (final node in _inputFocusNodes.values) {
+      node.dispose();
+    }
+    _inputFocusNodes.clear();
+    super.dispose();
+  }
+
+  static String? _normalizeKind(String? kind) {
+    if (kind == null || kind.trim().isEmpty) {
+      return null;
+    }
+    return kind.trim().toUpperCase();
+  }
+
+  String _kindDisplayName(String? kind) {
+    if (kind == 'ANIMAL') {
+      return 'Animal census';
+    }
+    if (kind == 'HUMAN') {
+      return 'Human census';
+    }
+    return 'Census';
   }
 }
