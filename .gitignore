@@ -54,3 +54,11 @@ untranslated.txt
 graphqlclientstore.*
 
 design_handoff*/
+
+# Local mobile test/build artifacts
+bundletool-all-*.jar
+*.apks
+*.apk
+toc.pb
+devtools_options.yaml
+tmp/
