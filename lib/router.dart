@@ -24,6 +24,21 @@ import 'package:podd_app/ui/report_type/report_type_view.dart';
 
 import 'locator.dart';
 
+CustomTransitionPage<void> _tabFadePage({
+  required Widget child,
+  LocalKey? key,
+}) {
+  return CustomTransitionPage<void>(
+    key: key,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 180),
+    reverseTransitionDuration: const Duration(milliseconds: 180),
+    transitionsBuilder: (context, animation, _, child) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+  );
+}
+
 class OhtkRouter {
   static final OhtkRouter _instance = OhtkRouter._internal();
 
@@ -106,7 +121,7 @@ class OhtkRouter {
           routes: <RouteBase>[
             GoRoute(
               path: '/reports',
-              pageBuilder: (context, state) => NoTransitionPage<void>(
+              pageBuilder: (context, state) => _tabFadePage(
                 key: state.pageKey,
                 child: const ReportHomeView(),
               ),
@@ -165,8 +180,9 @@ class OhtkRouter {
             GoRoute(
               name: census,
               path: '/census',
-              pageBuilder: (context, state) => const NoTransitionPage<void>(
-                child: CensusView(),
+              pageBuilder: (context, state) => _tabFadePage(
+                key: state.pageKey,
+                child: const CensusView(),
               ),
               routes: [
                 GoRoute(
@@ -179,7 +195,7 @@ class OhtkRouter {
             ),
             GoRoute(
               path: '/observations',
-              pageBuilder: (context, state) => NoTransitionPage<void>(
+              pageBuilder: (context, state) => _tabFadePage(
                 key: state.pageKey,
                 child: const ObservationHomeView(),
               ),
@@ -252,7 +268,7 @@ class OhtkRouter {
             ),
             GoRoute(
               path: '/profile',
-              pageBuilder: (context, state) => NoTransitionPage<void>(
+              pageBuilder: (context, state) => _tabFadePage(
                 key: state.pageKey,
                 child: const ProfileView(),
               ),

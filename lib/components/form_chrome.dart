@@ -174,7 +174,9 @@ class FormChromeProgressStrip extends StatelessWidget {
                       padding: EdgeInsets.only(
                         right: i == total - 1 ? 0 : 4,
                       ),
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 240),
+                        curve: Curves.easeOutCubic,
                         height: 4,
                         decoration: BoxDecoration(
                           color: color,

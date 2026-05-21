@@ -24,6 +24,7 @@ class _FormInputState extends State<FormInput> {
   final FormTextInputFocusController _textInputFocusController =
       FormTextInputFocusController();
   final Map<opsv.Question, GlobalKey> _questionKeys = {};
+  int? _previousSectionIdx;
 
   GlobalKey _keyFor(opsv.Question q) =>
       _questionKeys.putIfAbsent(q, () => GlobalKey());
@@ -60,8 +61,15 @@ class _FormInputState extends State<FormInput> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        final questions = widget.viewModel.formStore.currentSection.questions;
+        final form = widget.viewModel.formStore;
+        final currentIdx = form.currentSectionIdx;
+        final questions = form.currentSection.questions;
         _textInputFocusController.sync(questions);
+
+        final isForward =
+            _previousSectionIdx == null || currentIdx >= _previousSectionIdx!;
+        _previousSectionIdx = currentIdx;
+
         return FormTextInputFocusScope(
           controller: _textInputFocusController,
           child: Column(
@@ -70,11 +78,42 @@ class _FormInputState extends State<FormInput> {
                 child: SingleChildScrollView(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  child: Column(
-                    children: [
-                      for (final q in questions)
-                        FormQuestion(key: _keyFor(q), question: q),
-                    ],
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      final inOffset = isForward
+                          ? const Offset(0.25, 0)
+                          : const Offset(-0.25, 0);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: inOffset,
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: <Widget>[
+                          ...previousChildren,
+                          if (currentChild != null) currentChild,
+                        ],
+                      );
+                    },
+                    child: Column(
+                      key: ValueKey(currentIdx),
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (final q in questions)
+                          FormQuestion(key: _keyFor(q), question: q),
+                      ],
+                    ),
                   ),
                 ),
               ),
