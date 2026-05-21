@@ -1,15 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:podd_app/app_theme.dart';
-import 'package:podd_app/components/animated_list_item.dart';
-import 'package:podd_app/components/flat_button.dart';
-import 'package:podd_app/locator.dart';
+import 'package:podd_app/components/motion.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/observation_definition.dart';
 import 'package:podd_app/models/entities/observation_subject.dart';
 import 'package:podd_app/router.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/observation/observation_subject_list_view_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
@@ -32,67 +29,58 @@ class ObservationSubjectListView extends StatelessWidget {
 }
 
 class _SubjectListing extends StackedHookView<ObservationSubjectListViewModel> {
-  final AppTheme appTheme = locator<AppTheme>();
-
   @override
   Widget builder(
       BuildContext context, ObservationSubjectListViewModel viewModel) {
+    if (viewModel.observationSubjects.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () async => viewModel.refetchSubjects(),
+        child: _EmptyState(),
+      );
+    }
+
+    final localize = AppLocalizations.of(context)!;
+    final showLoadMore = viewModel.hasMoreSubjectRecords;
+
     return RefreshIndicator(
       onRefresh: () async => viewModel.refetchSubjects(),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-        child: ListView.builder(
-          key: const PageStorageKey('subject-list-storage-key'),
-          addAutomaticKeepAlives: true,
-          itemBuilder: (context, index) {
-            if (index >= viewModel.observationSubjects.length) {
-              return AnimatedListItem(
-                animateOnce: false,
-                duration: const Duration(milliseconds: 300),
-                child: FlatButton.outline(
-                  onPressed: () {
-                    viewModel.continueFetchSubjects();
-                  },
-                  child: Text(AppLocalizations.of(context)!.loadMore),
-                ),
-              );
-            }
-
-            var subject = viewModel.observationSubjects[index];
-            var leading = subject.imageUrl != null
-                ? CachedNetworkImage(
-                    imageUrl: subject.imageUrl!,
-                    placeholder: (context, url) => const Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ),
-                    fit: BoxFit.cover,
-                  )
-                : ColoredBox(
-                    color: appTheme.sub4,
-                    child: Image.asset(
-                      "assets/images/OHTK.png",
-                    ),
-                  );
-
-            return SubjectRecordItem(
-              subject: subject,
-              leading: leading,
-              onTap: () {
-                GoRouter.of(context).goNamed(
-                  OhtkRouter.observationSubjectDetail,
-                  pathParameters: {
-                    "definitionId": viewModel.definition.id.toString(),
-                    "subjectId": subject.id,
-                  },
-                );
-              },
-            );
-          },
-          itemCount: viewModel.hasMoreSubjectRecords
-              ? viewModel.observationSubjects.length + 1
-              : viewModel.observationSubjects.length,
+      child: ListView.separated(
+        key: const PageStorageKey('subject-list-storage-key'),
+        addAutomaticKeepAlives: true,
+        padding: const EdgeInsets.fromLTRB(
+          OhtkLayout.pagePad,
+          OhtkSpace.lg,
+          OhtkLayout.pagePad,
+          120,
         ),
+        separatorBuilder: (_, __) =>
+            const SizedBox(height: OhtkLayout.rowGap),
+        itemCount: viewModel.observationSubjects.length + (showLoadMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index >= viewModel.observationSubjects.length) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: OhtkSpace.md),
+              child: OhtkSecondaryButton(
+                label: localize.loadMore,
+                onPressed: viewModel.continueFetchSubjects,
+              ),
+            );
+          }
+
+          final subject = viewModel.observationSubjects[index];
+          return SubjectRecordItem(
+            subject: subject,
+            onTap: () {
+              GoRouter.of(context).goNamed(
+                OhtkRouter.observationSubjectDetail,
+                pathParameters: {
+                  'definitionId': viewModel.definition.id.toString(),
+                  'subjectId': subject.id,
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -100,104 +88,185 @@ class _SubjectListing extends StackedHookView<ObservationSubjectListViewModel> {
 
 class SubjectRecordItem extends StatelessWidget {
   final ObservationSubjectRecord subject;
-  final void Function() onTap;
-  final Widget? leading;
+  final VoidCallback onTap;
 
-  final AppTheme appTheme = locator<AppTheme>();
-
-  SubjectRecordItem({
+  const SubjectRecordItem({
     Key? key,
     required this.subject,
     required this.onTap,
-    this.leading,
   }) : super(key: key);
-
-  _title(BuildContext context, ObservationSubjectRecord report) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            report.title,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                  color: appTheme.primary,
-                ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  _description() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Text(
-            subject.description,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: appTheme.sub1,
-            ),
-          ),
-        ),
-        const SizedBox(width: 20),
-        Icon(
-          Icons.arrow_forward_ios_sharp,
-          size: 14,
-          color: appTheme.secondary,
-        ),
-      ],
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return OhtkCard(
       onTap: onTap,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        color: appTheme.bg2,
-        elevation: 0,
-        child: Row(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Thumbnail(imageUrl: subject.imageUrl),
+          const SizedBox(width: OhtkSpace.md),
+          Expanded(child: _Content(subject: subject)),
+        ],
+      ),
+    );
+  }
+}
+
+class _Thumbnail extends StatelessWidget {
+  final String? imageUrl;
+
+  const _Thumbnail({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageUrl == null) {
+      return const _FallbackTile();
+    }
+    return ClipRRect(
+      borderRadius: OhtkRadius.tile,
+      child: SizedBox(
+        width: 64,
+        height: 64,
+        child: CachedNetworkImage(
+          imageUrl: imageUrl!,
+          fit: BoxFit.cover,
+          placeholder: (_, __) => Container(color: OhtkColor.teal100),
+          errorWidget: (_, __, ___) => const _FallbackTile(),
+        ),
+      ),
+    );
+  }
+}
+
+class _FallbackTile extends StatelessWidget {
+  const _FallbackTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 64,
+      height: 64,
+      decoration: const BoxDecoration(
+        color: OhtkColor.teal100,
+        borderRadius: OhtkRadius.tile,
+      ),
+      child: const Icon(
+        Icons.visibility_outlined,
+        color: OhtkColor.teal700,
+        size: 28,
+      ),
+    );
+  }
+}
+
+class _Content extends StatelessWidget {
+  final ObservationSubjectRecord subject;
+
+  const _Content({required this.subject});
+
+  @override
+  Widget build(BuildContext context) {
+    final title = subject.title.isNotEmpty ? subject.title : '—';
+    final description = subject.description;
+    final identity = subject.identity;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4.0),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 80.w,
-                    maxWidth: 80.w,
-                    minHeight: 75.w,
-                    maxHeight: 75.w,
-                  ),
-                  child: leading,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: OhtkColor.ink900,
+                  height: 1.3,
                 ),
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _title(context, subject),
-                    _description(),
-                  ],
-                ),
-              ),
-            )
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: OhtkColor.ink400,
+            ),
           ],
         ),
-      ),
+        if (identity.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          OhtkChip(label: identity, small: true),
+        ],
+        if (description.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(
+            description,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              height: 1.45,
+              color: OhtkColor.ink500,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(24, 56, 24, 90),
+      children: [
+        EmptyStateAppear(
+          child: Column(
+            children: [
+              Center(
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: OhtkColor.teal700.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.visibility_outlined,
+                    color: OhtkColor.teal700,
+                    size: 36,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No subjects yet',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: OhtkColor.ink900,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Tap the + button to add your first subject.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.5,
+                  color: OhtkColor.ink500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
