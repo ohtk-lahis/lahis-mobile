@@ -16,7 +16,7 @@ class UserMessageView extends StatelessWidget {
     return ViewModelBuilder<UserMessageViewViewModel>.reactive(
       viewModelBuilder: () => UserMessageViewViewModel(id),
       builder: (context, viewModel, child) => Scaffold(
-        backgroundColor: incidentsSand,
+        backgroundColor: Colors.white,
         appBar: _NotificationAppBar(
           title: AppLocalizations.of(context)!.notificationDetailTitle,
         ),
@@ -50,9 +50,9 @@ class _MessageDetail extends StatelessWidget {
               color: incidentsInk,
               fontFamily: incidentsFontFamily,
               fontFamilyFallback: incidentsFontFamilyFallback,
-              fontSize: 14.5,
+              fontSize: 15.5,
               fontWeight: FontWeight.w400,
-              height: 1.6,
+              height: 1.65,
             ),
           ),
         ),
