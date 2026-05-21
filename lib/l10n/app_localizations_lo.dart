@@ -72,7 +72,7 @@ class AppLocalizationsLo extends AppLocalizations {
   String get pickQrcodeImageButton => 'Choose QRCode image';
 
   @override
-  String get getLoginQrcodeButton => 'my QR login';
+  String get getLoginQrcodeButton => 'QR ຂອງຂ້ອຍສຳລັບເຂົ້າສູ່ລະບົບ';
 
   @override
   String get logoutButton => 'ອອກ​ຈາກ​ລະ​ບົບ';
@@ -848,4 +848,10 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get censusHubHelperSingle => 'ເລືອກເພື່ອປັບສຳມະໂນນີ້ໃຫ້ເປັນປັດຈຸບັນ';
+
+  @override
+  String get notificationsTitle => 'ການແຈ້ງເຕືອນ';
+
+  @override
+  String get notificationDetailTitle => 'ຂໍ້ຄວາມ';
 }

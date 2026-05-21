@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:podd_app/components/progress_indicator.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/user_message.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/notification/user_message_view_model.dart';
@@ -16,7 +17,9 @@ class UserMessageView extends StatelessWidget {
       viewModelBuilder: () => UserMessageViewViewModel(id),
       builder: (context, viewModel, child) => Scaffold(
         backgroundColor: incidentsSand,
-        appBar: const _NotificationAppBar(title: 'Message'),
+        appBar: _NotificationAppBar(
+          title: AppLocalizations.of(context)!.notificationDetailTitle,
+        ),
         body: viewModel.isBusy
             ? const Center(child: OhtkProgressIndicator(size: 100))
             : viewModel.hasError || viewModel.data == null
@@ -148,7 +151,7 @@ class _HeroHeader extends StatelessWidget {
                 ),
               ),
               Text(
-                DateFormat('dd/MM/yyyy HH:mm')
+                DateFormat('dd/MM/yy HH:mm')
                     .format(userMessage.createdAt.toLocal()),
                 style: const TextStyle(
                   color: incidentsMuted,

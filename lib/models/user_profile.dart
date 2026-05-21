@@ -83,5 +83,5 @@ class UserProfile {
       assignedVillages.isEmpty ? null : assignedVillages.first;
 
   String get assignedVillageNames =>
-      assignedVillages.map((village) => village.displayName).join(', ');
+      assignedVillages.map((village) => village.name).join(', ');
 }

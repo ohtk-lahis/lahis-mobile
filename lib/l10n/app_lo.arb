@@ -20,7 +20,7 @@
   "loginButton": "ເຂົ້າ​ສູ່​ລະ​ບົບ",
   "qrCodeLoginButton": "QRCode LOGIN",
   "pickQrcodeImageButton": "Choose QRCode image",
-  "getLoginQrcodeButton": "my QR login",
+  "getLoginQrcodeButton": "QR ຂອງຂ້ອຍສຳລັບເຂົ້າສູ່ລະບົບ",
   "logoutButton": "ອອກ​ຈາກ​ລະ​ບົບ",
   "registerButton": "ລົງທະບຽນ",
   "forgotPasswordButton": "ລືມລະຫັດຜ່ານ",
@@ -278,5 +278,7 @@
   "passwordUpdatedSuccess": "ປ່ຽນລະຫັດຜ່ານສຳເລັດ",
   "villageEyebrow": "ບ້ານ",
   "censusHubHelperMulti": "ເລືອກສຳມະໂນທີ່ຕ້ອງການອັບເດດ ແຕ່ລະລາຍການຈະຖືກບັນທຶກແຍກກັນ",
-  "censusHubHelperSingle": "ເລືອກເພື່ອປັບສຳມະໂນນີ້ໃຫ້ເປັນປັດຈຸບັນ"
+  "censusHubHelperSingle": "ເລືອກເພື່ອປັບສຳມະໂນນີ້ໃຫ້ເປັນປັດຈຸບັນ",
+  "notificationsTitle": "ການແຈ້ງເຕືອນ",
+  "notificationDetailTitle": "ຂໍ້ຄວາມ"
 }

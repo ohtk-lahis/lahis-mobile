@@ -466,7 +466,7 @@ class _ConsolidatedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final localize = AppLocalizations.of(context)!;
     final isMulti = viewModel.hasMultipleAssignedVillages;
-    final activeVillage = viewModel.selectedVillage?.displayName ??
+    final activeVillage = viewModel.selectedVillage?.name ??
         viewModel.assignedVillageNames;
     final hasVillage = (activeVillage ?? '').trim().isNotEmpty;
     final languageLabel = _resolveLanguageNativeName(viewModel.language);

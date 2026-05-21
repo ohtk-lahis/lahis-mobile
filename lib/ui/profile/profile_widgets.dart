@@ -95,7 +95,7 @@ class ProfileDataRow extends StatelessWidget {
             style: const TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w500,
-              color: OhtkColor.teal700,
+              color: incidentsMuted,
               height: 1.2,
             ),
           ),

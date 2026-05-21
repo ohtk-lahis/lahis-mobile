@@ -1655,6 +1655,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose to keep this census up to date.'**
   String get censusHubHelperSingle;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsTitle;
+
+  /// No description provided for @notificationDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get notificationDetailTitle;
 }
 
 class _AppLocalizationsDelegate

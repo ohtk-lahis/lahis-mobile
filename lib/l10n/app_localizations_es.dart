@@ -867,4 +867,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get censusHubHelperSingle => 'Choose to keep this census up to date.';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get notificationDetailTitle => 'Message';
 }

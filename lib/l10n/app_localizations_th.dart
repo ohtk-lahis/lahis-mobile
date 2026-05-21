@@ -856,4 +856,10 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get censusHubHelperSingle => 'เลือกเพื่อปรับสำมะโนนี้ให้เป็นปัจจุบัน';
+
+  @override
+  String get notificationsTitle => 'การแจ้งเตือน';
+
+  @override
+  String get notificationDetailTitle => 'ข้อความ';
 }

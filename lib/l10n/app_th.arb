@@ -263,5 +263,7 @@
   "passwordUpdatedSuccess": "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว",
   "villageEyebrow": "หมู่บ้าน",
   "censusHubHelperMulti": "เลือกสำมะโนที่ต้องการอัปเดต แต่ละรายการจะถูกบันทึกแยกกัน",
-  "censusHubHelperSingle": "เลือกเพื่อปรับสำมะโนนี้ให้เป็นปัจจุบัน"
+  "censusHubHelperSingle": "เลือกเพื่อปรับสำมะโนนี้ให้เป็นปัจจุบัน",
+  "notificationsTitle": "การแจ้งเตือน",
+  "notificationDetailTitle": "ข้อความ"
 }

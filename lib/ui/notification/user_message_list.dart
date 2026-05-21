@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/user_message.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/notification/user_message_view.dart';
@@ -16,7 +17,9 @@ class UserMessageList extends StatelessWidget {
       viewModelBuilder: () => UserMessageListViewModel(),
       builder: (context, viewModel, child) => Scaffold(
         backgroundColor: incidentsSand,
-        appBar: const _NotificationAppBar(title: 'Notifications'),
+        appBar: _NotificationAppBar(
+          title: AppLocalizations.of(context)!.notificationsTitle,
+        ),
         body: _UserMessageList(),
       ),
     );
@@ -57,34 +60,103 @@ class _UserMessageList extends StackedHookView<UserMessageListViewModel> {
       );
     }
 
+    final localize = AppLocalizations.of(context)!;
+    final groups = _groupMessages(viewModel.userMessages);
+
+    final List<Widget> children = [];
+    for (final group in groups) {
+      children.add(_SectionEyebrow(label: group.labelFor(localize)));
+      for (int i = 0; i < group.messages.length; i++) {
+        final isLast = i == group.messages.length - 1;
+        children.add(_NotificationRow(
+          userMessage: group.messages[i],
+          hasBottomDivider: !isLast,
+          onTap: () {
+            viewModel.markSeen(group.messages[i]);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => UserMessageView(id: group.messages[i].id),
+              ),
+            );
+          },
+        ));
+      }
+    }
+
     return RefreshIndicator(
       color: incidentsTeal,
       onRefresh: viewModel.fetch,
-      child: ListView.separated(
+      child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(top: 10, bottom: 24),
-        separatorBuilder: (_, __) => const Divider(
-          height: 1,
-          thickness: 1,
-          indent: 62,
-          color: incidentsHair,
+        padding: EdgeInsets.only(
+          top: 4,
+          bottom: 24 + MediaQuery.of(context).padding.bottom,
         ),
-        itemCount: viewModel.userMessages.length,
-        itemBuilder: (context, index) {
-          final userMessage = viewModel.userMessages[index];
-          return _NotificationRow(
-            userMessage: userMessage,
-            onTap: () {
-              viewModel.markSeen(userMessage);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => UserMessageView(id: userMessage.id),
-                ),
-              );
-            },
-          );
-        },
+        children: children,
+      ),
+    );
+  }
+}
+
+enum _GroupKind { recent, earlier }
+
+class _MessageGroup {
+  final _GroupKind kind;
+  final List<UserMessage> messages;
+
+  _MessageGroup(this.kind, this.messages);
+
+  String labelFor(AppLocalizations localize) {
+    switch (kind) {
+      case _GroupKind.recent:
+        return localize.recentSectionLabel;
+      case _GroupKind.earlier:
+        return localize.earlierSectionLabel;
+    }
+  }
+}
+
+List<_MessageGroup> _groupMessages(List<UserMessage> messages) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final recentCutoff = today.subtract(const Duration(days: 7));
+
+  final recent = <UserMessage>[];
+  final earlier = <UserMessage>[];
+
+  for (final m in messages) {
+    final created = m.createdAt.toLocal();
+    if (!created.isBefore(recentCutoff)) {
+      recent.add(m);
+    } else {
+      earlier.add(m);
+    }
+  }
+
+  final groups = <_MessageGroup>[];
+  if (recent.isNotEmpty) groups.add(_MessageGroup(_GroupKind.recent, recent));
+  if (earlier.isNotEmpty) groups.add(_MessageGroup(_GroupKind.earlier, earlier));
+  return groups;
+}
+
+class _SectionEyebrow extends StatelessWidget {
+  final String label;
+
+  const _SectionEyebrow({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 6),
+      child: Text(
+        label.toUpperCase(),
+        style: const TextStyle(
+          color: incidentsMuted,
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.0,
+        ),
       ),
     );
   }
@@ -93,10 +165,12 @@ class _UserMessageList extends StackedHookView<UserMessageListViewModel> {
 class _NotificationRow extends StatelessWidget {
   final UserMessage userMessage;
   final VoidCallback onTap;
+  final bool hasBottomDivider;
 
   const _NotificationRow({
     required this.userMessage,
     required this.onTap,
+    this.hasBottomDivider = false,
   });
 
   @override
@@ -106,25 +180,33 @@ class _NotificationRow extends StatelessWidget {
       color: Colors.white,
       child: InkWell(
         onTap: onTap,
-        child: Stack(
-          children: [
-            if (unread)
-              Positioned(
-                left: 0,
-                top: 10,
-                bottom: 10,
-                child: Container(
-                  width: 3,
-                  decoration: const BoxDecoration(
-                    color: incidentsTeal,
-                    borderRadius: BorderRadius.horizontal(
-                      right: Radius.circular(2),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: hasBottomDivider
+                ? const Border(
+                    bottom: BorderSide(color: incidentsHair, width: 1),
+                  )
+                : null,
+          ),
+          child: Stack(
+            children: [
+              if (unread)
+                Positioned(
+                  left: 0,
+                  top: 10,
+                  bottom: 10,
+                  child: Container(
+                    width: 3,
+                    decoration: const BoxDecoration(
+                      color: incidentsTeal,
+                      borderRadius: BorderRadius.horizontal(
+                        right: Radius.circular(2),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -194,6 +276,7 @@ class _NotificationRow extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );
@@ -505,5 +588,5 @@ String _formatListTime(DateTime dateTime) {
   if (DateUtils.isSameDay(local, now)) {
     return DateFormat('HH:mm').format(local);
   }
-  return DateFormat('dd/MM HH:mm').format(local);
+  return DateFormat('dd/MM/yy').format(local);
 }
