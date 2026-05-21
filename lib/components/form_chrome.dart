@@ -10,12 +10,10 @@ const _appBarHeight = OhtkLayout.headerH;
 class FormChromeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback onBack;
-  final VoidCallback? onSaveDraft;
 
   const FormChromeAppBar({
     required this.title,
     required this.onBack,
-    this.onSaveDraft,
     super.key,
   });
 
@@ -24,7 +22,6 @@ class FormChromeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localize = AppLocalizations.of(context)!;
     return Container(
       color: incidentsTealDeep,
       child: SafeArea(
@@ -45,8 +42,7 @@ class FormChromeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Expanded(
                   child: Padding(
-                    padding:
-                        EdgeInsets.only(right: onSaveDraft != null ? 0 : 40),
+                    padding: const EdgeInsets.only(right: 40),
                     child: Text(
                       title,
                       textAlign: TextAlign.center,
@@ -61,41 +57,6 @@ class FormChromeAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                 ),
-                if (onSaveDraft != null)
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Colors.white),
-                    tooltip: localize.formSaveDraftAction,
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    onSelected: (key) {
-                      if (key == 'draft') onSaveDraft!();
-                    },
-                    itemBuilder: (_) => [
-                      PopupMenuItem<String>(
-                        value: 'draft',
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.bookmark_outline,
-                              size: 18,
-                              color: incidentsTeal,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              localize.formSaveDraftAction,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: incidentsInk,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
               ],
             ),
           ),
@@ -182,8 +143,8 @@ class FormChromeProgressStrip extends StatelessWidget {
                       color: incidentsMuted,
                     ),
                   ),
-                  const Spacer(),
-                  Flexible(
+                  const SizedBox(width: 12),
+                  Expanded(
                     child: Text(
                       form.currentSection.label,
                       textAlign: TextAlign.right,
@@ -204,9 +165,9 @@ class FormChromeProgressStrip extends StatelessWidget {
                   final isPast = i < current;
                   final isCurrent = i == current;
                   final color = isCurrent
-                      ? incidentsTeal
+                      ? incidentsAccent
                       : isPast
-                          ? incidentsTeal.withValues(alpha: 0.6)
+                          ? incidentsTeal
                           : incidentsHair;
                   return Expanded(
                     child: Padding(

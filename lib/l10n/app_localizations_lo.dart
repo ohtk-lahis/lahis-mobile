@@ -519,11 +519,11 @@ class AppLocalizationsLo extends AppLocalizations {
       'Press the submit button to submit your report';
 
   @override
-  String get reportDataSummary => 'Report data summary';
+  String get reportDataSummary => 'ສະຫຼຸບລາຍງານ';
 
   @override
   String get reportDataSummaryNotFound =>
-      'No content of summary is defined for this report type';
+      'ບໍ່ມີເນື້ອຫາສະຫຼຸບສຳລັບປະເພດລາຍງານນີ້';
 
   @override
   String get confirmExit => 'ທ່ານແນ່ໃຈບໍ່ວ່າຈະສືບຕໍ່';

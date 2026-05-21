@@ -59,37 +59,44 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
     final topInset = MediaQuery.of(context).padding.top;
     return Container(
       color: incidentsTealDeep,
-      padding: EdgeInsets.fromLTRB(8, 10 + topInset, 12, 10),
+      padding: EdgeInsets.only(top: topInset),
       height: 60 + topInset,
-      child: Row(
+      child: Stack(
         children: [
-          SizedBox(
-            width: 40,
-            height: 40,
-            child: Material(
-              color: Colors.transparent,
-              shape: const CircleBorder(),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () => Navigator.of(context).maybePop(),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 22,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
+          Center(
             child: Text(
               AppLocalizations.of(context)?.reportDetailTitle ??
                   'Report detail',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.2,
                 color: Colors.white,
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: Material(
+                  color: Colors.transparent,
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () => Navigator.of(context).maybePop(),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      size: 22,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

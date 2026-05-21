@@ -52,9 +52,6 @@ class FollowupReportFormView extends StatelessWidget {
                     Navigator.of(context).pop();
                   }
                 },
-                onSaveDraft: viewModel.state == ReportFormState.formInput
-                    ? () => _saveDraft(context)
-                    : null,
               ),
               body: SafeArea(
                 top: false,
@@ -112,17 +109,4 @@ class FollowupReportFormView extends StatelessWidget {
     return showExitConfirmDialog(context);
   }
 
-  // TODO: full draft persistence — see ReportFormView._saveDraft.
-  Future<void> _saveDraft(BuildContext context) async {
-    final localize = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(localize.formDraftSavedMessage),
-        backgroundColor: incidentsTeal,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-    Navigator.of(context).pop();
-  }
 }

@@ -378,21 +378,27 @@ class _ReviewFooter extends StatelessWidget {
                     ),
             ),
           ),
-          const SizedBox(height: 4),
-          TextButton(
-            onPressed: busy ? null : onBack,
-            style: TextButton.styleFrom(
-              foregroundColor: incidentsInk,
-              minimumSize: const Size(0, 40),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(
-              backText,
-              style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: busy ? null : onBack,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: incidentsInk,
+                side: const BorderSide(color: incidentsHair, width: 1.5),
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                minimumSize: const Size(0, 44),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                backText,
+                style: const TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),

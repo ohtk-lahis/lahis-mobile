@@ -21,17 +21,14 @@ class ReportTypeView extends StatelessWidget {
       viewModelBuilder: () => ReportTypeViewModel(),
       builder: (context, viewModel, child) => Scaffold(
         backgroundColor: incidentsSand,
-        body: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              const _ChooserAppBar(),
-              const _UtilityRow(),
-              const _TestBanner(),
-              Expanded(child: _ChooserBody(viewModel: viewModel)),
-              const _ZeroReportFooter(),
-            ],
-          ),
+        body: Column(
+          children: [
+            const _ChooserAppBar(),
+            const _UtilityRow(),
+            const _TestBanner(),
+            Expanded(child: _ChooserBody(viewModel: viewModel)),
+            const _ZeroReportFooter(),
+          ],
         ),
       ),
     );
@@ -44,9 +41,10 @@ class _ChooserAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localize = AppLocalizations.of(context)!;
+    final topInset = MediaQuery.of(context).padding.top;
     return Container(
       color: incidentsTealDeep,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: EdgeInsets.fromLTRB(12, topInset + 10, 12, 10),
       child: Row(
         children: [
           SizedBox(
@@ -318,17 +316,32 @@ class _SectionEyebrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 14, 4, 6),
-      child: Text(
-        label.toUpperCase(),
-        style: const TextStyle(
-          fontFamily: incidentsFontFamily,
-          fontFamilyFallback: incidentsFontFamilyFallback,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.5,
-          color: incidentsMuted,
-        ),
+      padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 3,
+            height: 14,
+            decoration: BoxDecoration(
+              color: incidentsTeal,
+              borderRadius: BorderRadius.circular(1.5),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: incidentsInk,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -382,7 +395,7 @@ class _TypeRow extends StatelessWidget {
               const Icon(
                 Icons.chevron_right,
                 size: 22,
-                color: incidentsTeal,
+                color: incidentsMuted,
               ),
             ],
           ),
@@ -630,13 +643,12 @@ class _ZeroReportButton extends StatelessWidget {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       child: Text(
-        localize.zeroReportPillLabel.toUpperCase(),
+        localize.zeroReportPillLabel,
         style: const TextStyle(
           fontFamily: incidentsFontFamily,
           fontFamilyFallback: incidentsFontFamilyFallback,
-          fontSize: 12,
+          fontSize: 13.5,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.4,
         ),
       ),
     );
