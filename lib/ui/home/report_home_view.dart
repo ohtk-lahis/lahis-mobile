@@ -48,24 +48,30 @@ class ReportHomeView extends HookWidget {
         ),
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(right: 2, bottom: 16),
-          child: SizedBox(
-            width: 64,
-            height: 64,
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: OhtkShadow.raised,
-              ),
-              child: FloatingActionButton(
-                backgroundColor: OhtkColor.teal700,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                highlightElevation: 0,
-                shape: const CircleBorder(),
-                onPressed: () {
-                  GoRouter.of(context).goNamed(OhtkRouter.reportTypes);
-                },
-                child: const Icon(Icons.add, size: 24),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: OhtkShadow.raised,
+            ),
+            child: FloatingActionButton.extended(
+              backgroundColor: OhtkColor.teal700,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              highlightElevation: 0,
+              shape: const StadiumBorder(),
+              extendedPadding:
+                  const EdgeInsets.symmetric(horizontal: 20),
+              onPressed: () {
+                GoRouter.of(context).goNamed(OhtkRouter.reportTypes);
+              },
+              icon: const Icon(Icons.add, size: 22),
+              label: Text(
+                AppLocalizations.of(context)!.newReportFabLabel,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
               ),
             ),
           ),
@@ -137,8 +143,8 @@ class _TabButton extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: selected ? OhtkColor.teal700 : Colors.transparent,
-              width: 2,
+              color: selected ? OhtkColor.accent : Colors.transparent,
+              width: 2.5,
             ),
           ),
         ),
@@ -149,7 +155,7 @@ class _TabButton extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.1,
-            color: selected ? OhtkColor.teal700 : OhtkColor.ink500,
+            color: selected ? OhtkColor.ink900 : OhtkColor.ink500,
           ),
         ),
       ),

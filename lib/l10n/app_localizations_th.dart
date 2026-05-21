@@ -37,6 +37,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get observationsTabTitle => 'สังเกตุการณ์';
 
   @override
+  String get censusTabTitle => 'สำมะโน';
+
+  @override
   String get profileTabTitle => 'ผู้ใช้';
 
   @override
@@ -333,6 +336,9 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get noReportsHelper =>
       'กดปุ่ม + สีเขียวด้านล่างเพื่อสร้างรายงานฉบับแรก หรือส่งรายงานปกติหากไม่มีเหตุการณ์ในสัปดาห์นี้';
+
+  @override
+  String get newReportFabLabel => 'รายงานใหม่';
 
   @override
   String get descriptionSectionLabel => 'รายละเอียด';

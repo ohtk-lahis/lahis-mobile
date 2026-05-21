@@ -248,9 +248,9 @@ class _IncidentsBottomNav extends StatelessWidget {
           iconPainter: _NavIconPainter.eye,
         ),
       if (viewModel.hasAnimalCensusFeature)
-        const _NavItem(
+        _NavItem(
           path: '/census',
-          label: 'Census',
+          label: localize?.censusTabTitle ?? 'Census',
           iconPainter: _NavIconPainter.users,
         ),
       _NavItem(

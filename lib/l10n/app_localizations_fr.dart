@@ -38,6 +38,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get observationsTabTitle => 'Observations';
 
   @override
+  String get censusTabTitle => 'Census';
+
+  @override
   String get profileTabTitle => 'Profile';
 
   @override
@@ -337,6 +340,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get noReportsHelper =>
       'Appuyez sur le + vert ci-dessous pour créer votre premier rapport, ou envoyez un Zéro rapport s\'il n\'y a rien à signaler cette semaine.';
+
+  @override
+  String get newReportFabLabel => 'New report';
 
   @override
   String get descriptionSectionLabel => 'Description';

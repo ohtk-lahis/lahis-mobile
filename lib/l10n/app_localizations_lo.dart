@@ -33,7 +33,10 @@ class AppLocalizationsLo extends AppLocalizations {
   String get incidentsTabTitle => 'ເຫດການ';
 
   @override
-  String get observationsTabTitle => 'Observations';
+  String get observationsTabTitle => 'ການສັງເກດ';
+
+  @override
+  String get censusTabTitle => 'ສຳມະໂນ';
 
   @override
   String get profileTabTitle => 'ຜູ້ໃຊ້';
@@ -332,6 +335,9 @@ class AppLocalizationsLo extends AppLocalizations {
   @override
   String get noReportsHelper =>
       'ກົດປຸ່ມ + ສີຂຽວດ້ານລຸ່ມເພື່ອສ້າງລາຍງານສະບັບທຳອິດ ຫຼື ສົ່ງລາຍງານປົກກະຕິຫາກບໍ່ມີເຫດການໃນອາທິດນີ້';
+
+  @override
+  String get newReportFabLabel => 'ລາຍງານໃໝ່';
 
   @override
   String get descriptionSectionLabel => 'ລາຍລະອຽດ';

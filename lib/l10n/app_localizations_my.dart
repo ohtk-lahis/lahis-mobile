@@ -37,6 +37,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get observationsTabTitle => 'Observations';
 
   @override
+  String get censusTabTitle => 'Census';
+
+  @override
   String get profileTabTitle => 'Profile';
 
   @override
@@ -336,6 +339,9 @@ class AppLocalizationsMy extends AppLocalizations {
   @override
   String get noReportsHelper =>
       'ပထမဆုံးအစီရင်ခံစာ တင်ရန် အောက်က အစိမ်းရောင် + ကို နှိပ်ပါ၊ သို့မဟုတ် ဤအပတ်တွင် တင်ပြရန် မရှိပါက သုညအစီရင်ခံစာ တင်ပါ။';
+
+  @override
+  String get newReportFabLabel => 'New report';
 
   @override
   String get descriptionSectionLabel => 'ဖော်ပြချက်';

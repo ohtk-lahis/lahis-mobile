@@ -162,6 +162,12 @@ abstract class AppLocalizations {
   /// **'Observations'**
   String get observationsTabTitle;
 
+  /// No description provided for @censusTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Census'**
+  String get censusTabTitle;
+
   /// No description provided for @profileTabTitle.
   ///
   /// In en, this message translates to:
@@ -731,6 +737,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap the green + below to file your first report, or submit a Zero report if there\'s nothing to report this week.'**
   String get noReportsHelper;
+
+  /// No description provided for @newReportFabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New report'**
+  String get newReportFabLabel;
 
   /// No description provided for @descriptionSectionLabel.
   ///

@@ -37,6 +37,9 @@ class AppLocalizationsKm extends AppLocalizations {
   String get observationsTabTitle => 'Observations';
 
   @override
+  String get censusTabTitle => 'Census';
+
+  @override
   String get profileTabTitle => 'Profile';
 
   @override
@@ -336,6 +339,9 @@ class AppLocalizationsKm extends AppLocalizations {
   @override
   String get noReportsHelper =>
       'ចុចលើ + ពណ៌បៃតងខាងក្រោមដើម្បីបង្កើតរបាយការណ៍ដំបូងរបស់អ្នក ឬ​ដាក់ស្នើ​របាយការណ៍​សូន្យ​ប្រសិន​បើ​មិន​មាន​អ្វី​ដែល​ត្រូវ​រាយការណ៍​ក្នុង​សប្តាហ៍​នេះ​ទេ។';
+
+  @override
+  String get newReportFabLabel => 'New report';
 
   @override
   String get descriptionSectionLabel => 'ការ​ពិពណ៌នា';

@@ -22,6 +22,9 @@ class OhtkColor {
   static const ink400 = Color(0xFF8A8A8A);
   static const ink300 = Color(0xFFB5B5B5);
 
+  static const accent = Color(0xFFE07A45);
+  static const accentSoft = Color(0xFFFBE5D6);
+
   static const danger = Color(0xFFB91C1C);
   static const dangerBg = Color(0xFFFEECEC);
   static const warning = Color(0xFF92400E);

@@ -10,7 +10,7 @@ import 'package:podd_app/ui/home/incidents_theme.dart';
 
 import 'all_reports_view_model.dart';
 
-final _timestampFormatter = DateFormat('dd/MM/yyyy HH:mm');
+final _timestampFormatter = DateFormat('dd/MM/yy HH:mm');
 
 class ReportListView<T extends BaseReportViewModel> extends StatelessWidget {
   final T viewModel;
@@ -47,7 +47,7 @@ class ReportListView<T extends BaseReportViewModel> extends StatelessWidget {
         OhtkLayout.pagePad,
         OhtkSpace.lg,
         OhtkLayout.pagePad,
-        96,
+        120,
       ),
       children: [
         for (int i = 0; i < children.length; i++) ...[
