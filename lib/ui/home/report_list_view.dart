@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:podd_app/components/motion.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/incident_report.dart';
 import 'package:podd_app/router.dart';
@@ -344,39 +345,45 @@ class _EmptyState extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 56, 24, 90),
       children: [
-        Center(
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: incidentsTeal.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.assignment_outlined,
-              color: incidentsTeal,
-              size: 36,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          localize.noReportsTitle,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: incidentsInk,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          localize.noReportsHelper,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 13,
-            height: 1.5,
-            color: incidentsMuted,
+        EmptyStateAppear(
+          child: Column(
+            children: [
+              Center(
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: incidentsTeal.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.assignment_outlined,
+                    color: incidentsTeal,
+                    size: 36,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                localize.noReportsTitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: incidentsInk,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                localize.noReportsHelper,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  height: 1.5,
+                  color: incidentsMuted,
+                ),
+              ),
+            ],
           ),
         ),
       ],

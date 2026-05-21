@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:podd_app/components/motion.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/user_message.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
@@ -422,7 +423,8 @@ class _StateMessage extends StatelessWidget {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-                child: Column(
+                child: EmptyStateAppear(
+                  child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
@@ -494,6 +496,7 @@ class _StateMessage extends StatelessWidget {
                             label: _ActionLabel(actionLabel),
                           ),
                   ],
+                ),
                 ),
               ),
             ),

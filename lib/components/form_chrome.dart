@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:podd_app/components/motion.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/opsv_form/opsv_form.dart' as opsv;
 import 'package:podd_app/theme/ohtk_style_system.dart';
@@ -73,36 +74,38 @@ class FormChromeTestBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!testFlag) return const SizedBox.shrink();
     final localize = AppLocalizations.of(context)!;
-    return Container(
-      decoration: const BoxDecoration(
-        color: incidentsTestBannerBg,
-        border: Border(
-          bottom: BorderSide(color: incidentsTestBannerBorder, width: 1),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.warning_amber_rounded,
-            size: 14,
-            color: incidentsTestPillFg,
+    return AnimatedNotice(
+      visible: testFlag,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: incidentsTestBannerBg,
+          border: Border(
+            bottom: BorderSide(color: incidentsTestBannerBorder, width: 1),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              localize.testModeBannerMessage,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: incidentsTestPillFg,
-                height: 1.4,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.warning_amber_rounded,
+              size: 14,
+              color: incidentsTestPillFg,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                localize.testModeBannerMessage,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: incidentsTestPillFg,
+                  height: 1.4,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:podd_app/components/motion.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
@@ -91,25 +92,33 @@ class CensusView extends StatelessWidget {
               padding: EdgeInsets.zero,
               children: [
                 _VillageHeader(viewModel: viewModel),
-                if (viewModel.usingCachedDefinition)
-                  const _NoticeBanner(
+                AnimatedNotice(
+                  visible: viewModel.usingCachedDefinition,
+                  child: const _NoticeBanner(
                     tone: _NoticeTone.warn,
                     icon: Icons.warning_amber_rounded,
                     text:
                         "Using a saved version of this form — couldn't refresh from server.",
                   ),
-                if (viewModel.message != null)
-                  _NoticeBanner(
+                ),
+                AnimatedNotice(
+                  visible: viewModel.message != null,
+                  child: _NoticeBanner(
                     tone: _NoticeTone.ok,
                     icon: Icons.check_circle_outline,
-                    text: viewModel.message!,
+                    text: viewModel.message ?? '',
                   ),
-                if (viewModel.hasErrorForKey('submit'))
-                  _NoticeBanner(
+                ),
+                AnimatedNotice(
+                  visible: viewModel.hasErrorForKey('submit'),
+                  child: _NoticeBanner(
                     tone: _NoticeTone.error,
                     icon: Icons.error_outline,
-                    text: viewModel.error('submit').toString(),
+                    text: viewModel.hasErrorForKey('submit')
+                        ? viewModel.error('submit').toString()
+                        : '',
                   ),
+                ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
                   child: Column(

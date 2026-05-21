@@ -285,7 +285,7 @@ class OhtkTheme {
 
 enum OhtkCardTone { paper, cream, mint }
 
-class OhtkCard extends StatelessWidget {
+class OhtkCard extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry? margin;
@@ -306,34 +306,49 @@ class OhtkCard extends StatelessWidget {
   });
 
   @override
+  State<OhtkCard> createState() => _OhtkCardState();
+}
+
+class _OhtkCardState extends State<OhtkCard> {
+  bool _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    final background = switch (tone) {
+    final background = switch (widget.tone) {
       OhtkCardTone.paper => OhtkColor.paper,
       OhtkCardTone.cream => OhtkColor.creamHi,
       OhtkCardTone.mint => OhtkColor.teal50,
     };
     final borderRadius = OhtkRadius.card;
     final content = Container(
-      padding: padding,
+      padding: widget.padding,
       decoration: BoxDecoration(
         color: background,
         borderRadius: borderRadius,
-        border: Border.all(color: borderColor),
-        boxShadow:
-            boxShadow ?? (tone == OhtkCardTone.paper ? OhtkShadow.card : null),
+        border: Border.all(color: widget.borderColor),
+        boxShadow: widget.boxShadow ??
+            (widget.tone == OhtkCardTone.paper ? OhtkShadow.card : null),
       ),
-      child: child,
+      child: widget.child,
     );
     return Padding(
-      padding: margin ?? EdgeInsets.zero,
-      child: onTap == null
+      padding: widget.margin ?? EdgeInsets.zero,
+      child: widget.onTap == null
           ? content
-          : Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: borderRadius,
-                onTap: onTap,
-                child: content,
+          : AnimatedScale(
+              scale: _pressed ? 0.97 : 1.0,
+              duration: const Duration(milliseconds: 120),
+              curve: Curves.easeOutCubic,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: borderRadius,
+                  onTap: widget.onTap,
+                  onHighlightChanged: (h) {
+                    if (h != _pressed) setState(() => _pressed = h);
+                  },
+                  child: content,
+                ),
               ),
             ),
     );
