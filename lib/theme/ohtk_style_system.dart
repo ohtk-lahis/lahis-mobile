@@ -172,7 +172,7 @@ class OhtkTheme {
         error: OhtkColor.danger,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: OhtkColor.teal900,
+        backgroundColor: OhtkColor.teal800,
         foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,

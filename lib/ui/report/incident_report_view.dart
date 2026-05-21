@@ -22,8 +22,8 @@ import 'package:podd_app/ui/report/report_comment_view.dart';
 import 'package:podd_app/ui/report/followup_list_view.dart';
 import 'package:stacked/stacked.dart';
 
-final _timestampFormatter = DateFormat('dd/MM/yyyy HH:mm');
-final _dateFormatter = DateFormat('dd/MM/yyyy');
+final _timestampFormatter = DateFormat('dd/MM/yy HH:mm');
+final _dateFormatter = DateFormat('dd/MM/yy');
 
 class IncidentReportView extends HookWidget {
   final String id;
@@ -86,8 +86,6 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
               AppLocalizations.of(context)?.reportDetailTitle ??
                   'Report detail',
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.2,
@@ -210,7 +208,7 @@ class _TabStrip extends StatelessWidget {
                     border: Border(
                       bottom: BorderSide(
                         color: activeIndex == i
-                            ? incidentsTeal
+                            ? incidentsAccent
                             : Colors.transparent,
                         width: 2.5,
                       ),
@@ -220,13 +218,11 @@ class _TabStrip extends StatelessWidget {
                     labels[i].toUpperCase(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
                       color: activeIndex == i
-                          ? incidentsTeal
+                          ? incidentsInk
                           : incidentsMuted,
                     ),
                   ),
@@ -300,16 +296,13 @@ class _DetailBlock extends StatelessWidget {
         children: [
           if (eyebrow != null)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 11, 16, 0),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
               child: Text(
-                eyebrow!.toUpperCase(),
+                eyebrow!,
                 style: const TextStyle(
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.5,
-                  color: incidentsMuted,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: incidentsInk,
                 ),
               ),
             ),
@@ -328,63 +321,61 @@ class _HeaderBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localize = AppLocalizations.of(context)!;
+    final hasPills = incident.caseId != null || incident.testFlag;
     return _DetailBlock(
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Expanded(
-                child: Text(
-                  incident.reportTypeName,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
-                    color: incidentsTeal,
-                  ),
-                ),
+          Expanded(
+            child: Text(
+              incident.reportTypeName,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+                color: incidentsInk,
+                height: 1.25,
               ),
-              const SizedBox(width: 10),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
               Text(
                 _timestampFormatter.format(incident.createdAt.toLocal()),
                 style: const TextStyle(
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: incidentsMuted,
                 ),
               ),
+              if (hasPills) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    if (incident.caseId != null)
+                      _StatusPill(
+                        label: localize.caseTag,
+                        bg: incidentsCasePillBg,
+                        fg: incidentsCasePillFg,
+                      ),
+                    if (incident.testFlag)
+                      _StatusPill(
+                        label: localize.testTag,
+                        bg: incidentsTestPillBg,
+                        fg: incidentsTestPillFg,
+                      ),
+                  ],
+                ),
+              ],
             ],
           ),
-          if (incident.caseId != null || incident.testFlag) ...[
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                if (incident.caseId != null)
-                  _StatusPill(
-                    label: localize.caseTag,
-                    bg: incidentsCasePillBg,
-                    fg: incidentsCasePillFg,
-                  ),
-                if (incident.testFlag)
-                  _StatusPill(
-                    label: localize.testTag,
-                    bg: incidentsTestPillBg,
-                    fg: incidentsTestPillFg,
-                  ),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -413,8 +404,6 @@ class _StatusPill extends StatelessWidget {
       child: Text(
         label.toUpperCase(),
         style: TextStyle(
-          fontFamily: incidentsFontFamily,
-          fontFamilyFallback: incidentsFontFamilyFallback,
           fontSize: 10,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.5,
@@ -435,16 +424,13 @@ class _DescriptionBlock extends StatelessWidget {
     final localize = AppLocalizations.of(context)!;
     final hasBody = incident.description.trim().isNotEmpty;
     return _DetailBlock(
-      eyebrow: localize.descriptionSectionLabel,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Text(
         hasBody
             ? incident.trimWhitespaceDescription
             : localize.noDescriptionProvided,
         style: TextStyle(
-          fontFamily: incidentsFontFamily,
-          fontFamilyFallback: incidentsFontFamilyFallback,
-          fontSize: 13.5,
+          fontSize: 15,
           height: 1.55,
           color: hasBody ? incidentsBody : incidentsMuted,
         ),
@@ -511,8 +497,6 @@ class _MetaCell extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
@@ -523,8 +507,6 @@ class _MetaCell extends StatelessWidget {
           Text(
             value,
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: incidentsInk,
@@ -718,8 +700,6 @@ class _AttachmentRow extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: incidentsInk,
@@ -756,8 +736,6 @@ class _LocationBlock extends StatelessWidget {
         child: Text(
           localize.noGpsProvided,
           style: const TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
             fontSize: 13,
             color: incidentsMuted,
           ),
@@ -794,8 +772,6 @@ class _LocationBlock extends StatelessWidget {
                   child: Text(
                     '${latlng[0].toStringAsFixed(4)}° · ${latlng[1].toStringAsFixed(4)}°',
                     style: const TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
                       fontSize: 12,
                       color: incidentsBody,
                     ),
@@ -850,8 +826,6 @@ class _TestWatermark extends StatelessWidget {
           maxLines: 1,
           softWrap: false,
           style: TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
             fontSize: 64,
             fontWeight: FontWeight.w800,
             letterSpacing: 8,
@@ -907,8 +881,6 @@ class _FollowUpFab extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -948,8 +920,6 @@ class _LoadingState extends StatelessWidget {
           Text(
             localize?.loadingLabel ?? 'Loading…',
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: incidentsMuted,
@@ -992,8 +962,6 @@ class _ErrorState extends StatelessWidget {
           Text(
             localize?.reportNotFoundTitle ?? 'Report not found',
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: incidentsInk,
@@ -1005,8 +973,6 @@ class _ErrorState extends StatelessWidget {
                 'This report may have been removed, or you might be offline.',
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 12.5,
               height: 1.5,
               color: incidentsMuted,
@@ -1025,8 +991,6 @@ class _ErrorState extends StatelessWidget {
                 child: Text(
                   localize?.backToIncidentsButton ?? 'Back to incidents',
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,

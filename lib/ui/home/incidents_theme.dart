@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
 
-const incidentsTealDeep = OhtkColor.teal900;
+const incidentsTealDeep = OhtkColor.teal800;
 const incidentsTeal = OhtkColor.teal700;
 const incidentsTealDark = OhtkColor.teal800;
 const incidentsSand = OhtkColor.cream;
@@ -9,6 +9,8 @@ const incidentsInk = OhtkColor.ink900;
 const incidentsMuted = OhtkColor.ink500;
 const incidentsHair = OhtkColor.line;
 const incidentsBody = OhtkColor.ink700;
+
+const incidentsAccent = OhtkColor.accent;
 
 const incidentsFabGreen = Color(0xFF5CB85C);
 
