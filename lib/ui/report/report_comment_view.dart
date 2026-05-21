@@ -5,13 +5,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/comment.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/report/report_comment_view_model.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
-final _commentTimestamp = DateFormat('dd/MM/yyyy HH:mm');
+final _commentTimestamp = DateFormat('dd/MM/yy HH:mm');
 
 class ReportCommentView extends StatelessWidget {
   final int threadId;
@@ -83,7 +84,7 @@ class _CommentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: incidentsHair),
       ),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -92,40 +93,45 @@ class _CommentCard extends StatelessWidget {
             name: comment.user.username,
             resolveImagePath: resolveImagePath,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  comment.user.username,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: incidentsInk,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  _commentTimestamp.format(comment.createdAt.toLocal()),
-                  style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
-                    fontSize: 10,
-                    color: incidentsMuted,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        comment.user.username,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: incidentsInk,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _commentTimestamp.format(comment.createdAt.toLocal()),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: incidentsMuted,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 6),
                 Text(
                   comment.body,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
-                    fontSize: 13,
+                    fontSize: 15,
                     height: 1.5,
                     color: incidentsBody,
                   ),
@@ -154,9 +160,13 @@ class _CommentCard extends StatelessWidget {
                           placeholder: (context, url) =>
                               Container(color: incidentsHair),
                           errorWidget: (context, url, error) => Container(
-                            color: incidentsHair,
-                            child: const Icon(Icons.broken_image,
-                                color: incidentsMuted),
+                            color: OhtkColor.teal100,
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.image_not_supported_outlined,
+                              color: incidentsMuted,
+                              size: 18,
+                            ),
                           ),
                         ),
                       );
@@ -187,10 +197,10 @@ class _Avatar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (avatarUrl != null && avatarUrl!.isNotEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         child: SizedBox(
-          width: 36,
-          height: 36,
+          width: 40,
+          height: 40,
           child: CachedNetworkImage(
             imageUrl: resolveImagePath(avatarUrl!),
             fit: BoxFit.cover,
@@ -206,8 +216,8 @@ class _Avatar extends StatelessWidget {
   Widget _initialFallback() {
     final initial = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?';
     return Container(
-      width: 36,
-      height: 36,
+      width: 40,
+      height: 40,
       decoration: BoxDecoration(
         color: incidentsTeal.withValues(alpha: 0.15),
         shape: BoxShape.circle,
@@ -216,9 +226,7 @@ class _Avatar extends StatelessWidget {
       child: Text(
         initial,
         style: const TextStyle(
-          fontFamily: incidentsFontFamily,
-          fontFamilyFallback: incidentsFontFamilyFallback,
-          fontSize: 14,
+          fontSize: 15,
           fontWeight: FontWeight.w700,
           color: incidentsTeal,
         ),
@@ -254,9 +262,7 @@ class _CommentEmptyState extends StatelessWidget {
           localize.noCommentsTitle,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: incidentsInk,
           ),
@@ -266,9 +272,7 @@ class _CommentEmptyState extends StatelessWidget {
           localize.noCommentsHelper,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
-            fontSize: 12.5,
+            fontSize: 13,
             height: 1.5,
             color: incidentsMuted,
           ),
@@ -310,12 +314,13 @@ class _CommentComposer extends StackedHookView<ReportCommentViewModel> {
     });
 
     final localize = AppLocalizations.of(context)!;
+    final canSend = hasText.value && !viewModel.isBusy;
     return Container(
       padding: EdgeInsets.fromLTRB(
         12,
-        10,
+        8,
         12,
-        10 + MediaQuery.of(context).padding.bottom,
+        8 + MediaQuery.of(context).padding.bottom,
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -328,82 +333,87 @@ class _CommentComposer extends StackedHookView<ReportCommentViewModel> {
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _AttachButton(viewModel: viewModel),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          if (viewModel.images.isNotEmpty) ...[
+            _PendingImagesGrid(images: viewModel.images),
+            const SizedBox(height: 8),
+          ],
+          Container(
+            constraints: const BoxConstraints(minHeight: 48),
+            decoration: BoxDecoration(
+              color: incidentsSand,
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(
+                color: isFocused.value
+                    ? incidentsTeal
+                    : Colors.transparent,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (viewModel.images.isNotEmpty) ...[
-                  _PendingImagesGrid(images: viewModel.images),
-                  const SizedBox(height: 8),
-                ],
-                Container(
-                  constraints: const BoxConstraints(minHeight: 44),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: incidentsSand,
-                    border: Border.all(
-                      color: isFocused.value ? incidentsTeal : incidentsHair,
-                    ),
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    onChanged: viewModel.setBody,
-                    keyboardType: TextInputType.multiline,
-                    textInputAction: TextInputAction.newline,
-                    minLines: 1,
-                    maxLines: 4,
-                    style: const TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
-                      fontSize: 14,
-                      color: incidentsInk,
-                    ),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      isCollapsed: true,
-                      hintText: localize.commentPlaceholder,
-                      hintStyle: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
-                        fontSize: 14,
-                        color: incidentsMuted,
+                _ComposerIcon(
+                  icon: Icons.camera_alt_outlined,
+                  tone: incidentsTeal,
+                  onTap: () => _showAddImageModal(context, viewModel),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      onChanged: viewModel.setBody,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      minLines: 1,
+                      maxLines: 4,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: incidentsInk,
+                        height: 1.3,
+                      ),
+                      decoration: InputDecoration(
+                        filled: false,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        isCollapsed: true,
+                        contentPadding: EdgeInsets.zero,
+                        hintText: localize.commentPlaceholder,
+                        hintStyle: const TextStyle(
+                          fontSize: 15,
+                          color: incidentsMuted,
+                        ),
                       ),
                     ),
                   ),
                 ),
+                _ComposerSend(
+                  enabled: canSend,
+                  busy: viewModel.isBusy,
+                  onPressed: () async {
+                    await viewModel.saveComment();
+                    controller.clear();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                ),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-          _SendButton(
-            enabled: hasText.value && !viewModel.isBusy,
-            busy: viewModel.isBusy,
-            onPressed: () async {
-              await viewModel.saveComment();
-              controller.clear();
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
           ),
         ],
       ),
     );
   }
-}
 
-class _AttachButton extends StatelessWidget {
-  final ReportCommentViewModel viewModel;
-
-  const _AttachButton({required this.viewModel});
-
-  Future<void> _showAddImageModal(BuildContext context) async {
+  Future<void> _showAddImageModal(
+      BuildContext context, ReportCommentViewModel viewModel) async {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -444,35 +454,39 @@ class _AttachButton extends StatelessWidget {
       return null;
     }
   }
+}
+
+class _ComposerIcon extends StatelessWidget {
+  final IconData icon;
+  final Color tone;
+  final VoidCallback onTap;
+
+  const _ComposerIcon({
+    required this.icon,
+    required this.tone,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 44,
-      height: 44,
-      child: Material(
-        color: incidentsTeal.withValues(alpha: 0.10),
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: () => _showAddImageModal(context),
-          child: const Icon(
-            Icons.camera_alt_outlined,
-            size: 22,
-            color: incidentsTeal,
-          ),
-        ),
-      ),
+    return IconButton(
+      icon: Icon(icon, size: 22),
+      color: tone,
+      splashRadius: 22,
+      focusColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      onPressed: onTap,
     );
   }
 }
 
-class _SendButton extends StatelessWidget {
+class _ComposerSend extends StatelessWidget {
   final bool enabled;
   final bool busy;
   final VoidCallback onPressed;
 
-  const _SendButton({
+  const _ComposerSend({
     required this.enabled,
     required this.busy,
     required this.onPressed,
@@ -480,32 +494,31 @@ class _SendButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = enabled ? incidentsTeal : incidentsHair;
-    final fg = enabled ? Colors.white : incidentsMuted;
-    return SizedBox(
-      width: 44,
-      height: 44,
-      child: Material(
-        color: bg,
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: enabled ? onPressed : null,
-          child: busy
-              ? const Padding(
-                  padding: EdgeInsets.all(12),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
-              : Icon(
-                  Icons.send_rounded,
-                  size: 20,
-                  color: fg,
-                ),
+    if (busy) {
+      return const SizedBox(
+        width: 48,
+        height: 48,
+        child: Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(incidentsTeal),
+            ),
+          ),
         ),
-      ),
+      );
+    }
+    return IconButton(
+      icon: const Icon(Icons.send_rounded, size: 22),
+      color: incidentsTeal,
+      disabledColor: incidentsTeal.withValues(alpha: 0.35),
+      splashRadius: 22,
+      focusColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      onPressed: enabled ? onPressed : null,
     );
   }
 }
