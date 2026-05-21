@@ -1637,6 +1637,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tip: pick a word or number you\'ll remember.'**
   String get passwordHelperTip;
+
+  /// No description provided for @villageEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Village'**
+  String get villageEyebrow;
+
+  /// No description provided for @censusHubHelperMulti.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a census to update. Each one is saved separately.'**
+  String get censusHubHelperMulti;
+
+  /// No description provided for @censusHubHelperSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose to keep this census up to date.'**
+  String get censusHubHelperSingle;
 }
 
 class _AppLocalizationsDelegate

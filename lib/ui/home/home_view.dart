@@ -112,6 +112,7 @@ class HomeView extends HookWidget {
             ? kToolbarHeight * .6
             : 0.0;
         return Scaffold(
+          primary: false,
           backgroundColor: incidentsSand,
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(

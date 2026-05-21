@@ -260,5 +260,8 @@
   "profilePhoneOptionalHelper": "ใช้สำหรับติดต่อเกี่ยวกับรายงานของคุณ",
   "passwordIntroBody": "ใช้รหัสที่จำง่ายก็พอ — คุณใช้ไม่บ่อย ขอแค่ไม่ลืม",
   "passwordHelperTip": "เคล็ดลับ: ใช้คำหรือตัวเลขที่คุณจำได้ง่าย",
-  "passwordUpdatedSuccess": "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว"
+  "passwordUpdatedSuccess": "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว",
+  "villageEyebrow": "หมู่บ้าน",
+  "censusHubHelperMulti": "เลือกสำมะโนที่ต้องการอัปเดต แต่ละรายการจะถูกบันทึกแยกกัน",
+  "censusHubHelperSingle": "เลือกเพื่อปรับสำมะโนนี้ให้เป็นปัจจุบัน"
 }

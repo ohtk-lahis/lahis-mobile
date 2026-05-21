@@ -275,5 +275,8 @@
   "profilePhoneOptionalHelper": "ໃຊ້ສຳລັບຕິດຕໍ່ກ່ຽວກັບລາຍງານຂອງທ່ານ",
   "passwordIntroBody": "ໃຊ້ລະຫັດທີ່ຈຳງ່າຍກໍ່ພໍ — ທ່ານໃຊ້ບໍ່ບ່ອຍ ຂໍແຕ່ບໍ່ລືມ",
   "passwordHelperTip": "ເຄັດລັບ: ໃຊ້ຄຳຫລືຕົວເລກທີ່ທ່ານຈຳໄດ້ງ່າຍ",
-  "passwordUpdatedSuccess": "ປ່ຽນລະຫັດຜ່ານສຳເລັດ"
+  "passwordUpdatedSuccess": "ປ່ຽນລະຫັດຜ່ານສຳເລັດ",
+  "villageEyebrow": "ບ້ານ",
+  "censusHubHelperMulti": "ເລືອກສຳມະໂນທີ່ຕ້ອງການອັບເດດ ແຕ່ລະລາຍການຈະຖືກບັນທຶກແຍກກັນ",
+  "censusHubHelperSingle": "ເລືອກເພື່ອປັບສຳມະໂນນີ້ໃຫ້ເປັນປັດຈຸບັນ"
 }

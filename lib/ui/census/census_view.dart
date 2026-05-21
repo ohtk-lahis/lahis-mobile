@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/census/census_view_model.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:stacked/stacked.dart';
+
+final _censusDateFormat = DateFormat('dd/MM/yy');
 
 class CensusView extends StatelessWidget {
   final String? kind;
@@ -118,7 +122,7 @@ class CensusView extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 13,
                           height: 1.45,
-                          color: incidentsBody,
+                          color: incidentsMuted,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -217,7 +221,7 @@ class _CensusHub extends StatelessWidget {
     if (viewModel.censusKinds.isEmpty) {
       return Column(
         children: [
-          _VillageHeader(viewModel: viewModel, showFreshness: false),
+          _VillageHubHeader(viewModel: viewModel),
           const Expanded(
             child: _FullState(
               icon: Icons.info_outline,
@@ -238,20 +242,25 @@ class _CensusHub extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          _VillageHeader(viewModel: viewModel, showFreshness: false),
+          _VillageHubHeader(viewModel: viewModel),
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 18),
+            padding: const EdgeInsets.fromLTRB(
+              OhtkLayout.pagePad,
+              OhtkSpace.md,
+              OhtkLayout.pagePad,
+              OhtkSpace.lg,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   viewModel.censusKinds.length == 1
-                      ? 'Choose to keep this census up to date.'
-                      : 'Choose a census to update. Each one is saved separately.',
+                      ? AppLocalizations.of(context)!.censusHubHelperSingle
+                      : AppLocalizations.of(context)!.censusHubHelperMulti,
                   style: const TextStyle(
                     fontSize: 13,
                     height: 1.45,
-                    color: incidentsBody,
+                    color: incidentsMuted,
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -286,6 +295,7 @@ class _CensusKindCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final snapshot = summary.latestSnapshot;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: OhtkCard(
@@ -305,26 +315,42 @@ class _CensusKindCard extends StatelessWidget {
                 children: [
                   Text(
                     summary.displayName,
-                    style: OhtkType.h3.copyWith(
-                    ),
+                    style: OhtkType.h3,
                   ),
-                  const SizedBox(height: 7),
-                  OhtkChip(
-                    icon: summary.latestSnapshot != null
-                        ? Icons.access_time_rounded
-                        : Icons.edit_outlined,
-                    label: summary.latestSnapshot != null
-                        ? 'Last updated ${_dateOnly(summary.latestSnapshot!.censusDate)}'
-                        : 'Never submitted',
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        snapshot != null
+                            ? Icons.access_time_rounded
+                            : Icons.edit_outlined,
+                        size: 13,
+                        color: incidentsMuted,
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          snapshot != null
+                              ? 'Last updated ${_dateOnly(snapshot.censusDate)}'
+                              : 'Not submitted yet',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: incidentsMuted,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             const Icon(
               Icons.chevron_right_rounded,
-              color: incidentsTeal,
-              size: 28,
+              color: incidentsMuted,
+              size: 22,
             ),
           ],
         ),
@@ -333,75 +359,139 @@ class _CensusKindCard extends StatelessWidget {
   }
 
   static String _dateOnly(DateTime? date) {
-    if (date == null) {
-      return '';
-    }
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final year = date.year.toString().padLeft(4, '0');
-    return '$day/$month/$year';
+    if (date == null) return '';
+    return _censusDateFormat.format(date);
   }
 }
 
-class _VillageHeader extends StatelessWidget {
+class _VillageHubHeader extends StatelessWidget {
   final CensusViewModel viewModel;
-  final bool showFreshness;
 
-  const _VillageHeader({
-    required this.viewModel,
-    this.showFreshness = true,
-  });
+  const _VillageHubHeader({required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
     final village = viewModel.selectedVillage;
-    final freshness = viewModel.freshnessLabel;
-    return OhtkCard(
-      margin: const EdgeInsets.fromLTRB(
+    final villageName =
+        village?.name.isNotEmpty == true ? village!.name : 'No village';
+    final district = viewModel.authorityName?.isNotEmpty == true
+        ? viewModel.authorityName!
+        : '—';
+    final localize = AppLocalizations.of(context)!;
+
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFFEFEAE0),
+      padding: const EdgeInsets.fromLTRB(
         OhtkLayout.pagePad,
-        OhtkSpace.md,
+        OhtkSpace.lg,
         OhtkLayout.pagePad,
-        0,
+        OhtkSpace.lg,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const OhtkIconTile(
-                size: 48,
-                icon: Icons.holiday_village_outlined,
+              const Icon(
+                Icons.location_on_outlined,
+                size: 14,
+                color: incidentsTeal,
               ),
-              const SizedBox(width: OhtkSpace.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(width: 6),
+              OhtkEyebrow(
+                label: localize.villageEyebrow,
+                color: incidentsTeal,
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            villageName,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: OhtkType.h1,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            district,
+            style: const TextStyle(
+              fontSize: 14,
+              color: incidentsMuted,
+              height: 1.35,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VillageHeader extends StatelessWidget {
+  final CensusViewModel viewModel;
+
+  const _VillageHeader({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final village = viewModel.selectedVillage;
+    final freshness = viewModel.freshnessLabel;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        OhtkLayout.pagePad,
+        OhtkSpace.md,
+        OhtkLayout.pagePad,
+        0,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const OhtkIconTile(
+            size: 44,
+            icon: Icons.holiday_village_outlined,
+          ),
+          const SizedBox(width: OhtkSpace.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  village?.name.isNotEmpty == true
+                      ? village!.name
+                      : 'No village',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: OhtkType.h3,
+                ),
+                const SizedBox(height: 4),
+                Row(
                   children: [
-                    const OhtkEyebrow(label: 'UPDATING VILLAGE'),
-                    const SizedBox(height: 2),
-                    Text(
-                      village?.displayName ?? 'No village',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: OhtkType.h3.copyWith(
+                    Icon(
+                      freshness == null
+                          ? Icons.edit_outlined
+                          : Icons.access_time_rounded,
+                      size: 14,
+                      color: incidentsMuted,
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        freshness == null
+                            ? 'No census submitted yet'
+                            : 'Last updated $freshness',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: incidentsMuted,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          if (showFreshness) ...[
-            const SizedBox(height: 12),
-            OhtkChip(
-              icon: freshness == null
-                  ? Icons.edit_outlined
-                  : Icons.access_time_rounded,
-              label: freshness == null
-                  ? 'No census submitted yet'
-                  : 'Last updated $freshness',
+              ],
             ),
-          ],
+          ),
         ],
       ),
     );

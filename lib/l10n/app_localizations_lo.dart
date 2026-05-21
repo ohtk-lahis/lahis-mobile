@@ -838,4 +838,14 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get passwordHelperTip => 'ເຄັດລັບ: ໃຊ້ຄຳຫລືຕົວເລກທີ່ທ່ານຈຳໄດ້ງ່າຍ';
+
+  @override
+  String get villageEyebrow => 'ບ້ານ';
+
+  @override
+  String get censusHubHelperMulti =>
+      'ເລືອກສຳມະໂນທີ່ຕ້ອງການອັບເດດ ແຕ່ລະລາຍການຈະຖືກບັນທຶກແຍກກັນ';
+
+  @override
+  String get censusHubHelperSingle => 'ເລືອກເພື່ອປັບສຳມະໂນນີ້ໃຫ້ເປັນປັດຈຸບັນ';
 }

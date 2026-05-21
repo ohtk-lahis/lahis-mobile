@@ -846,4 +846,14 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get passwordHelperTip => 'เคล็ดลับ: ใช้คำหรือตัวเลขที่คุณจำได้ง่าย';
+
+  @override
+  String get villageEyebrow => 'หมู่บ้าน';
+
+  @override
+  String get censusHubHelperMulti =>
+      'เลือกสำมะโนที่ต้องการอัปเดต แต่ละรายการจะถูกบันทึกแยกกัน';
+
+  @override
+  String get censusHubHelperSingle => 'เลือกเพื่อปรับสำมะโนนี้ให้เป็นปัจจุบัน';
 }

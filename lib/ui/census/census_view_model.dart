@@ -40,6 +40,8 @@ class CensusViewModel extends BaseViewModel {
 
   Village? get selectedVillage => authService.selectedVillage;
 
+  String? get authorityName => authService.userProfile?.authorityName;
+
   bool get hasCensusAccess =>
       featureCapabilityService.villageEnabled &&
       (authService.userProfile?.hasFeatureEnabled('animal_census_enabled') ??
@@ -504,7 +506,7 @@ class CensusViewModel extends BaseViewModel {
   }
 
   String _dateOnly(DateTime date) {
-    final year = date.year.toString().padLeft(4, '0');
+    final year = (date.year % 100).toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
     return '$day/$month/$year';

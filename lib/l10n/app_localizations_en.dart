@@ -854,4 +854,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get passwordHelperTip =>
       'Tip: pick a word or number you\'ll remember.';
+
+  @override
+  String get villageEyebrow => 'Village';
+
+  @override
+  String get censusHubHelperMulti =>
+      'Choose a census to update. Each one is saved separately.';
+
+  @override
+  String get censusHubHelperSingle => 'Choose to keep this census up to date.';
 }

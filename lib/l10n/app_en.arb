@@ -383,5 +383,8 @@
   "profileFormReadonlyEyebrow": "Set by your admin · not editable",
   "profilePhoneOptionalHelper": "Used to reach you about your reports",
   "passwordIntroBody": "Pick something easy for you to remember — you only use this once in a while.",
-  "passwordHelperTip": "Tip: pick a word or number you'll remember."
+  "passwordHelperTip": "Tip: pick a word or number you'll remember.",
+  "villageEyebrow": "Village",
+  "censusHubHelperMulti": "Choose a census to update. Each one is saved separately.",
+  "censusHubHelperSingle": "Choose to keep this census up to date."
 }
