@@ -873,4 +873,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get notificationDetailTitle => 'Message';
+
+  @override
+  String get reportSubmitSuccess => 'Report submitted';
 }

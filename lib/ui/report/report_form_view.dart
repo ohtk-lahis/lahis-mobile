@@ -4,6 +4,7 @@ import 'package:podd_app/components/confirm.dart';
 import 'package:podd_app/components/form_chrome.dart';
 import 'package:podd_app/components/form_confirm.dart';
 import 'package:podd_app/components/form_input.dart';
+import 'package:podd_app/components/submit_success_overlay.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/report_submit_result.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
@@ -73,7 +74,11 @@ class ReportFormView extends StatelessWidget {
                             if (result is ReportSubmitSuccess ||
                                 result is ReportSubmitPending) {
                               if (context.mounted) {
-                                Navigator.pop(context);
+                                await SubmitSuccessOverlay.show(
+                                  context,
+                                  message: localize.reportSubmitSuccess,
+                                );
+                                if (context.mounted) Navigator.pop(context);
                               }
                             }
                           },

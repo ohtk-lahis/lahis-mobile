@@ -265,5 +265,6 @@
   "censusHubHelperMulti": "เลือกสำมะโนที่ต้องการอัปเดต แต่ละรายการจะถูกบันทึกแยกกัน",
   "censusHubHelperSingle": "เลือกเพื่อปรับสำมะโนนี้ให้เป็นปัจจุบัน",
   "notificationsTitle": "การแจ้งเตือน",
-  "notificationDetailTitle": "ข้อความ"
+  "notificationDetailTitle": "ข้อความ",
+  "reportSubmitSuccess": "ส่งรายงานสำเร็จ"
 }

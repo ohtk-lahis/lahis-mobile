@@ -1667,6 +1667,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message'**
   String get notificationDetailTitle;
+
+  /// No description provided for @reportSubmitSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Report submitted'**
+  String get reportSubmitSuccess;
 }
 
 class _AppLocalizationsDelegate

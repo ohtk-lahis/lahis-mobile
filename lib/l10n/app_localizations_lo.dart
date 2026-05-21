@@ -854,4 +854,7 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get notificationDetailTitle => 'ຂໍ້ຄວາມ';
+
+  @override
+  String get reportSubmitSuccess => 'ສົ່ງລາຍງານສຳເລັດ';
 }

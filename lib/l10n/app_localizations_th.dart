@@ -862,4 +862,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get notificationDetailTitle => 'ข้อความ';
+
+  @override
+  String get reportSubmitSuccess => 'ส่งรายงานสำเร็จ';
 }

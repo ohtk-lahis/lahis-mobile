@@ -280,5 +280,6 @@
   "censusHubHelperMulti": "ເລືອກສຳມະໂນທີ່ຕ້ອງການອັບເດດ ແຕ່ລະລາຍການຈະຖືກບັນທຶກແຍກກັນ",
   "censusHubHelperSingle": "ເລືອກເພື່ອປັບສຳມະໂນນີ້ໃຫ້ເປັນປັດຈຸບັນ",
   "notificationsTitle": "ການແຈ້ງເຕືອນ",
-  "notificationDetailTitle": "ຂໍ້ຄວາມ"
+  "notificationDetailTitle": "ຂໍ້ຄວາມ",
+  "reportSubmitSuccess": "ສົ່ງລາຍງານສຳເລັດ"
 }

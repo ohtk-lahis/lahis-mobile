@@ -388,5 +388,6 @@
   "censusHubHelperMulti": "Choose a census to update. Each one is saved separately.",
   "censusHubHelperSingle": "Choose to keep this census up to date.",
   "notificationsTitle": "Notifications",
-  "notificationDetailTitle": "Message"
+  "notificationDetailTitle": "Message",
+  "reportSubmitSuccess": "Report submitted"
 }

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:podd_app/components/submit_success_overlay.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/report_type.dart';
 import 'package:podd_app/router.dart';
@@ -656,9 +657,13 @@ class _ZeroReportButton extends StatelessWidget {
 
   void _showZeroReportResult(BuildContext context, bool success) {
     final localize = AppLocalizations.of(context)!;
-    final message = success
-        ? localize.zeroReportSubmitSuccess
-        : 'Failed to submit';
+    if (success) {
+      SubmitSuccessOverlay.show(
+        context,
+        message: localize.zeroReportSubmitSuccess,
+      );
+      return;
+    }
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -667,13 +672,13 @@ class _ZeroReportButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
         ),
         content: Text(
-          message,
+          'Failed to submit',
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontFamily: incidentsFontFamily,
             fontFamilyFallback: incidentsFontFamilyFallback,
             fontSize: 14,
-            color: success ? incidentsTeal : incidentsErrorRed,
+            color: incidentsErrorRed,
           ),
         ),
         actionsAlignment: MainAxisAlignment.center,
