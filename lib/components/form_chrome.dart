@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/opsv_form/opsv_form.dart' as opsv;
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 
-const _appBarHeight = 56.0;
+const _appBarHeight = OhtkLayout.headerH;
 
 class FormChromeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -33,72 +34,69 @@ class FormChromeAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
-        children: [
-          IconButton(
-            iconSize: 22,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: onBack,
-          ),
-          Expanded(
-            child: Padding(
-              padding:
-                  EdgeInsets.only(right: onSaveDraft != null ? 0 : 40),
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
+              children: [
+                IconButton(
+                  iconSize: 22,
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints(minWidth: 40, minHeight: 40),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: onBack,
                 ),
-              ),
-            ),
-          ),
-          if (onSaveDraft != null)
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
-              tooltip: localize.formSaveDraftAction,
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              onSelected: (key) {
-                if (key == 'draft') onSaveDraft!();
-              },
-              itemBuilder: (_) => [
-                PopupMenuItem<String>(
-                  value: 'draft',
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.bookmark_outline,
-                        size: 18,
-                        color: incidentsTeal,
+                Expanded(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(right: onSaveDraft != null ? 0 : 40),
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
                       ),
-                      const SizedBox(width: 10),
-                      Text(
-                        localize.formSaveDraftAction,
-                        style: const TextStyle(
-                          fontFamily: incidentsFontFamily,
-                          fontFamilyFallback: incidentsFontFamilyFallback,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: incidentsInk,
+                    ),
+                  ),
+                ),
+                if (onSaveDraft != null)
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    tooltip: localize.formSaveDraftAction,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    onSelected: (key) {
+                      if (key == 'draft') onSaveDraft!();
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem<String>(
+                        value: 'draft',
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.bookmark_outline,
+                              size: 18,
+                              color: incidentsTeal,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              localize.formSaveDraftAction,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: incidentsInk,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
               ],
-            ),
-        ],
             ),
           ),
         ),
@@ -136,8 +134,6 @@ class FormChromeTestBanner extends StatelessWidget {
             child: Text(
               localize.testModeBannerMessage,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: incidentsTestPillFg,
@@ -178,12 +174,8 @@ class FormChromeProgressStrip extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    localize
-                        .formStepLabel(current + 1, total)
-                        .toUpperCase(),
+                    localize.formStepLabel(current + 1, total).toUpperCase(),
                     style: const TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
                       fontSize: 10.5,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.5,
@@ -198,8 +190,6 @@ class FormChromeProgressStrip extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: incidentsInk,
@@ -262,79 +252,38 @@ class FormChromeFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final localize = AppLocalizations.of(context)!;
     final media = MediaQuery.of(context);
-    final nextLabel =
-        isLastSection ? localize.formChromeReviewLabel : localize.formChromeNextLabel;
+    final nextLabel = isLastSection
+        ? localize.formChromeReviewLabel
+        : localize.formChromeNextLabel;
 
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: incidentsHair, width: 1)),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x0D000000),
-            offset: Offset(0, -6),
-            blurRadius: 18,
-          ),
-        ],
+        border: Border(top: BorderSide(color: OhtkColor.line, width: 1)),
+        boxShadow: OhtkShadow.sticky,
       ),
       padding: EdgeInsets.fromLTRB(14, 10, 14, 10 + media.padding.bottom),
       child: Row(
         children: [
-          OutlinedButton(
-            onPressed: canGoBack ? onBack : null,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: incidentsInk,
-              disabledForegroundColor: incidentsHair,
-              side: BorderSide(
-                color: canGoBack ? incidentsHair : incidentsHair,
-                width: 1,
-              ),
-              shape: const StadiumBorder(),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
-              minimumSize: const Size(0, 44),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(
-              localize.formChromeBackLabel,
-              style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
+          SizedBox(
+            height: 44,
+            child: OhtkSecondaryButton(
+              label: localize.formChromeBackLabel,
+              onPressed: canGoBack ? onBack : null,
             ),
           ),
           const Spacer(),
-          TextButton(
-            onPressed: onNext,
-            style: TextButton.styleFrom(
-              backgroundColor: incidentsTeal,
-              foregroundColor: Colors.white,
-              shape: const StadiumBorder(),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
-              minimumSize: const Size(0, 44),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  nextLabel,
-                  style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  isLastSection ? Icons.check : Icons.arrow_forward,
-                  size: 16,
-                ),
-              ],
+          SizedBox(
+            width: 150,
+            height: 44,
+            child: OhtkPrimaryButton(
+              label: nextLabel,
+              onPressed: onNext,
+              icon: Icon(
+                isLastSection ? Icons.check : Icons.arrow_forward,
+                color: Colors.white,
+                size: 16,
+              ),
             ),
           ),
         ],
@@ -375,8 +324,6 @@ Future<bool> showExitConfirmDialog(BuildContext context) async {
               localize.exitDialogTitle,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: incidentsInk,
@@ -388,8 +335,6 @@ Future<bool> showExitConfirmDialog(BuildContext context) async {
               localize.exitDialogBody,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 13,
                 color: incidentsMuted,
                 height: 1.5,
@@ -409,8 +354,6 @@ Future<bool> showExitConfirmDialog(BuildContext context) async {
                 child: Text(
                   localize.exitDialogDiscardButton,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),
@@ -431,8 +374,6 @@ Future<bool> showExitConfirmDialog(BuildContext context) async {
                 child: Text(
                   localize.exitDialogKeepButton,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),

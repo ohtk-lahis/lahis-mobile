@@ -9,6 +9,7 @@ import 'package:podd_app/components/language_dropdown.dart';
 import 'package:podd_app/components/restart_widget.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/report_type.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/login/picker_sheets.dart';
 import 'package:podd_app/ui/profile/profile_view_model.dart';
@@ -71,8 +72,6 @@ class ProfileView extends StatelessWidget {
                 localize.signOutConfirmTitle,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: incidentsInk,
@@ -84,8 +83,6 @@ class ProfileView extends StatelessWidget {
                 localize.signOutConfirmBody,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
                   fontSize: 13,
                   color: incidentsMuted,
                   height: 1.5,
@@ -105,8 +102,6 @@ class ProfileView extends StatelessWidget {
                   child: Text(
                     localize.logoutButton,
                     style: const TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
@@ -127,8 +122,6 @@ class ProfileView extends StatelessWidget {
                   child: Text(
                     localize.cancel,
                     style: const TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
@@ -155,14 +148,9 @@ class _IdentityHeader extends StatelessWidget {
     final fullName = _displayName(viewModel);
     final usernameLine = _usernameLine(viewModel);
 
-    return Container(
+    return OhtkCard(
       margin: const EdgeInsets.fromLTRB(14, 0, 14, 0),
       padding: const EdgeInsets.fromLTRB(14, 16, 14, 18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: incidentsHair, width: 1),
-      ),
       child: Column(
         children: [
           _Avatar(),
@@ -171,8 +159,6 @@ class _IdentityHeader extends StatelessWidget {
             Text(
               viewModel.error('uploadFail'),
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 color: incidentsErrorRed,
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
@@ -184,8 +170,6 @@ class _IdentityHeader extends StatelessWidget {
             fullName,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: incidentsInk,
@@ -198,8 +182,6 @@ class _IdentityHeader extends StatelessWidget {
               usernameLine,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 12.5,
                 fontWeight: FontWeight.w500,
                 color: incidentsMuted,
@@ -389,8 +371,6 @@ class _AvatarPickerSheet extends StatelessWidget {
                 child: Text(
                   localize.avatarSheetTitle,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     color: incidentsInk,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -406,8 +386,6 @@ class _AvatarPickerSheet extends StatelessWidget {
                 child: Text(
                   localize.avatarSheetSubtitle,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     color: incidentsMuted,
                     fontSize: 12,
                     height: 1.4,
@@ -467,8 +445,6 @@ class _SheetRow extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
                   color: fg,
@@ -587,8 +563,6 @@ class _ConsolidatedCard extends StatelessWidget {
               'The app needs to restart to apply the new language.',
           textAlign: TextAlign.center,
           style: const TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
             fontSize: 14,
             color: incidentsInk,
             height: 1.45,
@@ -612,8 +586,6 @@ class _ConsolidatedCard extends StatelessWidget {
             child: Text(
               AppLocalizations.of(context)?.ok ?? 'OK',
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
               ),
@@ -672,8 +644,6 @@ class _ActiveVillageSheet extends StatelessWidget {
                 child: Text(
                   localize.villageSheetTitle,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     color: incidentsInk,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -689,8 +659,6 @@ class _ActiveVillageSheet extends StatelessWidget {
                 child: Text(
                   localize.villageSheetBody,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     color: incidentsMuted,
                     fontSize: 12,
                     height: 1.45,
@@ -761,8 +729,6 @@ class _VillageRow extends StatelessWidget {
                 child: Text(
                   name,
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
                     color: incidentsInk,
@@ -831,8 +797,7 @@ class _QrLoginDialogState extends State<_QrLoginDialog> {
           as RenderRepaintBoundary?;
       if (boundary == null) throw Exception('capture boundary missing');
       final image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) throw Exception('encode failed');
       await Gal.putImageBytes(
         byteData.buffer.asUint8List(),
@@ -848,8 +813,6 @@ class _QrLoginDialogState extends State<_QrLoginDialog> {
           content: Text(
             localize.qrSaveSuccess,
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -866,8 +829,6 @@ class _QrLoginDialogState extends State<_QrLoginDialog> {
           content: Text(
             localize.qrSaveFailed,
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -905,8 +866,6 @@ class _QrLoginDialogState extends State<_QrLoginDialog> {
                     Text(
                       localize.qrDialogEyebrow.toUpperCase(),
                       style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
                         fontSize: 10.5,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.5,
@@ -917,8 +876,6 @@ class _QrLoginDialogState extends State<_QrLoginDialog> {
                     Text(
                       localize.qrDialogTitle,
                       style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: incidentsInk,
@@ -929,8 +886,6 @@ class _QrLoginDialogState extends State<_QrLoginDialog> {
                     Text(
                       localize.qrDialogBody,
                       style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
                         fontSize: 12.5,
                         color: incidentsMuted,
                         height: 1.5,
@@ -969,8 +924,6 @@ class _QrLoginDialogState extends State<_QrLoginDialog> {
                           Text(
                             localize.qrKeepPrivate,
                             style: const TextStyle(
-                              fontFamily: incidentsFontFamily,
-                              fontFamilyFallback: incidentsFontFamilyFallback,
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                               color: incidentsTealDark,
@@ -1003,8 +956,6 @@ class _QrLoginDialogState extends State<_QrLoginDialog> {
                     label: Text(
                       localize.qrSaveToGallery.toUpperCase(),
                       style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
                         fontSize: 12.5,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.2,
@@ -1077,8 +1028,6 @@ class _QrPanel extends StatelessWidget {
               Text(
                 localize.qrLoading.toUpperCase(),
                 style: const TextStyle(
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.4,
@@ -1122,22 +1071,20 @@ class _QrPanel extends StatelessWidget {
                 backgroundColor: Colors.white,
               ),
             ),
-          if (caption.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              caption,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600,
-                color: incidentsMuted,
-                letterSpacing: 0.3,
+            if (caption.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                caption,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  color: incidentsMuted,
+                  letterSpacing: 0.3,
+                ),
               ),
-            ),
-          ],
+            ],
           ],
         ),
       ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 
-const double _cardRadius = 12;
+const double _cardRadius = 16;
 
 class ProfileSectionCard extends StatelessWidget {
   final String? eyebrow;
@@ -34,8 +35,6 @@ class ProfileSectionCard extends StatelessWidget {
                     child: Text(
                       eyebrow!.toUpperCase(),
                       style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
                         fontSize: 10.5,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.5,
@@ -47,14 +46,10 @@ class ProfileSectionCard extends StatelessWidget {
                 ],
               ),
             ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(_cardRadius),
-              border: Border.all(color: incidentsHair, width: 1),
-            ),
+          OhtkCard(
+            padding: EdgeInsets.zero,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(_cardRadius),
+              borderRadius: OhtkRadius.card,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: children,
@@ -98,11 +93,9 @@ class ProfileDataRow extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 11.5,
               fontWeight: FontWeight.w500,
-              color: incidentsMuted,
+              color: OhtkColor.teal700,
               height: 1.2,
             ),
           ),
@@ -110,8 +103,6 @@ class ProfileDataRow extends StatelessWidget {
           Text(
             hasValue ? value! : emptyValueText,
             style: TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 14.5,
               fontWeight: hasValue ? FontWeight.w600 : FontWeight.w500,
               fontStyle: hasValue ? FontStyle.normal : FontStyle.italic,
@@ -175,8 +166,6 @@ class ProfileActionRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
                     color: fg,
@@ -193,8 +182,6 @@ class ProfileActionRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: incidentsMuted,
@@ -242,37 +229,24 @@ class ProfileSignOutRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: margin,
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(_cardRadius),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(_cardRadius),
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(_cardRadius),
-              border: Border.all(color: incidentsHair, width: 1),
-            ),
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: Row(
-              children: [
-                Icon(icon, size: 18, color: incidentsErrorRed),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w600,
-                      color: incidentsErrorRed,
-                    ),
-                  ),
+      child: OhtkCard(
+        onTap: onTap,
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: incidentsErrorRed),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w600,
+                  color: incidentsErrorRed,
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -324,8 +298,6 @@ class ProfileDashedPrompt extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
                         color: incidentsInk,
@@ -336,8 +308,6 @@ class ProfileDashedPrompt extends StatelessWidget {
                     Text(
                       body,
                       style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
                         fontSize: 12.5,
                         fontWeight: FontWeight.w500,
                         color: incidentsBody,
@@ -401,8 +371,6 @@ class ProfileTextField extends StatelessWidget {
             TextSpan(
               text: label,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
                 color: incidentsInk,
@@ -452,8 +420,6 @@ class ProfileTextField extends StatelessWidget {
             keyboardType: keyboardType,
             maxLines: obscureText ? 1 : maxLines,
             style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
               fontSize: 15,
               fontWeight: FontWeight.w500,
               color: incidentsInk,
@@ -486,8 +452,6 @@ class ProfileTextField extends StatelessWidget {
             child: Text(
               helper!,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 11.5,
                 fontWeight: FontWeight.w500,
                 color: incidentsMuted,
@@ -521,8 +485,6 @@ class _InlineErrorPill extends StatelessWidget {
             child: Text(
               message,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: incidentsErrorRed,

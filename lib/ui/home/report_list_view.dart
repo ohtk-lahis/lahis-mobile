@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/incident_report.dart';
 import 'package:podd_app/router.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 
 import 'all_reports_view_model.dart';
@@ -42,10 +43,15 @@ class ReportListView<T extends BaseReportViewModel> extends StatelessWidget {
 
     return ListView(
       key: key,
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 90),
+      padding: const EdgeInsets.fromLTRB(
+        OhtkLayout.pagePad,
+        OhtkSpace.lg,
+        OhtkLayout.pagePad,
+        96,
+      ),
       children: [
         for (int i = 0; i < children.length; i++) ...[
-          if (i > 0) const SizedBox(height: 10),
+          if (i > 0) const SizedBox(height: OhtkLayout.rowGap),
           children[i],
         ],
       ],
@@ -53,7 +59,8 @@ class ReportListView<T extends BaseReportViewModel> extends StatelessWidget {
   }
 
   String? _resolveImagePath(T vm, IncidentReport report) {
-    final image = (report.images?.isNotEmpty ?? false) ? report.images!.first : null;
+    final image =
+        (report.images?.isNotEmpty ?? false) ? report.images!.first : null;
     if (image == null) return null;
     return vm.resolveImagePath(image.thumbnailPath);
   }
@@ -112,18 +119,8 @@ class _SectionEyebrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-      child: Text(
-        label.toUpperCase(),
-        style: const TextStyle(
-          fontFamily: incidentsFontFamily,
-          fontFamilyFallback: incidentsFontFamilyFallback,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.5,
-          color: incidentsMuted,
-        ),
-      ),
+      padding: const EdgeInsets.fromLTRB(4, 4, 4, 6),
+      child: OhtkEyebrow(label: label),
     );
   }
 }
@@ -139,41 +136,23 @@ class _IncidentReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          GoRouter.of(context).goNamed(
-            OhtkRouter.incidentDetail,
-            pathParameters: {'incidentId': report.id},
-          );
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: incidentsHair),
+    return OhtkCard(
+      onTap: () {
+        GoRouter.of(context).goNamed(
+          OhtkRouter.incidentDetail,
+          pathParameters: {'incidentId': report.id},
+        );
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Thumbnail(
+            imagePath: imagePath,
+            fallbackLabel: report.reportTypeName,
           ),
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _Thumbnail(imagePath: imagePath),
-              const SizedBox(width: 12),
-              Expanded(child: _Content(report: report)),
-              const SizedBox(width: 12),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 28),
-                child: Icon(
-                  Icons.chevron_right,
-                  size: 18,
-                  color: incidentsTeal,
-                ),
-              ),
-            ],
-          ),
-        ),
+          const SizedBox(width: OhtkSpace.md),
+          Expanded(child: _Content(report: report)),
+        ],
       ),
     );
   }
@@ -181,55 +160,57 @@ class _IncidentReportCard extends StatelessWidget {
 
 class _Thumbnail extends StatelessWidget {
   final String? imagePath;
+  final String fallbackLabel;
 
-  const _Thumbnail({required this.imagePath});
+  const _Thumbnail({
+    required this.imagePath,
+    required this.fallbackLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
     if (imagePath == null) {
-      return const _HFallbackTile(size: 72);
+      return const _FallbackTile();
     }
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: OhtkRadius.tile,
       child: SizedBox(
-        width: 72,
-        height: 72,
+        width: 56,
+        height: 56,
         child: CachedNetworkImage(
           imageUrl: imagePath!,
           fit: BoxFit.cover,
-          placeholder: (context, url) => Container(color: incidentsHair),
-          errorWidget: (context, url, error) => const _HFallbackTile(size: 72),
+          placeholder: (context, url) => Container(color: OhtkColor.teal100),
+          errorWidget: (context, url, error) => const _FallbackTile(),
         ),
       ),
     );
   }
 }
 
-class _HFallbackTile extends StatelessWidget {
-  final double size;
-
-  const _HFallbackTile({required this.size});
+class _FallbackTile extends StatelessWidget {
+  const _FallbackTile();
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: size,
-      height: size,
+      width: 56,
+      height: 56,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: OhtkRadius.tile,
         child: CustomPaint(
-          painter: _HFallbackPainter(),
-          size: Size(size, size),
+          painter: _FallbackPainter(),
+          size: const Size(56, 56),
         ),
       ),
     );
   }
 }
 
-class _HFallbackPainter extends CustomPainter {
+class _FallbackPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final bgPaint = Paint()..color = incidentsFallbackTile;
+    final bgPaint = Paint()..color = OhtkColor.teal100;
     canvas.drawRect(Offset.zero & size, bgPaint);
 
     final glyphSide = size.width * 0.55;
@@ -239,15 +220,27 @@ class _HFallbackPainter extends CustomPainter {
     );
     final scale = glyphSide / 60.0;
 
-    final darkStem = Paint()..color = incidentsFallbackStemDark;
-    final lightStem = Paint()..color = incidentsFallbackStemLight;
+    final darkStem = Paint()..color = const Color(0xFFB9D6DD);
+    final lightStem = Paint()..color = const Color(0xFFCFE2E8);
 
-    final left = Rect.fromLTWH(origin.dx + 8 * scale, origin.dy + 6 * scale,
-        12 * scale, 48 * scale);
-    final right = Rect.fromLTWH(origin.dx + 26 * scale, origin.dy + 12 * scale,
-        12 * scale, 42 * scale);
-    final bar = Rect.fromLTWH(origin.dx + 20 * scale, origin.dy + 26 * scale,
-        6 * scale, 10 * scale);
+    final left = Rect.fromLTWH(
+      origin.dx + 8 * scale,
+      origin.dy + 6 * scale,
+      12 * scale,
+      48 * scale,
+    );
+    final right = Rect.fromLTWH(
+      origin.dx + 26 * scale,
+      origin.dy + 12 * scale,
+      12 * scale,
+      42 * scale,
+    );
+    final bar = Rect.fromLTWH(
+      origin.dx + 20 * scale,
+      origin.dy + 26 * scale,
+      6 * scale,
+      10 * scale,
+    );
 
     canvas.drawRect(left, darkStem);
     canvas.drawRect(right, lightStem);
@@ -279,12 +272,11 @@ class _Content extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontFamily: incidentsFontFamily,
-                  fontFamilyFallback: incidentsFontFamilyFallback,
-                  fontSize: 15,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: -0.1,
-                  color: incidentsTeal,
+                  letterSpacing: 0,
+                  color: incidentsInk,
+                  height: 1.25,
                 ),
               ),
             ),
@@ -292,9 +284,8 @@ class _Content extends StatelessWidget {
             Text(
               _timestampFormatter.format(report.createdAt.toLocal()),
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
-                fontSize: 11,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
                 color: incidentsMuted,
               ),
             ),
@@ -308,9 +299,7 @@ class _Content extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
-            fontSize: 12,
+            fontSize: 15,
             height: 1.45,
             color: incidentsBody,
           ),
@@ -330,16 +319,14 @@ class _CasePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: incidentsCasePillBg,
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: OhtkRadius.chip,
       ),
       child: Text(
         (AppLocalizations.of(context)?.caseTag ?? 'Case').toUpperCase(),
         style: const TextStyle(
-          fontFamily: incidentsFontFamily,
-          fontFamilyFallback: incidentsFontFamilyFallback,
           fontSize: 10,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.4,
@@ -377,8 +364,6 @@ class _EmptyState extends StatelessWidget {
           localize.noReportsTitle,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: incidentsInk,
@@ -389,8 +374,6 @@ class _EmptyState extends StatelessWidget {
           localize.noReportsHelper,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
             fontSize: 13,
             height: 1.5,
             color: incidentsMuted,

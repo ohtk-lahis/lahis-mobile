@@ -5,6 +5,7 @@ import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/consent_view.dart';
 import 'package:podd_app/ui/home/home_view_model.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
@@ -43,8 +44,6 @@ class HomeView extends HookWidget {
               'You have a new message',
               style: TextStyle(
                 color: Colors.white,
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -58,8 +57,6 @@ class HomeView extends HookWidget {
                   'VIEW',
                   style: TextStyle(
                     color: Colors.white,
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1,
                   ),
@@ -109,7 +106,7 @@ class HomeView extends HookWidget {
         });
       },
       builder: (context, viewModel, _) {
-        const appBarContentHeight = 60.0; // 12 top + 36 bell + 12 bottom
+        const appBarContentHeight = OhtkLayout.headerH;
         final topInset = MediaQuery.of(context).padding.top;
         final resubmitExtra = viewModel.numberOfPendingSubmissions > 0
             ? kToolbarHeight * .6
@@ -143,18 +140,22 @@ class _IncidentsAppBar extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     return Container(
       color: incidentsTealDeep,
-      padding: EdgeInsets.fromLTRB(14, 12 + mediaQuery.padding.top, 14, 12),
+      padding: EdgeInsets.fromLTRB(
+        OhtkLayout.pagePad,
+        mediaQuery.padding.top,
+        OhtkLayout.pagePad,
+        0,
+      ),
+      height: mediaQuery.padding.top + OhtkLayout.headerH,
       child: Row(
         children: [
           Expanded(
             child: Text(
               AppLocalizations.of(context)?.appName ?? 'OHTK Mobile',
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
+                letterSpacing: 0,
                 color: Colors.white,
               ),
             ),
@@ -265,14 +266,14 @@ class _IncidentsBottomNav extends StatelessWidget {
 
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: incidentsHair)),
+        color: OhtkColor.paper,
+        border: Border(top: BorderSide(color: OhtkColor.line)),
       ),
       padding: EdgeInsets.only(
-        top: 6,
+        top: 5,
         left: 4,
         right: 4,
-        bottom: 8 + MediaQuery.of(context).padding.bottom,
+        bottom: 7 + MediaQuery.of(context).padding.bottom,
       ),
       child: Row(
         children: [
@@ -315,7 +316,7 @@ class _NavTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? incidentsTeal : incidentsNavInactive;
+    final color = selected ? OhtkColor.teal700 : OhtkColor.ink400;
     return InkResponse(
       onTap: onTap,
       child: Padding(
@@ -339,9 +340,7 @@ class _NavTab extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 color: color,
               ),

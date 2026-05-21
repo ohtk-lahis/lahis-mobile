@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:podd_app/models/census_definition.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/census/census_view_model.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:stacked/stacked.dart';
@@ -115,8 +116,6 @@ class CensusView extends StatelessWidget {
                             ? 'No census has been submitted yet. Enter the current values for each row.'
                             : 'Update anything that has changed. Numbers from the last submission are pre-filled.',
                         style: const TextStyle(
-                          fontFamily: incidentsFontFamily,
-                          fontFamilyFallback: incidentsFontFamilyFallback,
                           fontSize: 13,
                           height: 1.45,
                           color: incidentsBody,
@@ -127,8 +126,6 @@ class CensusView extends StatelessWidget {
                         const Text(
                           'No active census rows are configured.',
                           style: TextStyle(
-                            fontFamily: incidentsFontFamily,
-                            fontFamilyFallback: incidentsFontFamilyFallback,
                             color: incidentsBody,
                           ),
                         )
@@ -195,8 +192,6 @@ class _CensusFormScaffold extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
             fontSize: 17,
             fontWeight: FontWeight.w700,
           ),
@@ -254,8 +249,6 @@ class _CensusHub extends StatelessWidget {
                       ? 'Choose to keep this census up to date.'
                       : 'Choose a census to update. Each one is saved separately.',
                   style: const TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
                     fontSize: 13,
                     height: 1.45,
                     color: incidentsBody,
@@ -295,71 +288,45 @@ class _CensusKindCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: incidentsHair),
+      child: OhtkCard(
+        onTap: onTap,
+        child: Row(
+          children: [
+            OhtkIconTile(
+              size: 44,
+              icon: summary.kind == 'HUMAN'
+                  ? Icons.groups_outlined
+                  : Icons.pets_outlined,
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: incidentsTeal.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(11),
+            const SizedBox(width: OhtkSpace.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    summary.displayName,
+                    style: OhtkType.h3.copyWith(
+                    ),
                   ),
-                  child: Icon(
-                    summary.kind == 'HUMAN'
-                        ? Icons.groups_outlined
-                        : Icons.pets_outlined,
-                    color: incidentsTeal,
-                    size: 20,
+                  const SizedBox(height: 7),
+                  OhtkChip(
+                    icon: summary.latestSnapshot != null
+                        ? Icons.access_time_rounded
+                        : Icons.edit_outlined,
+                    label: summary.latestSnapshot != null
+                        ? 'Last updated ${_dateOnly(summary.latestSnapshot!.censusDate)}'
+                        : 'Never submitted',
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        summary.displayName,
-                        style: const TextStyle(
-                          fontFamily: incidentsFontFamily,
-                          fontFamilyFallback: incidentsFontFamilyFallback,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: incidentsInk,
-                        ),
-                      ),
-                      const SizedBox(height: 7),
-                      _FreshnessChip(
-                        icon: summary.latestSnapshot != null
-                            ? Icons.access_time_rounded
-                            : Icons.edit_outlined,
-                        text: summary.latestSnapshot != null
-                            ? 'Last updated ${_dateOnly(summary.latestSnapshot!.censusDate)}'
-                            : 'Never submitted',
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: incidentsTeal,
-                  size: 28,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            const SizedBox(width: 10),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: incidentsTeal,
+              size: 28,
+            ),
+          ],
         ),
       ),
     );
@@ -389,55 +356,34 @@ class _VillageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final village = viewModel.selectedVillage;
     final freshness = viewModel.freshnessLabel;
-    return Container(
-      width: double.infinity,
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
+    return OhtkCard(
+      margin: const EdgeInsets.fromLTRB(
+        OhtkLayout.pagePad,
+        OhtkSpace.md,
+        OhtkLayout.pagePad,
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: incidentsTeal.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(11),
-                ),
-                child: const Icon(
-                  Icons.holiday_village_outlined,
-                  color: incidentsTeal,
-                  size: 20,
-                ),
+              const OhtkIconTile(
+                size: 48,
+                icon: Icons.holiday_village_outlined,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: OhtkSpace.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'UPDATING VILLAGE',
-                      style: TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.5,
-                        color: incidentsMuted,
-                      ),
-                    ),
+                    const OhtkEyebrow(label: 'UPDATING VILLAGE'),
                     const SizedBox(height: 2),
                     Text(
                       village?.displayName ?? 'No village',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: incidentsFontFamily,
-                        fontFamilyFallback: incidentsFontFamilyFallback,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: incidentsInk,
+                      style: OhtkType.h3.copyWith(
                       ),
                     ),
                   ],
@@ -447,50 +393,15 @@ class _VillageHeader extends StatelessWidget {
           ),
           if (showFreshness) ...[
             const SizedBox(height: 12),
-            _FreshnessChip(
+            OhtkChip(
               icon: freshness == null
                   ? Icons.edit_outlined
                   : Icons.access_time_rounded,
-              text: freshness == null
+              label: freshness == null
                   ? 'No census submitted yet'
                   : 'Last updated $freshness',
             ),
           ],
-        ],
-      ),
-    );
-  }
-}
-
-class _FreshnessChip extends StatelessWidget {
-  final IconData icon;
-  final String text;
-
-  const _FreshnessChip({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: incidentsTeal.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: incidentsTeal, size: 14),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
-              fontSize: 11.5,
-              fontWeight: FontWeight.w600,
-              color: incidentsTeal,
-            ),
-          ),
         ],
       ),
     );
@@ -522,8 +433,6 @@ class _CensusRowSection extends StatelessWidget {
                   child: Text(
                     row.label,
                     style: const TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: incidentsInk,
@@ -534,8 +443,6 @@ class _CensusRowSection extends StatelessWidget {
                   const Text(
                     'EDITED',
                     style: TextStyle(
-                      fontFamily: incidentsFontFamily,
-                      fontFamilyFallback: incidentsFontFamilyFallback,
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1,
@@ -546,21 +453,18 @@ class _CensusRowSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: dirty ? incidentsTeal : incidentsHair),
-              boxShadow: dirty
-                  ? [
-                      BoxShadow(
-                        color: incidentsTeal.withValues(alpha: 0.10),
-                        spreadRadius: 3,
-                        blurRadius: 0,
-                      )
-                    ]
-                  : null,
-            ),
+          OhtkCard(
+            padding: EdgeInsets.zero,
+            borderColor: dirty ? incidentsTeal : incidentsHair,
+            boxShadow: dirty
+                ? [
+                    BoxShadow(
+                      color: incidentsTeal.withValues(alpha: 0.10),
+                      spreadRadius: 3,
+                      blurRadius: 0,
+                    )
+                  ]
+                : null,
             child: Column(
               children: [
                 for (var i = 0; i < viewModel.measures.length; i++)
@@ -608,8 +512,6 @@ class _MeasureInputRow extends StatelessWidget {
             child: Text(
               label,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 13,
                 height: 1.2,
                 fontWeight: FontWeight.w500,
@@ -634,8 +536,6 @@ class _MeasureInputRow extends StatelessWidget {
               onChanged: (value) =>
                   viewModel.setMeasureValue(row.rowKey, measure.key, value),
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: incidentsInk,
@@ -680,44 +580,19 @@ class _StickyFooter extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: incidentsHair)),
+        border: Border(top: BorderSide(color: OhtkColor.line)),
+        boxShadow: OhtkShadow.sticky,
       ),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 18),
-      child: SizedBox(
-        width: double.infinity,
-        height: 50,
-        child: ElevatedButton(
-          onPressed: viewModel.busy('submit') || !viewModel.canSubmit
-              ? null
-              : () => viewModel.submit(),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: incidentsTeal,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: incidentsHair,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(999),
-            ),
-          ),
-          child: viewModel.busy('submit')
-              ? const SizedBox(
-                  height: 18,
-                  width: 18,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2.5,
-                  ),
-                )
-              : const Text(
-                  'SAVE CURRENT CENSUS',
-                  style: TextStyle(
-                    fontFamily: incidentsFontFamily,
-                    fontFamilyFallback: incidentsFontFamilyFallback,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-        ),
+      padding: const EdgeInsets.fromLTRB(
+        OhtkLayout.pagePad,
+        OhtkSpace.sm,
+        OhtkLayout.pagePad,
+        18,
+      ),
+      child: OhtkPrimaryButton(
+        label: 'Save current census',
+        loading: viewModel.busy('submit'),
+        onPressed: viewModel.canSubmit ? () => viewModel.submit() : null,
       ),
     );
   }
@@ -763,8 +638,6 @@ class _NoticeBanner extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 13,
                 height: 1.35,
                 fontWeight: FontWeight.w600,
@@ -819,8 +692,6 @@ class _FullState extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: incidentsInk,
@@ -831,8 +702,6 @@ class _FullState extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 13.5,
                 height: 1.55,
                 color: incidentsMuted,

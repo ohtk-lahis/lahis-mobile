@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/router.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/all_reports_view.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/home/my_reports_view.dart';
@@ -48,21 +49,15 @@ class ReportHomeView extends HookWidget {
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(right: 2, bottom: 16),
           child: SizedBox(
-            width: 56,
-            height: 56,
+            width: 64,
+            height: 64,
             child: DecoratedBox(
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x38000000),
-                    offset: Offset(0, 6),
-                    blurRadius: 18,
-                  ),
-                ],
+                boxShadow: OhtkShadow.raised,
               ),
               child: FloatingActionButton(
-                backgroundColor: incidentsFabGreen,
+                backgroundColor: OhtkColor.teal700,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 highlightElevation: 0,
@@ -102,10 +97,10 @@ class _TabsStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: incidentsHair)),
+        color: OhtkColor.paper,
+        border: Border(bottom: BorderSide(color: OhtkColor.line)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: OhtkLayout.pagePad),
       child: Row(
         children: [
           for (int i = 0; i < labels.length; i++)
@@ -142,8 +137,8 @@ class _TabButton extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: selected ? incidentsTeal : Colors.transparent,
-              width: 2.5,
+              color: selected ? OhtkColor.teal700 : Colors.transparent,
+              width: 2,
             ),
           ),
         ),
@@ -151,12 +146,10 @@ class _TabButton extends StatelessWidget {
           label.toUpperCase(),
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontFamily: incidentsFontFamily,
-            fontFamilyFallback: incidentsFontFamilyFallback,
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            letterSpacing: 0.3,
-            color: selected ? incidentsTeal : incidentsMuted,
+            letterSpacing: 1.1,
+            color: selected ? OhtkColor.teal700 : OhtkColor.ink500,
           ),
         ),
       ),
