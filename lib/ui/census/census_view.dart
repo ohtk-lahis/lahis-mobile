@@ -71,6 +71,22 @@ class CensusView extends StatelessWidget {
           return _CensusHub(viewModel: viewModel);
         }
 
+        if (viewModel.definitionInactive) {
+          return _CensusFormScaffold(
+            title: viewModel.activeKindName,
+            body: _FullState(
+              icon: Icons.pause_circle_outline,
+              iconColor: Color(0xFFA07015),
+              iconBackground: Color(0x1AA07015),
+              title: localize.censusInactiveTitle,
+              message: localize.censusInactiveMessage,
+              actionLabel: localize.backButton,
+              actionIcon: Icons.arrow_back_rounded,
+              onAction: () => _goBackToCensusHub(context),
+            ),
+          );
+        }
+
         if (viewModel.unsupportedSchema) {
           return _CensusFormScaffold(
             title: viewModel.activeKindName,
@@ -222,13 +238,7 @@ class _CensusFormScaffold extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/census');
-            }
-          },
+          onPressed: () => _goBackToCensusHub(context),
         ),
         title: Text(
           title,
@@ -247,6 +257,14 @@ class _CensusFormScaffold extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+void _goBackToCensusHub(BuildContext context) {
+  if (context.canPop()) {
+    context.pop();
+  } else {
+    context.go('/census');
   }
 }
 
@@ -293,9 +311,7 @@ class _CensusHub extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  viewModel.censusKinds.length == 1
-                      ? AppLocalizations.of(context)!.censusHubHelperSingle
-                      : AppLocalizations.of(context)!.censusHubHelperMulti,
+                  AppLocalizations.of(context)!.censusHubHelperMulti,
                   style: const TextStyle(
                     fontSize: 13,
                     height: 1.45,
@@ -842,6 +858,7 @@ class _FullState extends StatelessWidget {
   final String title;
   final String message;
   final String? actionLabel;
+  final IconData actionIcon;
   final VoidCallback? onAction;
 
   const _FullState({
@@ -851,6 +868,7 @@ class _FullState extends StatelessWidget {
     this.iconColor = incidentsErrorRed,
     this.iconBackground = incidentsErrorTint,
     this.actionLabel,
+    this.actionIcon = Icons.refresh,
     this.onAction,
   });
 
@@ -895,7 +913,7 @@ class _FullState extends StatelessWidget {
               const SizedBox(height: 22),
               ElevatedButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.refresh, size: 15),
+                icon: Icon(actionIcon, size: 15),
                 label: Text(actionLabel!.toUpperCase()),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: incidentsTeal,

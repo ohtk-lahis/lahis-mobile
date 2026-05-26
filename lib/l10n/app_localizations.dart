@@ -1740,6 +1740,18 @@ abstract class AppLocalizations {
   /// **'This account is not assigned to update a village census.'**
   String get censusUnavailableMessage;
 
+  /// No description provided for @censusInactiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This census is inactive'**
+  String get censusInactiveTitle;
+
+  /// No description provided for @censusInactiveMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This census form is currently turned off by your coordinator. Go back to choose an available census.'**
+  String get censusInactiveMessage;
+
   /// No description provided for @censusLoadFailedTitle.
   ///
   /// In en, this message translates to:

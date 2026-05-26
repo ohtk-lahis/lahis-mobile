@@ -901,6 +901,13 @@ class AppLocalizationsLo extends AppLocalizations {
       'ບັນຊີນີ້ບໍ່ໄດ້ຖືກມອບໝາຍໃຫ້ອັບເດດສຳມະໂນຂອງບ້ານ.';
 
   @override
+  String get censusInactiveTitle => 'ສຳມະໂນນີ້ຖືກປິດໃຊ້ງານ';
+
+  @override
+  String get censusInactiveMessage =>
+      'ຜູ້ປະສານງານໄດ້ປິດແບບຟອມສຳມະໂນນີ້ໄວ້ໃນຕອນນີ້. ກັບຄືນເພື່ອເລືອກສຳມະໂນທີ່ຍັງເປີດໃຊ້ງານ.';
+
+  @override
   String get censusLoadFailedTitle => 'ໂຫຼດສຳມະໂນບໍ່ສຳເລັດ';
 
   @override

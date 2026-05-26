@@ -547,6 +547,39 @@ void main() {
       expect(result, isA<CensusDefinitionChanged>());
     });
 
+    test('submitVillageCensusSnapshotV2 classifies disabled definition',
+        () async {
+      final link = QueueLink([
+        {
+          '__typename': 'Mutation',
+          'submitVillageCensusSnapshotV2': {
+            '__typename': 'SubmitVillageCensusSnapshotV2Mutation',
+            'result': {
+              '__typename': 'VillageCensusSnapshotProblem',
+              'message': null,
+              'fields': [
+                {
+                  '__typename': 'AdminFieldValidationProblem',
+                  'name': 'definition_version_id',
+                  'message': 'DEFINITION_DISABLED',
+                }
+              ],
+            }
+          }
+        }
+      ]);
+      final api = censusApiFor(link);
+
+      final result = await api.submitVillageCensusSnapshotV2(
+        villageId: 11,
+        definitionVersionId: 7,
+        censusDate: '2026-05-05',
+        formData: const {'rows': []},
+      );
+
+      expect(result, isA<CensusDefinitionChanged>());
+    });
+
     test('submitVillageCensusSnapshotV2 reports unsupported legacy server',
         () async {
       final link = QueueLink([

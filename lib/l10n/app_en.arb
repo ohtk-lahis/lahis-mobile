@@ -409,6 +409,8 @@
   "censusGenericTitle": "Census",
   "censusUnavailableTitle": "Census is not available",
   "censusUnavailableMessage": "This account is not assigned to update a village census.",
+  "censusInactiveTitle": "This census is inactive",
+  "censusInactiveMessage": "This census form is currently turned off by your coordinator. Go back to choose an available census.",
   "censusLoadFailedTitle": "Couldn't load the census",
   "censusUnsupportedTitle": "This census needs a newer app",
   "censusUnsupportedMessage": "The village census has been updated and isn't supported on this version of OHTK Mobile. Please update the app, then try again.",

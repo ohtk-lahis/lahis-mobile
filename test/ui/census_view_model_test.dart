@@ -127,6 +127,49 @@ void main() {
     );
   });
 
+  test('direct inactive human census route does not show unsupported schema',
+      () async {
+    censusService.activeDefinition = null;
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+
+    expect(viewModel.definitionInactive, isTrue);
+    expect(viewModel.unsupportedSchema, isFalse);
+    expect(viewModel.hasRows, isFalse);
+    expect(viewModel.canSubmit, isFalse);
+  });
+
+  test('census tab stays on hub when only one census is active', () async {
+    censusService.activeKinds = [
+      CensusKindSummary(
+        kind: 'ANIMAL',
+        name: 'Animal census',
+        enabled: true,
+        activeVersion: humanDefinition(
+          id: 1,
+          version: 1,
+          rows: const [
+            CensusSchemaRow(
+              rowKey: 'species:1',
+              label: 'Cattle',
+              speciesId: 1,
+            ),
+          ],
+        ),
+      ),
+    ];
+
+    final viewModel = CensusViewModel();
+    await flushAsync();
+
+    expect(viewModel.isHubMode, isTrue);
+    expect(viewModel.censusKinds, hasLength(1));
+    expect(viewModel.censusKinds.single.kind, 'ANIMAL');
+    expect(viewModel.hasRows, isFalse);
+    expect(viewModel.activeDefinition, isNull);
+  });
+
   test('reload clears incompatible values after definition shape changes',
       () async {
     censusService.activeDefinition = humanDefinition(
@@ -531,6 +574,7 @@ class FeatureCapabilityServiceMock extends IFeatureCapabilityService {
 class CensusServiceMock implements ICensusService {
   CensusDefinitionVersion? activeDefinition;
   VillageCensusSnapshot? latestV2;
+  List<CensusKindSummary> activeKinds = const [];
   bool throwActiveDefinitionError = false;
   final drafts = <String, VillageCensusDraft>{};
   VillageCensusSubmitResult submitResult = VillageCensusSubmitSuccess(
@@ -574,7 +618,7 @@ class CensusServiceMock implements ICensusService {
   Future<List<CensusKindSummary>> getActiveVillageCensusDefinitions(
     int villageId,
   ) async =>
-      const [];
+      activeKinds;
 
   @override
   Future<CensusDefinitionVersion?> getCachedCensusDefinitionVersion({

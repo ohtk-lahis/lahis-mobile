@@ -293,6 +293,8 @@
   "censusGenericTitle": "ສຳມະໂນ",
   "censusUnavailableTitle": "ບໍ່ສາມາດໃຊ້ສຳມະໂນໄດ້",
   "censusUnavailableMessage": "ບັນຊີນີ້ບໍ່ໄດ້ຖືກມອບໝາຍໃຫ້ອັບເດດສຳມະໂນຂອງບ້ານ.",
+  "censusInactiveTitle": "ສຳມະໂນນີ້ຖືກປິດໃຊ້ງານ",
+  "censusInactiveMessage": "ຜູ້ປະສານງານໄດ້ປິດແບບຟອມສຳມະໂນນີ້ໄວ້ໃນຕອນນີ້. ກັບຄືນເພື່ອເລືອກສຳມະໂນທີ່ຍັງເປີດໃຊ້ງານ.",
   "censusLoadFailedTitle": "ໂຫຼດສຳມະໂນບໍ່ສຳເລັດ",
   "censusUnsupportedTitle": "ສຳມະໂນນີ້ຕ້ອງໃຊ້ແອັບເວີຊັນໃໝ່ກວ່າ",
   "censusUnsupportedMessage": "ສຳມະໂນຂອງບ້ານຖືກອັບເດດແລ້ວ ແລະ OHTK Mobile ເວີຊັນນີ້ບໍ່ຮອງຮັບ. ກະລຸນາອັບເດດແອັບແລ້ວລອງໃໝ່.",

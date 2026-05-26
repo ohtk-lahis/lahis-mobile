@@ -909,6 +909,13 @@ class AppLocalizationsTh extends AppLocalizations {
       'บัญชีนี้ไม่ได้รับมอบหมายให้อัปเดตสำมะโนของหมู่บ้าน';
 
   @override
+  String get censusInactiveTitle => 'This census is inactive';
+
+  @override
+  String get censusInactiveMessage =>
+      'This census form is currently turned off by your coordinator. Go back to choose an available census.';
+
+  @override
   String get censusLoadFailedTitle => 'โหลดสำมะโนไม่สำเร็จ';
 
   @override

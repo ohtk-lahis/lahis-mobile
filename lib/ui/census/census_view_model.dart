@@ -33,6 +33,7 @@ class CensusViewModel extends BaseViewModel {
   String? message;
   bool usingCachedDefinition = false;
   bool unsupportedSchema = false;
+  bool definitionInactive = false;
   bool definitionChanged = false;
   bool latestSnapshotUsesOlderDefinition = false;
   bool latestSnapshotPrefilledAnyValue = false;
@@ -61,7 +62,11 @@ class CensusViewModel extends BaseViewModel {
 
   bool get hasRows => rows.isNotEmpty;
 
-  bool get canSubmit => hasRows && !unsupportedSchema && !definitionChanged;
+  bool get canSubmit =>
+      hasRows &&
+      !unsupportedSchema &&
+      !definitionInactive &&
+      !definitionChanged;
 
   bool get isHubMode => activeKind == null;
 
@@ -215,6 +220,13 @@ class CensusViewModel extends BaseViewModel {
       );
       return null;
     }
+    if (definitionInactive) {
+      setErrorForObject(
+        'submit',
+        localize.censusInactiveMessage,
+      );
+      return null;
+    }
 
     final formData = _buildFormData();
     if (formData == null) {
@@ -359,12 +371,7 @@ class CensusViewModel extends BaseViewModel {
   Future<void> _loadHubOrSingleForm() async {
     censusKinds = await censusService
         .getActiveVillageCensusDefinitions(selectedVillage!.id);
-    if (censusKinds.length == 1) {
-      await _loadFormForKind(censusKinds.single.kind,
-          summary: censusKinds.single);
-    } else {
-      _clearLoadedForm();
-    }
+    _clearLoadedForm();
   }
 
   Future<void> loadKind(String kind) async {
@@ -417,6 +424,7 @@ class CensusViewModel extends BaseViewModel {
     _canSubmitWithLegacyMutation = true;
     usingCachedDefinition = false;
     unsupportedSchema = false;
+    definitionInactive = false;
     latestSnapshotUsesOlderDefinition = false;
     latestSnapshotPrefilledAnyValue = false;
     _clearFormData();
@@ -447,7 +455,7 @@ class CensusViewModel extends BaseViewModel {
       species = await censusService.fetchActiveSpecies();
       _useLegacySpeciesRows(species);
     } else if (definition == null) {
-      unsupportedSchema = true;
+      definitionInactive = true;
     } else {
       activeDefinition = definition;
       rows = definition.runtimeSchema.rows;
@@ -812,6 +820,7 @@ class CensusViewModel extends BaseViewModel {
     activeDefinition = null;
     latestCensus = null;
     draft = null;
+    definitionInactive = false;
     species = [];
     rows = [];
     measures = [];

@@ -920,6 +920,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'This account is not assigned to update a village census.';
 
   @override
+  String get censusInactiveTitle => 'This census is inactive';
+
+  @override
+  String get censusInactiveMessage =>
+      'This census form is currently turned off by your coordinator. Go back to choose an available census.';
+
+  @override
   String get censusLoadFailedTitle => 'Couldn\'t load the census';
 
   @override

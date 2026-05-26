@@ -461,7 +461,9 @@ class CensusApi extends GraphQlBaseApi {
     return messages.any(
       (message) =>
           message.contains('census definition version must be published') ||
-          message.contains('DEFINITION_VERSION_RETIRED'),
+          message.contains('DEFINITION_VERSION_RETIRED') ||
+          message.contains('DEFINITION_DISABLED') ||
+          message.contains('census definition is not enabled'),
     );
   }
 
