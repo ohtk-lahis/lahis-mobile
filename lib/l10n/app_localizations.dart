@@ -1689,7 +1689,7 @@ abstract class AppLocalizations {
   /// No description provided for @censusDefinitionChangedMessage.
   ///
   /// In en, this message translates to:
-  /// **'Census form changed. Reload the form and submit again.'**
+  /// **'Census form changed while you were editing. Reload the form to include the latest rows, then submit again.'**
   String get censusDefinitionChangedMessage;
 
   /// No description provided for @censusReloadFormAction.

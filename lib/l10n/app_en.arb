@@ -400,7 +400,7 @@
   "censusOldSnapshotBlankNotice": "Previous submission used an older form. Enter current values for this version.",
   "censusNoPreviousSubmissionInstruction": "No census has been submitted yet. Enter the current values for each row.",
   "censusUpdatePreviousSubmissionInstruction": "Update anything that has changed. Numbers from the last submission are pre-filled.",
-  "censusDefinitionChangedMessage": "Census form changed. Reload the form and submit again.",
+  "censusDefinitionChangedMessage": "Census form changed while you were editing. Reload the form to include the latest rows, then submit again.",
   "censusReloadFormAction": "Reload form",
   "censusFormReloadedMessage": "Census form reloaded.",
   "censusFormReloadedPartialMessage": "Census form reloaded. Some values need to be entered again.",

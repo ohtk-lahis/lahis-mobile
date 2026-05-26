@@ -888,7 +888,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get censusDefinitionChangedMessage =>
-      'Census form changed. Reload the form and submit again.';
+      'Census form changed while you were editing. Reload the form to include the latest rows, then submit again.';
 
   @override
   String get censusReloadFormAction => 'Reload form';

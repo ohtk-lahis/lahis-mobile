@@ -880,7 +880,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get censusDefinitionChangedMessage =>
-      'แบบฟอร์มสำมะโนเปลี่ยนแล้ว โปรดโหลดแบบฟอร์มใหม่แล้วส่งอีกครั้ง';
+      'แบบฟอร์มสำมะโนเปลี่ยนระหว่างที่กำลังกรอก โปรดโหลดแบบฟอร์มใหม่เพื่อให้มีรายการล่าสุด แล้วส่งอีกครั้ง';
 
   @override
   String get censusReloadFormAction => 'โหลดแบบฟอร์มใหม่';

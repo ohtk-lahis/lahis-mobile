@@ -134,6 +134,7 @@ class CensusView extends StatelessWidget {
                     text: viewModel.definitionChangedMessage,
                     actionLabel:
                         AppLocalizations.of(context)!.censusReloadFormAction,
+                    actionIcon: Icons.refresh_rounded,
                     onAction: viewModel.reloadDefinition,
                   ),
                 ),
@@ -558,6 +559,7 @@ class _CensusRowSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dirty = viewModel.isRowDirty(row);
+    final invalid = viewModel.hasRowErrors(row);
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(
@@ -593,16 +595,28 @@ class _CensusRowSection extends StatelessWidget {
           const SizedBox(height: 8),
           OhtkCard(
             padding: EdgeInsets.zero,
-            borderColor: dirty ? incidentsTeal : incidentsHair,
-            boxShadow: dirty
+            borderColor: invalid
+                ? incidentsErrorRed
+                : dirty
+                    ? incidentsTeal
+                    : incidentsHair,
+            boxShadow: invalid
                 ? [
                     BoxShadow(
-                      color: incidentsTeal.withValues(alpha: 0.10),
+                      color: incidentsErrorRed.withValues(alpha: 0.10),
                       spreadRadius: 3,
                       blurRadius: 0,
                     )
                   ]
-                : null,
+                : dirty
+                    ? [
+                        BoxShadow(
+                          color: incidentsTeal.withValues(alpha: 0.10),
+                          spreadRadius: 3,
+                          blurRadius: 0,
+                        )
+                      ]
+                    : null,
             child: Column(
               children: [
                 for (var i = 0; i < viewModel.measures.length; i++)
@@ -637,6 +651,8 @@ class _MeasureInputRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = measure.label.isNotEmpty ? measure.label : measure.key;
+    final errorText = viewModel.measureError(row, measure);
+    final isInvalid = errorText != null && errorText.isNotEmpty;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
@@ -660,54 +676,79 @@ class _MeasureInputRow extends StatelessWidget {
           const SizedBox(width: 12),
           SizedBox(
             width: 100,
-            child: TextFormField(
-              key: ValueKey(
-                '${row.rowKey}:${measure.key}:${viewModel.formValueRevision}',
-              ),
-              initialValue: viewModel.measureValue(row.rowKey, measure.key),
-              focusNode: viewModel.focusNodeFor(row, measure),
-              enabled: !viewModel.busy('submit'),
-              textAlign: TextAlign.right,
-              keyboardType: TextInputType.number,
-              textInputAction: viewModel.textInputActionFor(row, measure),
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              onEditingComplete: () =>
-                  viewModel.completeEditing(context, row, measure),
-              onChanged: (value) =>
-                  viewModel.setMeasureValue(row.rowKey, measure.key, value),
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: incidentsInk,
-              ),
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                filled: viewModel.busy('submit'),
-                fillColor: incidentsSand,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      const BorderSide(color: incidentsHair, width: 1.5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                TextFormField(
+                  key: ValueKey(
+                    '${row.rowKey}:${measure.key}:${viewModel.formValueRevision}',
+                  ),
+                  initialValue: viewModel.measureValue(row.rowKey, measure.key),
+                  focusNode: viewModel.focusNodeFor(row, measure),
+                  enabled: !viewModel.busy('submit'),
+                  textAlign: TextAlign.right,
+                  keyboardType: TextInputType.number,
+                  textInputAction: viewModel.textInputActionFor(row, measure),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onEditingComplete: () =>
+                      viewModel.completeEditing(context, row, measure),
+                  onChanged: (value) =>
+                      viewModel.setMeasureValue(row.rowKey, measure.key, value),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: incidentsInk,
+                  ),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    filled: viewModel.busy('submit') || isInvalid,
+                    fillColor: isInvalid ? Colors.white : incidentsSand,
+                    border: _measureInputBorder(
+                      isInvalid ? incidentsErrorRed : incidentsHair,
+                      1.5,
+                    ),
+                    enabledBorder: _measureInputBorder(
+                      isInvalid ? incidentsErrorRed : incidentsHair,
+                      1.5,
+                    ),
+                    focusedBorder: _measureInputBorder(
+                      isInvalid ? incidentsErrorRed : incidentsTeal,
+                      1.8,
+                    ),
+                    errorBorder: _measureInputBorder(incidentsErrorRed, 1.5),
+                    focusedErrorBorder:
+                        _measureInputBorder(incidentsErrorRed, 1.8),
+                  ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      const BorderSide(color: incidentsHair, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      const BorderSide(color: incidentsTeal, width: 1.5),
-                ),
-              ),
+                if (isInvalid) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    errorText,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                      color: incidentsErrorRed,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
+
+OutlineInputBorder _measureInputBorder(Color color, double width) {
+  return OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: BorderSide(color: color, width: width),
+  );
 }
 
 class _StickyFooter extends StatelessWidget {

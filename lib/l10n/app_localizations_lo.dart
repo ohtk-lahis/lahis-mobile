@@ -872,7 +872,7 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get censusDefinitionChangedMessage =>
-      'ແບບຟອມສຳມະໂນມີການປ່ຽນແປງ. ໂຫຼດແບບຟອມໃໝ່ແລ້ວສົ່ງອີກຄັ້ງ.';
+      'ແບບຟອມສຳມະໂນປ່ຽນລະຫວ່າງທີ່ທ່ານກຳລັງກອກ. ໂຫຼດແບບຟອມໃໝ່ເພື່ອໃຫ້ມີລາຍການຫຼ້າສຸດ ແລ້ວສົ່ງອີກຄັ້ງ.';
 
   @override
   String get censusReloadFormAction => 'ໂຫຼດແບບຟອມໃໝ່';

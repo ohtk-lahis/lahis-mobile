@@ -29,6 +29,7 @@ class CensusViewModel extends BaseViewModel {
   VillageCensusSnapshot? latestCensus;
   VillageCensusDraft? draft;
   final measureValues = <String, Map<String, String>>{};
+  final measureErrors = <String, String>{};
   final _initialMeasureValues = <String, Map<String, String>>{};
   String? message;
   bool usingCachedDefinition = false;
@@ -144,6 +145,7 @@ class CensusViewModel extends BaseViewModel {
   void setMeasureValue(String rowKey, String measureKey, String value) {
     measureValues.putIfAbsent(rowKey, () => {});
     measureValues[rowKey]![measureKey] = value.trim();
+    measureErrors.remove(_inputKeyFor(rowKey, measureKey));
     _clearSubmitError();
     _pendingDraftWrite = _saveDraft();
     unawaited(_pendingDraftWrite!);
@@ -160,6 +162,18 @@ class CensusViewModel extends BaseViewModel {
     return measures.any(
       (measure) => (current[measure.key] ?? '') != (initial[measure.key] ?? ''),
     );
+  }
+
+  bool hasMeasureError(CensusSchemaRow row, CensusSchemaMeasure measure) {
+    return measureErrors.containsKey(_inputKey(row, measure));
+  }
+
+  bool hasRowErrors(CensusSchemaRow row) {
+    return measures.any((measure) => hasMeasureError(row, measure));
+  }
+
+  String? measureError(CensusSchemaRow row, CensusSchemaMeasure measure) {
+    return measureErrors[_inputKey(row, measure)];
   }
 
   FocusNode focusNodeFor(CensusSchemaRow row, CensusSchemaMeasure measure) {
@@ -334,19 +348,23 @@ class CensusViewModel extends BaseViewModel {
 
   Map<String, dynamic>? _buildFormData() {
     final formRows = <Map<String, dynamic>>[];
+    measureErrors.clear();
     for (final row in rows) {
       final measureMap = <String, int>{};
       for (final measure in measures) {
-        final quantity = _parseQuantity(measureValue(row.rowKey, measure.key));
+        final value = measureValue(row.rowKey, measure.key);
+        final quantity = _parseQuantity(value);
         if (quantity == null) {
           final label = measure.label.isNotEmpty ? measure.label : measure.key;
-          setErrorForObject(
-            'submit',
-            localize.censusInvalidNumberError(label),
-          );
-          return null;
+          measureErrors[_inputKey(row, measure)] = value.isEmpty
+              ? localize.validateRequiredMsg
+              : localize.censusInvalidNumberError(label);
+          continue;
         }
         measureMap[measure.key] = quantity;
+      }
+      if (measureMap.length != measures.length) {
+        continue;
       }
 
       final payload = <String, dynamic>{
@@ -365,6 +383,11 @@ class CensusViewModel extends BaseViewModel {
       }
 
       formRows.add(payload);
+    }
+    if (measureErrors.isNotEmpty) {
+      setErrorForObject('submit', null);
+      _focusFirstInvalidMeasure();
+      return null;
     }
     return {'rows': formRows};
   }
@@ -829,6 +852,7 @@ class CensusViewModel extends BaseViewModel {
     latestSnapshotUsesOlderDefinition = false;
     latestSnapshotPrefilledAnyValue = false;
     measureValues.clear();
+    measureErrors.clear();
     _initialMeasureValues.clear();
     _syncInputFocusNodes();
   }
@@ -858,7 +882,24 @@ class CensusViewModel extends BaseViewModel {
   }
 
   String _inputKey(CensusSchemaRow row, CensusSchemaMeasure measure) {
-    return '${row.rowKey}:${measure.key}';
+    return _inputKeyFor(row.rowKey, measure.key);
+  }
+
+  String _inputKeyFor(String rowKey, String measureKey) {
+    return '$rowKey:$measureKey';
+  }
+
+  void _focusFirstInvalidMeasure() {
+    for (final row in rows) {
+      for (final measure in measures) {
+        final key = _inputKey(row, measure);
+        if (!measureErrors.containsKey(key)) {
+          continue;
+        }
+        _inputFocusNodes[key]?.requestFocus();
+        return;
+      }
+    }
   }
 
   String? _nextInputKeyAfter(String key) {

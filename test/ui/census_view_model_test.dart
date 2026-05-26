@@ -127,6 +127,59 @@ void main() {
     );
   });
 
+  test('animal species change submit shows reload state without raw code',
+      () async {
+    censusService.activeDefinition = animalDefinition();
+    censusService.submitResult = CensusDefinitionChanged(
+      const ['ACTIVE_ANIMAL_SPECIES_CHANGED'],
+    );
+
+    final viewModel = CensusViewModel(kind: 'ANIMAL');
+    await flushAsync();
+    viewModel.setMeasureValue('species:1', 'animal_quantity', '10');
+    viewModel.setMeasureValue('species:1', 'household_quantity', '5');
+
+    final result = await viewModel.submit();
+
+    expect(result, isA<CensusDefinitionChanged>());
+    expect(viewModel.definitionChanged, isTrue);
+    expect(viewModel.canSubmit, isFalse);
+    expect(viewModel.hasErrorForKey('submit'), isFalse);
+    expect(viewModel.definitionChangedMessage, isNot(contains('ACTIVE_')));
+    expect(viewModel.definitionChangedMessage, contains('Reload'));
+  });
+
+  test('blank census measures are marked on the matching fields', () async {
+    censusService.activeDefinition = animalDefinition();
+
+    final viewModel = CensusViewModel(kind: 'ANIMAL');
+    await flushAsync();
+    viewModel.setMeasureValue('species:1', 'animal_quantity', '10');
+
+    final result = await viewModel.submit();
+
+    expect(result, isNull);
+    expect(viewModel.hasErrorForKey('submit'), isFalse);
+    expect(
+      viewModel.hasMeasureError(
+        viewModel.rows.single,
+        viewModel.measures.first,
+      ),
+      isFalse,
+    );
+    expect(
+      viewModel.hasMeasureError(
+        viewModel.rows.single,
+        viewModel.measures.last,
+      ),
+      isTrue,
+    );
+    expect(
+      viewModel.measureError(viewModel.rows.single, viewModel.measures.last),
+      'This field is required',
+    );
+  });
+
   test('direct inactive human census route does not show unsupported schema',
       () async {
     censusService.activeDefinition = null;
@@ -476,6 +529,38 @@ CensusDefinitionVersion humanDefinition({
         CensusSchemaMeasure(
           key: 'population',
           label: 'Population',
+          type: 'integer',
+          required: true,
+        ),
+      ],
+    ),
+  );
+}
+
+CensusDefinitionVersion animalDefinition() {
+  return const CensusDefinitionVersion(
+    id: 7,
+    version: 1,
+    status: 'PUBLISHED',
+    runtimeSchema: CensusRuntimeSchema(
+      rows: [
+        CensusSchemaRow(
+          rowKey: 'species:1',
+          label: 'Cattle',
+          speciesId: 1,
+          speciesCode: 'CATTLE',
+        ),
+      ],
+      measures: [
+        CensusSchemaMeasure(
+          key: 'animal_quantity',
+          label: 'Animal quantity',
+          type: 'integer',
+          required: true,
+        ),
+        CensusSchemaMeasure(
+          key: 'household_quantity',
+          label: 'Households',
           type: 'integer',
           required: true,
         ),
