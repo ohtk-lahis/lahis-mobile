@@ -35,11 +35,11 @@ class _DateTimeDropdown extends StatelessWidget {
       if (!field.display) return const SizedBox.shrink();
       return Row(
         children: [
-          Expanded(flex: 1, child: _dayDropdown(field)),
+          Expanded(flex: 2, child: _dayDropdown(field)),
           const SizedBox(width: 6),
-          Expanded(flex: 2, child: _monthDropdown(field, context)),
+          Expanded(flex: 3, child: _monthDropdown(field, context)),
           const SizedBox(width: 6),
-          Expanded(flex: 1, child: _yearDropdown(field)),
+          Expanded(flex: 2, child: _yearDropdown(field)),
           if (field.withTime) ...[
             const SizedBox(width: 6),
             Expanded(child: _hourDropdown(field)),
