@@ -40,6 +40,7 @@ class CensusViewModel extends BaseViewModel {
   bool _canSubmitWithLegacyMutation = true;
   final String? requestedKind;
   String? activeKind;
+  int formValueRevision = 0;
   final Map<String, FocusNode> _inputFocusNodes = {};
   List<String> _visibleInputKeys = const [];
   Future<void>? _pendingDraftWrite;
@@ -700,6 +701,7 @@ class CensusViewModel extends BaseViewModel {
           (entry) => MapEntry(entry.key, Map<String, String>.from(entry.value)),
         ),
       );
+    formValueRevision++;
     message = localize.censusDraftDiscardedMessage;
     notifyListeners();
   }

@@ -138,18 +138,6 @@ class CensusView extends StatelessWidget {
                   ),
                 ),
                 AnimatedNotice(
-                  visible: viewModel.hasDraft,
-                  child: _NoticeBanner(
-                    tone: _NoticeTone.warn,
-                    icon: Icons.save_outlined,
-                    text: viewModel.draftSavedNotice,
-                    actionLabel:
-                        AppLocalizations.of(context)!.censusDiscardDraftAction,
-                    actionIcon: Icons.delete_outline,
-                    onAction: viewModel.discardDraft,
-                  ),
-                ),
-                AnimatedNotice(
                   visible: viewModel.message != null,
                   child: _NoticeBanner(
                     tone: _NoticeTone.ok,
@@ -673,7 +661,9 @@ class _MeasureInputRow extends StatelessWidget {
           SizedBox(
             width: 100,
             child: TextFormField(
-              key: ValueKey('${row.rowKey}:${measure.key}'),
+              key: ValueKey(
+                '${row.rowKey}:${measure.key}:${viewModel.formValueRevision}',
+              ),
               initialValue: viewModel.measureValue(row.rowKey, measure.key),
               focusNode: viewModel.focusNodeFor(row, measure),
               enabled: !viewModel.busy('submit'),
@@ -739,22 +729,87 @@ class _StickyFooter extends StatelessWidget {
         OhtkLayout.pagePad,
         18,
       ),
-      child: OhtkPrimaryButton(
-        label: AppLocalizations.of(context)!.censusSaveCurrentButton,
-        loading: viewModel.busy('submit'),
-        onPressed: viewModel.canSubmit
-            ? () async {
-                final result = await viewModel.submit();
-                if (context.mounted && result is VillageCensusSubmitSuccess) {
-                  await SubmitSuccessOverlay.show(
-                    context,
-                    message:
-                        AppLocalizations.of(context)!.censusSubmittedMessage,
-                  );
-                }
-              }
-            : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (viewModel.hasDraft) ...[
+            _DraftFooterNote(viewModel: viewModel),
+            const SizedBox(height: 10),
+            const Divider(height: 1, thickness: 1, color: OhtkColor.line),
+            const SizedBox(height: 14),
+          ],
+          OhtkPrimaryButton(
+            label: AppLocalizations.of(context)!.censusSaveCurrentButton,
+            loading: viewModel.busy('submit'),
+            onPressed: viewModel.canSubmit
+                ? () async {
+                    final result = await viewModel.submit();
+                    if (context.mounted &&
+                        result is VillageCensusSubmitSuccess) {
+                      await SubmitSuccessOverlay.show(
+                        context,
+                        message: AppLocalizations.of(context)!
+                            .censusSubmittedMessage,
+                      );
+                    }
+                  }
+                : null,
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _DraftFooterNote extends StatelessWidget {
+  final CensusViewModel viewModel;
+
+  const _DraftFooterNote({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(top: 1),
+          child: Icon(
+            Icons.circle,
+            size: 8,
+            color: Color(0xFFA07015),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            viewModel.draftSavedNotice,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              height: 1.3,
+              fontWeight: FontWeight.w600,
+              color: incidentsMuted,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        TextButton(
+          onPressed:
+              viewModel.busy('submit') ? null : () => viewModel.discardDraft(),
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFFA07015),
+            minimumSize: const Size(0, 36),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            textStyle: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          child: Text(localize.censusDiscardDraftAction),
+        ),
+      ],
     );
   }
 }

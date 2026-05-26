@@ -427,6 +427,7 @@ void main() {
     await viewModel.discardDraft();
 
     expect(viewModel.measureValue('total', 'population'), '100');
+    expect(viewModel.formValueRevision, 1);
     expect(viewModel.hasDraft, isFalse);
     expect(viewModel.message, 'Draft discarded.');
   });
