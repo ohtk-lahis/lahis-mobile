@@ -211,6 +211,13 @@ class CensusApi extends GraphQlBaseApi {
           censusDate
           submittedAt
           formData
+          definitionVersion {
+            id
+            version
+            definition {
+              kind
+            }
+          }
           village {
             id
             code
@@ -287,6 +294,14 @@ class CensusApi extends GraphQlBaseApi {
               id
               censusDate
               submittedAt
+              formData
+              definitionVersion {
+                id
+                version
+                definition {
+                  kind
+                }
+              }
               village {
                 id
                 code
@@ -432,10 +447,22 @@ class CensusApi extends GraphQlBaseApi {
         .map((field) => field['message'].toString())
         .toList();
     final message = result?['message']?.toString();
-    return VillageCensusSubmitValidationFailure([
+    final messages = [
       ...fieldMessages,
       if (message != null && message.isNotEmpty) message,
-    ]);
+    ];
+    if (_isDefinitionChanged(messages)) {
+      return CensusDefinitionChanged(messages);
+    }
+    return VillageCensusSubmitValidationFailure(messages);
+  }
+
+  bool _isDefinitionChanged(List<String> messages) {
+    return messages.any(
+      (message) =>
+          message.contains('census definition version must be published') ||
+          message.contains('DEFINITION_VERSION_RETIRED'),
+    );
   }
 
   bool _hasUnsupportedField(OperationException? exception, String fieldName) {

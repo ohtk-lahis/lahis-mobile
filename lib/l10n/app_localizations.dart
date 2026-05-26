@@ -1656,6 +1656,192 @@ abstract class AppLocalizations {
   /// **'Choose to keep this census up to date.'**
   String get censusHubHelperSingle;
 
+  /// No description provided for @censusCachedDefinitionNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline or unable to refresh. Showing cached form version v{version}.'**
+  String censusCachedDefinitionNotice(int version);
+
+  /// No description provided for @censusOldSnapshotMatchingNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous submission used an older form. Matching values are pre-filled.'**
+  String get censusOldSnapshotMatchingNotice;
+
+  /// No description provided for @censusOldSnapshotBlankNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous submission used an older form. Enter current values for this version.'**
+  String get censusOldSnapshotBlankNotice;
+
+  /// No description provided for @censusNoPreviousSubmissionInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'No census has been submitted yet. Enter the current values for each row.'**
+  String get censusNoPreviousSubmissionInstruction;
+
+  /// No description provided for @censusUpdatePreviousSubmissionInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Update anything that has changed. Numbers from the last submission are pre-filled.'**
+  String get censusUpdatePreviousSubmissionInstruction;
+
+  /// No description provided for @censusDefinitionChangedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Census form changed. Reload the form and submit again.'**
+  String get censusDefinitionChangedMessage;
+
+  /// No description provided for @censusReloadFormAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload form'**
+  String get censusReloadFormAction;
+
+  /// No description provided for @censusFormReloadedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Census form reloaded.'**
+  String get censusFormReloadedMessage;
+
+  /// No description provided for @censusFormReloadedPartialMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Census form reloaded. Some values need to be entered again.'**
+  String get censusFormReloadedPartialMessage;
+
+  /// No description provided for @censusAnimalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal census'**
+  String get censusAnimalTitle;
+
+  /// No description provided for @censusHumanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Human census'**
+  String get censusHumanTitle;
+
+  /// No description provided for @censusGenericTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Census'**
+  String get censusGenericTitle;
+
+  /// No description provided for @censusUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Census is not available'**
+  String get censusUnavailableTitle;
+
+  /// No description provided for @censusUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is not assigned to update a village census.'**
+  String get censusUnavailableMessage;
+
+  /// No description provided for @censusLoadFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the census'**
+  String get censusLoadFailedTitle;
+
+  /// No description provided for @censusUnsupportedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This census needs a newer app'**
+  String get censusUnsupportedTitle;
+
+  /// No description provided for @censusUnsupportedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The village census has been updated and isn\'t supported on this version of OHTK Mobile. Please update the app, then try again.'**
+  String get censusUnsupportedMessage;
+
+  /// No description provided for @censusNoRowsConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'No active census rows are configured.'**
+  String get censusNoRowsConfigured;
+
+  /// No description provided for @censusNoSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No census set up'**
+  String get censusNoSetupTitle;
+
+  /// No description provided for @censusNoSetupMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This village does not have an active census form configured.'**
+  String get censusNoSetupMessage;
+
+  /// No description provided for @censusLastUpdatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated {date}'**
+  String censusLastUpdatedLabel(String date);
+
+  /// No description provided for @censusNotSubmittedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not submitted yet'**
+  String get censusNotSubmittedYet;
+
+  /// No description provided for @censusNoVillage.
+  ///
+  /// In en, this message translates to:
+  /// **'No village'**
+  String get censusNoVillage;
+
+  /// No description provided for @censusNoSubmittedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No census submitted yet'**
+  String get censusNoSubmittedYet;
+
+  /// No description provided for @censusEditedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'EDITED'**
+  String get censusEditedBadge;
+
+  /// No description provided for @censusSaveCurrentButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save current census'**
+  String get censusSaveCurrentButton;
+
+  /// No description provided for @censusSubmittedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Census submitted.'**
+  String get censusSubmittedMessage;
+
+  /// No description provided for @censusVillageUnavailableError.
+  ///
+  /// In en, this message translates to:
+  /// **'Village census is not available.'**
+  String get censusVillageUnavailableError;
+
+  /// No description provided for @censusUnsupportedError.
+  ///
+  /// In en, this message translates to:
+  /// **'This census form is not supported by this app version.'**
+  String get censusUnsupportedError;
+
+  /// No description provided for @censusUnknownKindError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown census kind.'**
+  String get censusUnknownKindError;
+
+  /// No description provided for @censusInvalidNumberError.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a non-negative whole number for {label}.'**
+  String censusInvalidNumberError(String label);
+
   /// No description provided for @notificationsTitle.
   ///
   /// In en, this message translates to:

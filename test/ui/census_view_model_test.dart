@@ -1,0 +1,388 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
+import 'package:podd_app/locator.dart';
+import 'package:podd_app/models/animal_species.dart';
+import 'package:podd_app/models/census_definition.dart';
+import 'package:podd_app/models/login_result.dart';
+import 'package:podd_app/models/user_profile.dart';
+import 'package:podd_app/models/village.dart';
+import 'package:podd_app/models/village_census.dart';
+import 'package:podd_app/services/auth_service.dart';
+import 'package:podd_app/services/census_service.dart';
+import 'package:podd_app/services/feature_capability_service.dart';
+import 'package:podd_app/ui/census/census_view_model.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  late AuthServiceMock authService;
+  late CensusServiceMock censusService;
+  late FeatureCapabilityServiceMock featureCapabilityService;
+
+  setUp(() async {
+    await locator.reset();
+    locator.allowReassignment = true;
+    authService = AuthServiceMock();
+    censusService = CensusServiceMock();
+    featureCapabilityService = FeatureCapabilityServiceMock();
+    locator.registerSingleton<IAuthService>(authService);
+    locator.registerSingleton<ICensusService>(censusService);
+    locator.registerSingleton<IFeatureCapabilityService>(
+      featureCapabilityService,
+    );
+    locator.registerSingleton<AppLocalizations>(
+      await AppLocalizations.delegate.load(const Locale('en')),
+    );
+  });
+
+  test('shows old snapshot notice and does not prefill incompatible rows',
+      () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 3,
+      version: 2,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+    censusService.latestV2 = VillageCensusSnapshot(
+      id: 8,
+      censusDate: DateTime.parse('2026-05-21'),
+      definitionVersionId: 2,
+      definitionVersionNumber: 1,
+      formData: const {
+        'rows': [
+          {
+            'row_key': 'male',
+            'measures': {'population': 1910},
+          },
+          {
+            'row_key': 'female',
+            'measures': {'population': 2000},
+          },
+        ],
+      },
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+
+    expect(viewModel.activeDefinition?.id, 3);
+    expect(viewModel.latestSnapshotUsesOlderDefinition, isTrue);
+    expect(viewModel.latestSnapshotPrefilledAnyValue, isFalse);
+    expect(viewModel.measureValue('total', 'population'), '');
+    expect(
+      viewModel.formInstruction,
+      'Previous submission used an older form. Enter current values for this version.',
+    );
+  });
+
+  test('stale definition submit shows reload state and reload preserves values',
+      () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+    censusService.submitResult = CensusDefinitionChanged(
+      const ['census definition version must be published'],
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+    viewModel.setMeasureValue('total', 'population', '123');
+
+    final result = await viewModel.submit();
+
+    expect(result, isA<CensusDefinitionChanged>());
+    expect(viewModel.definitionChanged, isTrue);
+    expect(viewModel.canSubmit, isFalse);
+    expect(viewModel.definitionChangedMessage, contains('Reload'));
+
+    censusService.activeDefinition = humanDefinition(
+      id: 3,
+      version: 2,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+
+    await viewModel.reloadDefinition();
+
+    expect(viewModel.definitionChanged, isFalse);
+    expect(viewModel.activeDefinition?.id, 3);
+    expect(viewModel.measureValue('total', 'population'), '123');
+    expect(viewModel.message, 'Census form reloaded.');
+  });
+
+  test('reload clears incompatible values after definition shape changes',
+      () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'male', label: 'Male'),
+        CensusSchemaRow(rowKey: 'female', label: 'Female'),
+      ],
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+    viewModel.setMeasureValue('male', 'population', '1910');
+    viewModel.setMeasureValue('female', 'population', '2000');
+
+    censusService.activeDefinition = humanDefinition(
+      id: 3,
+      version: 2,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+
+    await viewModel.reloadDefinition();
+
+    expect(viewModel.activeDefinition?.id, 3);
+    expect(viewModel.measureValue('total', 'population'), '');
+    expect(viewModel.message, contains('Some values need'));
+  });
+
+  test('successful submit clears older snapshot notice', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'male', label: 'Male'),
+        CensusSchemaRow(rowKey: 'female', label: 'Female'),
+      ],
+    );
+    censusService.latestV2 = VillageCensusSnapshot(
+      id: 8,
+      censusDate: DateTime.parse('2026-05-21'),
+      definitionVersionId: 3,
+      definitionVersionNumber: 2,
+      formData: const {
+        'rows': [
+          {
+            'row_key': 'total',
+            'measures': {'population': 1010},
+          },
+        ],
+      },
+    );
+    censusService.submitResult = VillageCensusSubmitSuccess(
+      VillageCensusSnapshot(id: 100),
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+    expect(viewModel.latestSnapshotUsesOlderDefinition, isTrue);
+    viewModel.setMeasureValue('male', 'population', '100');
+    viewModel.setMeasureValue('female', 'population', '200');
+
+    await viewModel.submit();
+
+    expect(viewModel.latestSnapshotUsesOlderDefinition, isFalse);
+    expect(viewModel.oldSnapshotNotice, isNull);
+    expect(viewModel.formInstruction, contains('Numbers from the last'));
+    expect(viewModel.latestCensus?.definitionVersionId, 2);
+  });
+
+  test('failed reload keeps stale definition state', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+    censusService.submitResult = CensusDefinitionChanged(
+      const ['census definition version must be published'],
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+    viewModel.setMeasureValue('total', 'population', '123');
+    await viewModel.submit();
+
+    censusService.throwActiveDefinitionError = true;
+    await viewModel.reloadDefinition();
+
+    expect(viewModel.definitionChanged, isTrue);
+    expect(viewModel.canSubmit, isFalse);
+  });
+}
+
+CensusDefinitionVersion humanDefinition({
+  required int id,
+  required int version,
+  required List<CensusSchemaRow> rows,
+}) {
+  return CensusDefinitionVersion(
+    id: id,
+    version: version,
+    status: 'PUBLISHED',
+    runtimeSchema: CensusRuntimeSchema(
+      rows: rows,
+      measures: const [
+        CensusSchemaMeasure(
+          key: 'population',
+          label: 'Population',
+          type: 'integer',
+          required: true,
+        ),
+      ],
+    ),
+  );
+}
+
+Future<void> flushAsync() async {
+  for (var i = 0; i < 10; i++) {
+    await Future<void>.delayed(Duration.zero);
+  }
+}
+
+class AuthServiceMock extends ChangeNotifier implements IAuthService {
+  final _village = const Village(id: 1, code: 'V001', name: 'FAO Mock Village');
+  late final _profile = UserProfile(
+    id: 1,
+    username: 'samor1',
+    firstName: 'Samor',
+    lastName: 'Reporter',
+    authorityName: 'FAO',
+    authorityId: 1,
+    features: const ['features.animal_census_enabled'],
+    assignedVillages: [_village],
+  );
+
+  @override
+  bool? get isLogin => true;
+
+  @override
+  UserProfile? get userProfile => _profile;
+
+  @override
+  Village? get selectedVillage => _village;
+
+  @override
+  Future<AuthResult> authenticate(String username, String password) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> fetchProfile() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> logout() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> requestAccessTokenIfExpired() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveTokenAndFetchProfile(AuthSuccess loginSuccess) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> selectVillage(int villageId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  updateAvatarUrl(String avatarUrl) {
+    throw UnimplementedError();
+  }
+
+  @override
+  updateConfirmedConsent() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<AuthResult> verifyQrToken(String token) {
+    throw UnimplementedError();
+  }
+}
+
+class FeatureCapabilityServiceMock extends IFeatureCapabilityService {
+  @override
+  bool get villageCapabilityKnown => true;
+
+  @override
+  bool get villageEnabled => true;
+
+  @override
+  Future<void> refresh() async {}
+
+  @override
+  void reset() {}
+}
+
+class CensusServiceMock implements ICensusService {
+  CensusDefinitionVersion? activeDefinition;
+  VillageCensusSnapshot? latestV2;
+  bool throwActiveDefinitionError = false;
+  VillageCensusSubmitResult submitResult = VillageCensusSubmitSuccess(
+    VillageCensusSnapshot(id: 99),
+  );
+
+  @override
+  Future<List<AnimalSpecies>> fetchActiveSpecies() async => const [];
+
+  @override
+  Future<CensusDefinitionVersion?> getActiveCensusDefinitionVersion({
+    required String kind,
+  }) async {
+    if (throwActiveDefinitionError) {
+      throw Exception('unable to refresh definition');
+    }
+    return activeDefinition;
+  }
+
+  @override
+  Future<List<CensusKindSummary>> getActiveVillageCensusDefinitions(
+    int villageId,
+  ) async =>
+      const [];
+
+  @override
+  Future<CensusDefinitionVersion?> getCachedCensusDefinitionVersion({
+    required String kind,
+  }) async =>
+      null;
+
+  @override
+  Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId) async =>
+      null;
+
+  @override
+  Future<VillageCensusSnapshot?> getLatestVillageCensusV2({
+    required int villageId,
+    required String kind,
+  }) async =>
+      latestV2;
+
+  @override
+  Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
+    required int villageId,
+    required DateTime censusDate,
+    required List<AnimalCensusFactInput> facts,
+  }) async =>
+      submitResult;
+
+  @override
+  Future<VillageCensusSubmitResult> submitVillageCensusSnapshotV2({
+    required int villageId,
+    required int definitionVersionId,
+    required DateTime censusDate,
+    required Map<String, dynamic> formData,
+  }) async =>
+      submitResult;
+}

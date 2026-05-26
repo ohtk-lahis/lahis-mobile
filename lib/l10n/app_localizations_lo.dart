@@ -850,6 +850,113 @@ class AppLocalizationsLo extends AppLocalizations {
   String get censusHubHelperSingle => 'ເລືອກເພື່ອປັບສຳມະໂນນີ້ໃຫ້ເປັນປັດຈຸບັນ';
 
   @override
+  String censusCachedDefinitionNotice(int version) {
+    return 'ອອບລາຍ ຫຼື ບໍ່ສາມາດໂຫຼດໃໝ່ໄດ້. ກຳລັງສະແດງແບບຟອມທີ່ບັນທຶກໄວ້ເວີຊັນ v$version.';
+  }
+
+  @override
+  String get censusOldSnapshotMatchingNotice =>
+      'ການສົ່ງຄັ້ງກ່ອນໃຊ້ແບບຟອມເກົ່າ. ຄ່າທີ່ກົງກັນຖືກເຕີມໄວ້ແລ້ວ.';
+
+  @override
+  String get censusOldSnapshotBlankNotice =>
+      'ການສົ່ງຄັ້ງກ່ອນໃຊ້ແບບຟອມເກົ່າ. ປ້ອນຄ່າປັດຈຸບັນສຳລັບເວີຊັນນີ້.';
+
+  @override
+  String get censusNoPreviousSubmissionInstruction =>
+      'ຍັງບໍ່ມີການສົ່ງສຳມະໂນ. ປ້ອນຄ່າປັດຈຸບັນໃນແຕ່ລະແຖວ.';
+
+  @override
+  String get censusUpdatePreviousSubmissionInstruction =>
+      'ອັບເດດສິ່ງທີ່ປ່ຽນໄປ. ຕົວເລກຈາກການສົ່ງຄັ້ງຫຼ້າສຸດຖືກເຕີມໄວ້ແລ້ວ.';
+
+  @override
+  String get censusDefinitionChangedMessage =>
+      'ແບບຟອມສຳມະໂນມີການປ່ຽນແປງ. ໂຫຼດແບບຟອມໃໝ່ແລ້ວສົ່ງອີກຄັ້ງ.';
+
+  @override
+  String get censusReloadFormAction => 'ໂຫຼດແບບຟອມໃໝ່';
+
+  @override
+  String get censusFormReloadedMessage => 'ໂຫຼດແບບຟອມສຳມະໂນໃໝ່ແລ້ວ.';
+
+  @override
+  String get censusFormReloadedPartialMessage =>
+      'ໂຫຼດແບບຟອມສຳມະໂນໃໝ່ແລ້ວ. ບາງຄ່າຕ້ອງປ້ອນໃໝ່.';
+
+  @override
+  String get censusAnimalTitle => 'ສຳມະໂນສັດ';
+
+  @override
+  String get censusHumanTitle => 'ສຳມະໂນປະຊາກອນ';
+
+  @override
+  String get censusGenericTitle => 'ສຳມະໂນ';
+
+  @override
+  String get censusUnavailableTitle => 'ບໍ່ສາມາດໃຊ້ສຳມະໂນໄດ້';
+
+  @override
+  String get censusUnavailableMessage =>
+      'ບັນຊີນີ້ບໍ່ໄດ້ຖືກມອບໝາຍໃຫ້ອັບເດດສຳມະໂນຂອງບ້ານ.';
+
+  @override
+  String get censusLoadFailedTitle => 'ໂຫຼດສຳມະໂນບໍ່ສຳເລັດ';
+
+  @override
+  String get censusUnsupportedTitle => 'ສຳມະໂນນີ້ຕ້ອງໃຊ້ແອັບເວີຊັນໃໝ່ກວ່າ';
+
+  @override
+  String get censusUnsupportedMessage =>
+      'ສຳມະໂນຂອງບ້ານຖືກອັບເດດແລ້ວ ແລະ OHTK Mobile ເວີຊັນນີ້ບໍ່ຮອງຮັບ. ກະລຸນາອັບເດດແອັບແລ້ວລອງໃໝ່.';
+
+  @override
+  String get censusNoRowsConfigured => 'ຍັງບໍ່ໄດ້ກຳນົດແຖວສຳມະໂນທີ່ໃຊ້ງານ.';
+
+  @override
+  String get censusNoSetupTitle => 'ຍັງບໍ່ໄດ້ຕັ້ງຄ່າສຳມະໂນ';
+
+  @override
+  String get censusNoSetupMessage => 'ບ້ານນີ້ຍັງບໍ່ມີແບບຟອມສຳມະໂນທີ່ໃຊ້ງານ.';
+
+  @override
+  String censusLastUpdatedLabel(String date) {
+    return 'ອັບເດດຫຼ້າສຸດ $date';
+  }
+
+  @override
+  String get censusNotSubmittedYet => 'ຍັງບໍ່ໄດ້ສົ່ງ';
+
+  @override
+  String get censusNoVillage => 'ບໍ່ມີບ້ານ';
+
+  @override
+  String get censusNoSubmittedYet => 'ຍັງບໍ່ໄດ້ສົ່ງສຳມະໂນ';
+
+  @override
+  String get censusEditedBadge => 'ແກ້ໄຂແລ້ວ';
+
+  @override
+  String get censusSaveCurrentButton => 'ບັນທຶກສຳມະໂນປັດຈຸບັນ';
+
+  @override
+  String get censusSubmittedMessage => 'ສົ່ງສຳມະໂນແລ້ວ.';
+
+  @override
+  String get censusVillageUnavailableError => 'ບໍ່ສາມາດໃຊ້ສຳມະໂນບ້ານໄດ້.';
+
+  @override
+  String get censusUnsupportedError => 'ແອັບເວີຊັນນີ້ບໍ່ຮອງຮັບແບບຟອມສຳມະໂນນີ້.';
+
+  @override
+  String get censusUnknownKindError => 'ບໍ່ຮູ້ຈັກຊະນິດສຳມະໂນ.';
+
+  @override
+  String censusInvalidNumberError(String label) {
+    return 'ປ້ອນຈຳນວນເຕັມທີ່ບໍ່ຕິດລົບສຳລັບ $label.';
+  }
+
+  @override
   String get notificationsTitle => 'ການແຈ້ງເຕືອນ';
 
   @override

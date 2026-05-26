@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/census_definition.dart';
@@ -15,6 +16,7 @@ class CensusViewModel extends BaseViewModel {
   final ICensusService censusService = locator<ICensusService>();
   final IFeatureCapabilityService featureCapabilityService =
       locator<IFeatureCapabilityService>();
+  final AppLocalizations localize = locator<AppLocalizations>();
 
   List<AnimalSpecies> species = [];
   List<CensusKindSummary> censusKinds = [];
@@ -28,6 +30,9 @@ class CensusViewModel extends BaseViewModel {
   String? message;
   bool usingCachedDefinition = false;
   bool unsupportedSchema = false;
+  bool definitionChanged = false;
+  bool latestSnapshotUsesOlderDefinition = false;
+  bool latestSnapshotPrefilledAnyValue = false;
   bool _canSubmitWithLegacyMutation = true;
   final String? requestedKind;
   String? activeKind;
@@ -52,7 +57,7 @@ class CensusViewModel extends BaseViewModel {
 
   bool get hasRows => rows.isNotEmpty;
 
-  bool get canSubmit => hasRows && !unsupportedSchema;
+  bool get canSubmit => hasRows && !unsupportedSchema && !definitionChanged;
 
   bool get isHubMode => activeKind == null;
 
@@ -65,6 +70,36 @@ class CensusViewModel extends BaseViewModel {
     }
     return _dateOnly(latestCensus!.censusDate ?? DateTime.now());
   }
+
+  String? get cachedDefinitionNotice {
+    if (!usingCachedDefinition || activeDefinition == null) {
+      return null;
+    }
+    return localize.censusCachedDefinitionNotice(activeDefinition!.version);
+  }
+
+  String? get oldSnapshotNotice {
+    if (!latestSnapshotUsesOlderDefinition) {
+      return null;
+    }
+    if (latestSnapshotPrefilledAnyValue) {
+      return localize.censusOldSnapshotMatchingNotice;
+    }
+    return localize.censusOldSnapshotBlankNotice;
+  }
+
+  String get formInstruction {
+    if (oldSnapshotNotice != null) {
+      return oldSnapshotNotice!;
+    }
+    if (latestCensus == null) {
+      return localize.censusNoPreviousSubmissionInstruction;
+    }
+    return localize.censusUpdatePreviousSubmissionInstruction;
+  }
+
+  String get definitionChangedMessage =>
+      localize.censusDefinitionChangedMessage;
 
   Future<void> init() async {
     setBusy(true);
@@ -157,15 +192,16 @@ class CensusViewModel extends BaseViewModel {
   Future<VillageCensusSubmitResult?> submit() async {
     _clearSubmitError();
     message = null;
+    definitionChanged = false;
 
     if (!hasCensusAccess) {
-      setErrorForObject('submit', 'Village census is not available.');
+      setErrorForObject('submit', localize.censusVillageUnavailableError);
       return null;
     }
     if (unsupportedSchema) {
       setErrorForObject(
         'submit',
-        'This census form is not supported by this app version.',
+        localize.censusUnsupportedError,
       );
       return null;
     }
@@ -200,9 +236,11 @@ class CensusViewModel extends BaseViewModel {
     }
 
     if (result is VillageCensusSubmitSuccess) {
-      latestCensus = result.snapshot;
+      latestCensus = _submittedSnapshot(result.snapshot, formData);
+      latestSnapshotUsesOlderDefinition = false;
+      latestSnapshotPrefilledAnyValue = false;
       _captureInitialValues();
-      message = 'Census submitted.';
+      message = localize.censusSubmittedMessage;
     } else if (result is VillageCensusSubmitValidationFailure) {
       setErrorForObject('submit', result.messages.join(', '));
     } else if (result is VillageCensusSubmitFailure) {
@@ -210,12 +248,62 @@ class CensusViewModel extends BaseViewModel {
     } else if (result is VillageCensusSubmitUnsupported) {
       setErrorForObject(
         'submit',
-        'This census form is not supported by this app version.',
+        localize.censusUnsupportedError,
       );
+    } else if (result is CensusDefinitionChanged) {
+      definitionChanged = true;
     }
 
     notifyListeners();
     return result;
+  }
+
+  VillageCensusSnapshot _submittedSnapshot(
+    VillageCensusSnapshot snapshot,
+    Map<String, dynamic> formData,
+  ) {
+    return VillageCensusSnapshot(
+      id: snapshot.id,
+      village: snapshot.village,
+      censusDate: snapshot.censusDate,
+      submittedAt: snapshot.submittedAt,
+      definitionVersionId: snapshot.definitionVersionId ?? activeDefinition?.id,
+      definitionVersionNumber:
+          snapshot.definitionVersionNumber ?? activeDefinition?.version,
+      facts: snapshot.facts,
+      formData: snapshot.formData.isNotEmpty ? snapshot.formData : formData,
+    );
+  }
+
+  Future<void> reloadDefinition() async {
+    final kind = activeKind ?? requestedKind;
+    if (kind == null) {
+      await init();
+      return;
+    }
+
+    final previousValues = {
+      for (final entry in measureValues.entries)
+        entry.key: Map<String, String>.from(entry.value),
+    };
+
+    setBusy(true);
+    message = null;
+    clearErrors();
+    final wasDefinitionChanged = definitionChanged;
+    try {
+      await _loadFormForKind(kind, allowCachedDefinitionFallback: false);
+      definitionChanged = false;
+      final restoredAll = _restoreCompatibleValues(previousValues);
+      message = restoredAll
+          ? localize.censusFormReloadedMessage
+          : localize.censusFormReloadedPartialMessage;
+    } catch (e) {
+      definitionChanged = wasDefinitionChanged;
+      setError(e.toString());
+    }
+    setBusy(false);
+    notifyListeners();
   }
 
   Map<String, dynamic>? _buildFormData() {
@@ -228,7 +316,7 @@ class CensusViewModel extends BaseViewModel {
           final label = measure.label.isNotEmpty ? measure.label : measure.key;
           setErrorForObject(
             'submit',
-            'Enter a non-negative whole number for $label.',
+            localize.censusInvalidNumberError(label),
           );
           return null;
         }
@@ -245,7 +333,7 @@ class CensusViewModel extends BaseViewModel {
       } else {
         setErrorForObject(
           'submit',
-          'This census form is not supported by this app version.',
+          localize.censusUnsupportedError,
         );
         return null;
       }
@@ -281,15 +369,20 @@ class CensusViewModel extends BaseViewModel {
   Future<void> _loadFormForKind(
     String kind, {
     CensusKindSummary? summary,
+    bool allowCachedDefinitionFallback = true,
   }) async {
     final normalizedKind = _normalizeKind(kind);
     if (normalizedKind == null) {
-      throw Exception('Unknown census kind.');
+      throw Exception(localize.censusUnknownKindError);
     }
 
     activeKind = normalizedKind;
     activeKindSummary = summary;
-    await _loadCensusRows(normalizedKind, summary: summary);
+    await _loadCensusRows(
+      normalizedKind,
+      summary: summary,
+      allowCachedDefinitionFallback: allowCachedDefinitionFallback,
+    );
     if (activeDefinition != null) {
       latestCensus = await censusService.getLatestVillageCensusV2(
         villageId: selectedVillage!.id,
@@ -305,10 +398,13 @@ class CensusViewModel extends BaseViewModel {
   Future<void> _loadCensusRows(
     String kind, {
     CensusKindSummary? summary,
+    bool allowCachedDefinitionFallback = true,
   }) async {
     _canSubmitWithLegacyMutation = true;
     usingCachedDefinition = false;
     unsupportedSchema = false;
+    latestSnapshotUsesOlderDefinition = false;
+    latestSnapshotPrefilledAnyValue = false;
     _clearFormData();
     CensusDefinitionVersion? definition;
 
@@ -320,6 +416,9 @@ class CensusViewModel extends BaseViewModel {
           kind: kind,
         );
       } catch (_) {
+        if (!allowCachedDefinitionFallback) {
+          rethrow;
+        }
         definition = await censusService.getCachedCensusDefinitionVersion(
           kind: kind,
         );
@@ -364,7 +463,7 @@ class CensusViewModel extends BaseViewModel {
     if (facts == null) {
       return Future.value(
         VillageCensusSubmitValidationFailure([
-          'This census form is not supported by this app version.',
+          localize.censusUnsupportedError,
         ]),
       );
     }
@@ -442,11 +541,15 @@ class CensusViewModel extends BaseViewModel {
   }
 
   void _prefillFromLatestCensus() {
+    latestSnapshotUsesOlderDefinition = activeDefinition != null &&
+        latestCensus?.definitionVersionId != null &&
+        latestCensus!.definitionVersionId != activeDefinition!.id;
     if (latestCensus == null) {
       _captureInitialValues();
       return;
     }
 
+    var prefilledAny = false;
     final submittedRows = latestCensus!.formData['rows'];
     if (submittedRows is List && submittedRows.isNotEmpty) {
       for (final submittedRow in submittedRows.whereType<Map>()) {
@@ -471,9 +574,11 @@ class CensusViewModel extends BaseViewModel {
           final value = submittedMeasures[measure.key];
           if (value != null) {
             measureValues[row.rowKey]![measure.key] = value.toString();
+            prefilledAny = true;
           }
         }
       }
+      latestSnapshotPrefilledAnyValue = prefilledAny;
       _captureInitialValues();
       return;
     }
@@ -491,8 +596,33 @@ class CensusViewModel extends BaseViewModel {
           fact.animalQuantity.toString();
       measureValues[row.rowKey]!['household_quantity'] =
           fact.householdQuantity.toString();
+      prefilledAny = true;
+    }
+    latestSnapshotPrefilledAnyValue = prefilledAny;
+    _captureInitialValues();
+  }
+
+  bool _restoreCompatibleValues(
+    Map<String, Map<String, String>> previousValues,
+  ) {
+    var totalPrevious = 0;
+    var restored = 0;
+    for (final entry in previousValues.entries) {
+      for (final measureEntry in entry.value.entries) {
+        if (measureEntry.value.isEmpty) {
+          continue;
+        }
+        totalPrevious++;
+        final rowValues = measureValues[entry.key];
+        if (rowValues == null || !rowValues.containsKey(measureEntry.key)) {
+          continue;
+        }
+        rowValues[measureEntry.key] = measureEntry.value;
+        restored++;
+      }
     }
     _captureInitialValues();
+    return totalPrevious == restored;
   }
 
   void _captureInitialValues() {
@@ -542,6 +672,8 @@ class CensusViewModel extends BaseViewModel {
     species = [];
     rows = [];
     measures = [];
+    latestSnapshotUsesOlderDefinition = false;
+    latestSnapshotPrefilledAnyValue = false;
     measureValues.clear();
     _initialMeasureValues.clear();
     _syncInputFocusNodes();
@@ -616,11 +748,11 @@ class CensusViewModel extends BaseViewModel {
 
   String _kindDisplayName(String? kind) {
     if (kind == 'ANIMAL') {
-      return 'Animal census';
+      return localize.censusAnimalTitle;
     }
     if (kind == 'HUMAN') {
-      return 'Human census';
+      return localize.censusHumanTitle;
     }
-    return 'Census';
+    return localize.censusGenericTitle;
   }
 }

@@ -858,6 +858,115 @@ class AppLocalizationsTh extends AppLocalizations {
   String get censusHubHelperSingle => 'เลือกเพื่อปรับสำมะโนนี้ให้เป็นปัจจุบัน';
 
   @override
+  String censusCachedDefinitionNotice(int version) {
+    return 'ออฟไลน์หรือไม่สามารถรีเฟรชได้ กำลังแสดงแบบฟอร์มที่บันทึกไว้เวอร์ชัน v$version.';
+  }
+
+  @override
+  String get censusOldSnapshotMatchingNotice =>
+      'การส่งครั้งก่อนใช้แบบฟอร์มเวอร์ชันเก่า ค่าที่ตรงกันถูกเติมไว้แล้ว';
+
+  @override
+  String get censusOldSnapshotBlankNotice =>
+      'การส่งครั้งก่อนใช้แบบฟอร์มเวอร์ชันเก่า โปรดกรอกค่าปัจจุบันสำหรับเวอร์ชันนี้';
+
+  @override
+  String get censusNoPreviousSubmissionInstruction =>
+      'ยังไม่เคยส่งสำมะโน โปรดกรอกค่าปัจจุบันในแต่ละแถว';
+
+  @override
+  String get censusUpdatePreviousSubmissionInstruction =>
+      'อัปเดตค่าที่เปลี่ยนแปลง ตัวเลขจากการส่งครั้งล่าสุดถูกเติมไว้แล้ว';
+
+  @override
+  String get censusDefinitionChangedMessage =>
+      'แบบฟอร์มสำมะโนเปลี่ยนแล้ว โปรดโหลดแบบฟอร์มใหม่แล้วส่งอีกครั้ง';
+
+  @override
+  String get censusReloadFormAction => 'โหลดแบบฟอร์มใหม่';
+
+  @override
+  String get censusFormReloadedMessage => 'โหลดแบบฟอร์มสำมะโนใหม่แล้ว';
+
+  @override
+  String get censusFormReloadedPartialMessage =>
+      'โหลดแบบฟอร์มสำมะโนใหม่แล้ว บางค่าต้องกรอกใหม่';
+
+  @override
+  String get censusAnimalTitle => 'สำมะโนสัตว์';
+
+  @override
+  String get censusHumanTitle => 'สำมะโนประชากร';
+
+  @override
+  String get censusGenericTitle => 'สำมะโน';
+
+  @override
+  String get censusUnavailableTitle => 'ไม่สามารถใช้สำมะโนได้';
+
+  @override
+  String get censusUnavailableMessage =>
+      'บัญชีนี้ไม่ได้รับมอบหมายให้อัปเดตสำมะโนของหมู่บ้าน';
+
+  @override
+  String get censusLoadFailedTitle => 'โหลดสำมะโนไม่สำเร็จ';
+
+  @override
+  String get censusUnsupportedTitle => 'สำมะโนนี้ต้องใช้แอปเวอร์ชันใหม่กว่า';
+
+  @override
+  String get censusUnsupportedMessage =>
+      'สำมะโนหมู่บ้านถูกอัปเดตแล้วและแอป OHTK Mobile เวอร์ชันนี้ยังไม่รองรับ โปรดอัปเดตแอปแล้วลองอีกครั้ง';
+
+  @override
+  String get censusNoRowsConfigured => 'ยังไม่ได้กำหนดแถวสำมะโนที่ใช้งาน';
+
+  @override
+  String get censusNoSetupTitle => 'ยังไม่ได้ตั้งค่าสำมะโน';
+
+  @override
+  String get censusNoSetupMessage =>
+      'หมู่บ้านนี้ยังไม่มีแบบฟอร์มสำมะโนที่ใช้งาน';
+
+  @override
+  String censusLastUpdatedLabel(String date) {
+    return 'อัปเดตล่าสุด $date';
+  }
+
+  @override
+  String get censusNotSubmittedYet => 'ยังไม่ได้ส่ง';
+
+  @override
+  String get censusNoVillage => 'ไม่มีหมู่บ้าน';
+
+  @override
+  String get censusNoSubmittedYet => 'ยังไม่ได้ส่งสำมะโน';
+
+  @override
+  String get censusEditedBadge => 'แก้ไขแล้ว';
+
+  @override
+  String get censusSaveCurrentButton => 'บันทึกสำมะโนปัจจุบัน';
+
+  @override
+  String get censusSubmittedMessage => 'ส่งสำมะโนแล้ว';
+
+  @override
+  String get censusVillageUnavailableError => 'ไม่สามารถใช้สำมะโนหมู่บ้านได้';
+
+  @override
+  String get censusUnsupportedError =>
+      'แอปเวอร์ชันนี้ยังไม่รองรับแบบฟอร์มสำมะโนนี้';
+
+  @override
+  String get censusUnknownKindError => 'ไม่รู้จักชนิดสำมะโน';
+
+  @override
+  String censusInvalidNumberError(String label) {
+    return 'กรอกจำนวนเต็มที่ไม่ติดลบสำหรับ $label';
+  }
+
+  @override
   String get notificationsTitle => 'การแจ้งเตือน';
 
   @override

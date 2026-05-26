@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:podd_app/components/motion.dart';
+import 'package:podd_app/components/submit_success_overlay.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/census_definition.dart';
+import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/census/census_view_model.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
@@ -22,10 +24,11 @@ class CensusView extends StatelessWidget {
     return ViewModelBuilder<CensusViewModel>.reactive(
       viewModelBuilder: () => CensusViewModel(kind: kind),
       builder: (context, viewModel, _) {
+        final localize = AppLocalizations.of(context)!;
         if (viewModel.isBusy) {
           if (kind != null) {
             return _CensusFormScaffold(
-              title: _kindTitle(kind),
+              title: _kindTitle(localize, kind),
               body: const _CensusLoading(),
             );
           }
@@ -33,14 +36,14 @@ class CensusView extends StatelessWidget {
         }
 
         if (!viewModel.hasCensusAccess) {
-          const state = _FullState(
+          final state = _FullState(
             icon: Icons.lock_outline,
-            title: 'Census is not available',
-            message: 'This account is not assigned to update a village census.',
+            title: localize.censusUnavailableTitle,
+            message: localize.censusUnavailableMessage,
           );
           if (kind != null) {
             return _CensusFormScaffold(
-              title: _kindTitle(kind),
+              title: _kindTitle(localize, kind),
               body: state,
             );
           }
@@ -50,9 +53,9 @@ class CensusView extends StatelessWidget {
         if (viewModel.hasError && !viewModel.hasRows) {
           final state = _FullState(
             icon: Icons.cloud_off_outlined,
-            title: "Couldn't load the census",
+            title: localize.censusLoadFailedTitle,
             message: viewModel.modelError.toString(),
-            actionLabel: 'Try again',
+            actionLabel: localize.tryAgainButton,
             onAction: viewModel.init,
           );
           if (viewModel.isHubMode) {
@@ -71,13 +74,12 @@ class CensusView extends StatelessWidget {
         if (viewModel.unsupportedSchema) {
           return _CensusFormScaffold(
             title: viewModel.activeKindName,
-            body: const _FullState(
+            body: _FullState(
               icon: Icons.warning_amber_rounded,
               iconColor: Color(0xFFA07015),
               iconBackground: Color(0x1AA07015),
-              title: 'This census needs a newer app',
-              message:
-                  "The village census has been updated and isn't supported on this version of OHTK Mobile. Please update the app, then try again.",
+              title: localize.censusUnsupportedTitle,
+              message: localize.censusUnsupportedMessage,
             ),
           );
         }
@@ -93,12 +95,30 @@ class CensusView extends StatelessWidget {
               children: [
                 _VillageHeader(viewModel: viewModel),
                 AnimatedNotice(
-                  visible: viewModel.usingCachedDefinition,
-                  child: const _NoticeBanner(
+                  visible: viewModel.cachedDefinitionNotice != null,
+                  child: _NoticeBanner(
                     tone: _NoticeTone.warn,
                     icon: Icons.warning_amber_rounded,
-                    text:
-                        "Using a saved version of this form — couldn't refresh from server.",
+                    text: viewModel.cachedDefinitionNotice ?? '',
+                  ),
+                ),
+                AnimatedNotice(
+                  visible: viewModel.oldSnapshotNotice != null,
+                  child: _NoticeBanner(
+                    tone: _NoticeTone.warn,
+                    icon: Icons.history_rounded,
+                    text: viewModel.oldSnapshotNotice ?? '',
+                  ),
+                ),
+                AnimatedNotice(
+                  visible: viewModel.definitionChanged,
+                  child: _NoticeBanner(
+                    tone: _NoticeTone.error,
+                    icon: Icons.sync_problem_rounded,
+                    text: viewModel.definitionChangedMessage,
+                    actionLabel:
+                        AppLocalizations.of(context)!.censusReloadFormAction,
+                    onAction: viewModel.reloadDefinition,
                   ),
                 ),
                 AnimatedNotice(
@@ -125,9 +145,7 @@ class CensusView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        viewModel.latestCensus == null
-                            ? 'No census has been submitted yet. Enter the current values for each row.'
-                            : 'Update anything that has changed. Numbers from the last submission are pre-filled.',
+                        viewModel.formInstruction,
                         style: const TextStyle(
                           fontSize: 13,
                           height: 1.45,
@@ -136,9 +154,9 @@ class CensusView extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       if (!viewModel.hasRows)
-                        const Text(
-                          'No active census rows are configured.',
-                          style: TextStyle(
+                        Text(
+                          localize.censusNoRowsConfigured,
+                          style: const TextStyle(
                             color: incidentsBody,
                           ),
                         )
@@ -160,15 +178,15 @@ class CensusView extends StatelessWidget {
   }
 }
 
-String _kindTitle(String? kind) {
+String _kindTitle(AppLocalizations localize, String? kind) {
   final normalized = kind?.trim().toUpperCase();
   if (normalized == 'ANIMAL') {
-    return 'Animal census';
+    return localize.censusAnimalTitle;
   }
   if (normalized == 'HUMAN') {
-    return 'Human census';
+    return localize.censusHumanTitle;
   }
-  return 'Census';
+  return localize.censusGenericTitle;
 }
 
 class _CensusFormScaffold extends StatelessWidget {
@@ -227,18 +245,18 @@ class _CensusHub extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
     if (viewModel.censusKinds.isEmpty) {
       return Column(
         children: [
           _VillageHubHeader(viewModel: viewModel),
-          const Expanded(
+          Expanded(
             child: _FullState(
               icon: Icons.info_outline,
               iconColor: incidentsTeal,
               iconBackground: Color(0x1A0F8A82),
-              title: 'No census set up',
-              message:
-                  'This village does not have an active census form configured.',
+              title: localize.censusNoSetupTitle,
+              message: localize.censusNoSetupMessage,
             ),
           ),
         ],
@@ -304,6 +322,7 @@ class _CensusKindCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
     final snapshot = summary.latestSnapshot;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -340,8 +359,10 @@ class _CensusKindCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           snapshot != null
-                              ? 'Last updated ${_dateOnly(snapshot.censusDate)}'
-                              : 'Not submitted yet',
+                              ? localize.censusLastUpdatedLabel(
+                                  _dateOnly(snapshot.censusDate),
+                                )
+                              : localize.censusNotSubmittedYet,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -380,13 +401,14 @@ class _VillageHubHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
     final village = viewModel.selectedVillage;
-    final villageName =
-        village?.name.isNotEmpty == true ? village!.name : 'No village';
+    final villageName = village?.name.isNotEmpty == true
+        ? village!.name
+        : localize.censusNoVillage;
     final district = viewModel.authorityName?.isNotEmpty == true
         ? viewModel.authorityName!
         : '—';
-    final localize = AppLocalizations.of(context)!;
 
     return Container(
       width: double.infinity,
@@ -445,6 +467,7 @@ class _VillageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final village = viewModel.selectedVillage;
     final freshness = viewModel.freshnessLabel;
+    final localize = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         OhtkLayout.pagePad,
@@ -467,7 +490,7 @@ class _VillageHeader extends StatelessWidget {
                 Text(
                   village?.name.isNotEmpty == true
                       ? village!.name
-                      : 'No village',
+                      : localize.censusNoVillage,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: OhtkType.h3,
@@ -486,8 +509,8 @@ class _VillageHeader extends StatelessWidget {
                     Flexible(
                       child: Text(
                         freshness == null
-                            ? 'No census submitted yet'
-                            : 'Last updated $freshness',
+                            ? localize.censusNoSubmittedYet
+                            : localize.censusLastUpdatedLabel(freshness),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -539,9 +562,9 @@ class _CensusRowSection extends StatelessWidget {
                   ),
                 ),
                 if (dirty)
-                  const Text(
-                    'EDITED',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.censusEditedBadge,
+                    style: const TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1,
@@ -689,9 +712,20 @@ class _StickyFooter extends StatelessWidget {
         18,
       ),
       child: OhtkPrimaryButton(
-        label: 'Save current census',
+        label: AppLocalizations.of(context)!.censusSaveCurrentButton,
         loading: viewModel.busy('submit'),
-        onPressed: viewModel.canSubmit ? () => viewModel.submit() : null,
+        onPressed: viewModel.canSubmit
+            ? () async {
+                final result = await viewModel.submit();
+                if (context.mounted && result is VillageCensusSubmitSuccess) {
+                  await SubmitSuccessOverlay.show(
+                    context,
+                    message:
+                        AppLocalizations.of(context)!.censusSubmittedMessage,
+                  );
+                }
+              }
+            : null,
       ),
     );
   }
@@ -703,11 +737,15 @@ class _NoticeBanner extends StatelessWidget {
   final _NoticeTone tone;
   final IconData icon;
   final String text;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   const _NoticeBanner({
     required this.tone,
     required this.icon,
     required this.text,
+    this.actionLabel,
+    this.onAction,
   });
 
   @override
@@ -729,21 +767,54 @@ class _NoticeBanner extends StatelessWidget {
         color: background,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 13,
-                height: 1.35,
-                fontWeight: FontWeight.w600,
-                color: color,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 1),
+                child: Icon(icon, color: color, size: 16),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (actionLabel != null && onAction != null) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: onAction,
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: Text(actionLabel!),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: color,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  minimumSize: const Size.fromHeight(40),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

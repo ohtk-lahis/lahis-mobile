@@ -46,6 +46,8 @@ class VillageCensusSnapshot {
   final Village? village;
   final DateTime? censusDate;
   final String? submittedAt;
+  final int? definitionVersionId;
+  final int? definitionVersionNumber;
   final List<AnimalCensusFact> facts;
   final Map<String, dynamic> formData;
 
@@ -54,24 +56,32 @@ class VillageCensusSnapshot {
     this.village,
     this.censusDate,
     this.submittedAt,
+    this.definitionVersionId,
+    this.definitionVersionNumber,
     this.facts = const [],
     this.formData = const {},
   });
 
-  factory VillageCensusSnapshot.fromJson(Map<String, dynamic> json) =>
-      VillageCensusSnapshot(
-        id: json['id'] is int ? json['id'] as int : int.parse('${json['id']}'),
-        village:
-            json['village'] != null ? Village.fromJson(json['village']) : null,
-        censusDate: json['censusDate'] != null
-            ? DateTime.tryParse(json['censusDate'].toString())
-            : null,
-        submittedAt: json['submittedAt']?.toString(),
-        facts: (json['facts'] as List? ?? const [])
-            .map((fact) => AnimalCensusFact.fromJson(fact))
-            .toList(),
-        formData: Map<String, dynamic>.from(json['formData'] as Map? ?? {}),
-      );
+  factory VillageCensusSnapshot.fromJson(Map<String, dynamic> json) {
+    final definitionVersion = json['definitionVersion'] is Map
+        ? Map<String, dynamic>.from(json['definitionVersion'] as Map)
+        : const <String, dynamic>{};
+    return VillageCensusSnapshot(
+      id: json['id'] is int ? json['id'] as int : int.parse('${json['id']}'),
+      village:
+          json['village'] != null ? Village.fromJson(json['village']) : null,
+      censusDate: json['censusDate'] != null
+          ? DateTime.tryParse(json['censusDate'].toString())
+          : null,
+      submittedAt: json['submittedAt']?.toString(),
+      definitionVersionId: _parseInt(definitionVersion['id']),
+      definitionVersionNumber: _parseInt(definitionVersion['version']),
+      facts: (json['facts'] as List? ?? const [])
+          .map((fact) => AnimalCensusFact.fromJson(fact))
+          .toList(),
+      formData: Map<String, dynamic>.from(json['formData'] as Map? ?? {}),
+    );
+  }
 }
 
 abstract class VillageCensusSubmitResult {}
@@ -94,3 +104,19 @@ class VillageCensusSubmitValidationFailure extends VillageCensusSubmitResult {
 }
 
 class VillageCensusSubmitUnsupported extends VillageCensusSubmitResult {}
+
+class CensusDefinitionChanged extends VillageCensusSubmitResult {
+  final List<String> messages;
+
+  CensusDefinitionChanged(this.messages);
+}
+
+int? _parseInt(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is int) {
+    return value;
+  }
+  return int.tryParse(value.toString());
+}

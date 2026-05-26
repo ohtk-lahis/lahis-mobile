@@ -865,6 +865,116 @@ class AppLocalizationsMy extends AppLocalizations {
   String get censusHubHelperSingle => 'Choose to keep this census up to date.';
 
   @override
+  String censusCachedDefinitionNotice(int version) {
+    return 'Offline or unable to refresh. Showing cached form version v$version.';
+  }
+
+  @override
+  String get censusOldSnapshotMatchingNotice =>
+      'Previous submission used an older form. Matching values are pre-filled.';
+
+  @override
+  String get censusOldSnapshotBlankNotice =>
+      'Previous submission used an older form. Enter current values for this version.';
+
+  @override
+  String get censusNoPreviousSubmissionInstruction =>
+      'No census has been submitted yet. Enter the current values for each row.';
+
+  @override
+  String get censusUpdatePreviousSubmissionInstruction =>
+      'Update anything that has changed. Numbers from the last submission are pre-filled.';
+
+  @override
+  String get censusDefinitionChangedMessage =>
+      'Census form changed. Reload the form and submit again.';
+
+  @override
+  String get censusReloadFormAction => 'Reload form';
+
+  @override
+  String get censusFormReloadedMessage => 'Census form reloaded.';
+
+  @override
+  String get censusFormReloadedPartialMessage =>
+      'Census form reloaded. Some values need to be entered again.';
+
+  @override
+  String get censusAnimalTitle => 'Animal census';
+
+  @override
+  String get censusHumanTitle => 'Human census';
+
+  @override
+  String get censusGenericTitle => 'Census';
+
+  @override
+  String get censusUnavailableTitle => 'Census is not available';
+
+  @override
+  String get censusUnavailableMessage =>
+      'This account is not assigned to update a village census.';
+
+  @override
+  String get censusLoadFailedTitle => 'Couldn\'t load the census';
+
+  @override
+  String get censusUnsupportedTitle => 'This census needs a newer app';
+
+  @override
+  String get censusUnsupportedMessage =>
+      'The village census has been updated and isn\'t supported on this version of OHTK Mobile. Please update the app, then try again.';
+
+  @override
+  String get censusNoRowsConfigured => 'No active census rows are configured.';
+
+  @override
+  String get censusNoSetupTitle => 'No census set up';
+
+  @override
+  String get censusNoSetupMessage =>
+      'This village does not have an active census form configured.';
+
+  @override
+  String censusLastUpdatedLabel(String date) {
+    return 'Last updated $date';
+  }
+
+  @override
+  String get censusNotSubmittedYet => 'Not submitted yet';
+
+  @override
+  String get censusNoVillage => 'No village';
+
+  @override
+  String get censusNoSubmittedYet => 'No census submitted yet';
+
+  @override
+  String get censusEditedBadge => 'EDITED';
+
+  @override
+  String get censusSaveCurrentButton => 'Save current census';
+
+  @override
+  String get censusSubmittedMessage => 'Census submitted.';
+
+  @override
+  String get censusVillageUnavailableError =>
+      'Village census is not available.';
+
+  @override
+  String get censusUnsupportedError =>
+      'This census form is not supported by this app version.';
+
+  @override
+  String get censusUnknownKindError => 'Unknown census kind.';
+
+  @override
+  String censusInvalidNumberError(String label) {
+    return 'Enter a non-negative whole number for $label.';
+  }
+
+  @override
   String get notificationsTitle => 'Notifications';
 
   @override
