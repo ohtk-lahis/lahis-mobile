@@ -952,6 +952,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get censusSubmittedMessage => 'ส่งสำมะโนแล้ว';
 
   @override
+  String get censusDraftSavedNotice => 'บันทึกร่างไว้ในอุปกรณ์นี้แล้ว';
+
+  @override
+  String get censusDiscardDraftAction => 'ทิ้งร่าง';
+
+  @override
+  String get censusDraftDiscardedMessage => 'ทิ้งร่างแล้ว';
+
+  @override
   String get censusVillageUnavailableError => 'ไม่สามารถใช้สำมะโนหมู่บ้านได้';
 
   @override

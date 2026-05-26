@@ -122,6 +122,18 @@ class CensusView extends StatelessWidget {
                   ),
                 ),
                 AnimatedNotice(
+                  visible: viewModel.hasDraft,
+                  child: _NoticeBanner(
+                    tone: _NoticeTone.warn,
+                    icon: Icons.save_outlined,
+                    text: viewModel.draftSavedNotice,
+                    actionLabel:
+                        AppLocalizations.of(context)!.censusDiscardDraftAction,
+                    actionIcon: Icons.delete_outline,
+                    onAction: viewModel.discardDraft,
+                  ),
+                ),
+                AnimatedNotice(
                   visible: viewModel.message != null,
                   child: _NoticeBanner(
                     tone: _NoticeTone.ok,
@@ -738,6 +750,7 @@ class _NoticeBanner extends StatelessWidget {
   final IconData icon;
   final String text;
   final String? actionLabel;
+  final IconData actionIcon;
   final VoidCallback? onAction;
 
   const _NoticeBanner({
@@ -745,6 +758,7 @@ class _NoticeBanner extends StatelessWidget {
     required this.icon,
     required this.text,
     this.actionLabel,
+    this.actionIcon = Icons.refresh_rounded,
     this.onAction,
   });
 
@@ -797,7 +811,7 @@ class _NoticeBanner extends StatelessWidget {
               width: double.infinity,
               child: TextButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.refresh_rounded, size: 16),
+                icon: Icon(actionIcon, size: 16),
                 label: Text(actionLabel!),
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,

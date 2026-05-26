@@ -115,6 +115,16 @@ void main() {
     expect(viewModel.activeDefinition?.id, 3);
     expect(viewModel.measureValue('total', 'population'), '123');
     expect(viewModel.message, 'Census form reloaded.');
+    expect(
+      censusService
+          .draftFor(
+            villageId: 1,
+            kind: 'HUMAN',
+            definitionVersionId: 3,
+          )
+          ?.measureValues['total']?['population'],
+      '123',
+    );
   });
 
   test('reload clears incompatible values after definition shape changes',
@@ -146,6 +156,7 @@ void main() {
     expect(viewModel.activeDefinition?.id, 3);
     expect(viewModel.measureValue('total', 'population'), '');
     expect(viewModel.message, contains('Some values need'));
+    expect(viewModel.hasDraft, isFalse);
   });
 
   test('successful submit clears older snapshot notice', () async {
@@ -211,6 +222,198 @@ void main() {
 
     expect(viewModel.definitionChanged, isTrue);
     expect(viewModel.canSubmit, isFalse);
+  });
+
+  test('saves draft after measure value changes', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+    viewModel.setMeasureValue('total', 'population', '123');
+    await flushAsync();
+
+    final saved = censusService.draftFor(
+      villageId: 1,
+      kind: 'HUMAN',
+      definitionVersionId: 2,
+    );
+    expect(saved?.measureValues['total']?['population'], '123');
+    expect(viewModel.hasDraft, isTrue);
+  });
+
+  test('restores matching draft over latest census values', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+    censusService.latestV2 = VillageCensusSnapshot(
+      id: 8,
+      censusDate: DateTime.parse('2026-05-21'),
+      definitionVersionId: 2,
+      definitionVersionNumber: 1,
+      formData: const {
+        'rows': [
+          {
+            'row_key': 'total',
+            'measures': {'population': 100},
+          },
+        ],
+      },
+    );
+    censusService.seedDraft(
+      VillageCensusDraft(
+        villageId: 1,
+        kind: 'HUMAN',
+        definitionVersionId: 2,
+        measureValues: const {
+          'total': {'population': '123'},
+        },
+        savedAt: DateTime.parse('2026-05-22T00:00:00Z'),
+      ),
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+
+    expect(viewModel.measureValue('total', 'population'), '123');
+    expect(viewModel.hasDraft, isTrue);
+    expect(viewModel.isRowDirty(viewModel.rows.single), isTrue);
+  });
+
+  test('does not restore draft from a different definition version', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 3,
+      version: 2,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+    censusService.seedDraft(
+      VillageCensusDraft(
+        villageId: 1,
+        kind: 'HUMAN',
+        definitionVersionId: 2,
+        measureValues: const {
+          'total': {'population': '123'},
+        },
+        savedAt: DateTime.parse('2026-05-22T00:00:00Z'),
+      ),
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+
+    expect(viewModel.measureValue('total', 'population'), '');
+    expect(viewModel.hasDraft, isFalse);
+  });
+
+  test('successful submit clears matching draft', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+    viewModel.setMeasureValue('total', 'population', '123');
+    await flushAsync();
+
+    await viewModel.submit();
+
+    expect(
+      censusService.draftFor(
+        villageId: 1,
+        kind: 'HUMAN',
+        definitionVersionId: 2,
+      ),
+      isNull,
+    );
+    expect(viewModel.hasDraft, isFalse);
+  });
+
+  test('discard draft restores latest submitted values', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+    censusService.latestV2 = VillageCensusSnapshot(
+      id: 8,
+      censusDate: DateTime.parse('2026-05-21'),
+      definitionVersionId: 2,
+      definitionVersionNumber: 1,
+      formData: const {
+        'rows': [
+          {
+            'row_key': 'total',
+            'measures': {'population': 100},
+          },
+        ],
+      },
+    );
+    censusService.seedDraft(
+      VillageCensusDraft(
+        villageId: 1,
+        kind: 'HUMAN',
+        definitionVersionId: 2,
+        measureValues: const {
+          'total': {'population': '123'},
+        },
+        savedAt: DateTime.parse('2026-05-22T00:00:00Z'),
+      ),
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+    expect(viewModel.measureValue('total', 'population'), '123');
+
+    await viewModel.discardDraft();
+
+    expect(viewModel.measureValue('total', 'population'), '100');
+    expect(viewModel.hasDraft, isFalse);
+    expect(viewModel.message, 'Draft discarded.');
+  });
+
+  test('invalid submit keeps draft', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 2,
+      version: 1,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+    viewModel.setMeasureValue('total', 'population', '-1');
+    await flushAsync();
+
+    final result = await viewModel.submit();
+
+    expect(result, isNull);
+    expect(viewModel.hasDraft, isTrue);
+    expect(
+      censusService.draftFor(
+        villageId: 1,
+        kind: 'HUMAN',
+        definitionVersionId: 2,
+      ),
+      isNotNull,
+    );
   });
 }
 
@@ -329,9 +532,30 @@ class CensusServiceMock implements ICensusService {
   CensusDefinitionVersion? activeDefinition;
   VillageCensusSnapshot? latestV2;
   bool throwActiveDefinitionError = false;
+  final drafts = <String, VillageCensusDraft>{};
   VillageCensusSubmitResult submitResult = VillageCensusSubmitSuccess(
     VillageCensusSnapshot(id: 99),
   );
+
+  void seedDraft(VillageCensusDraft draft) {
+    drafts[_draftKey(
+      villageId: draft.villageId,
+      kind: draft.kind,
+      definitionVersionId: draft.definitionVersionId,
+    )] = draft;
+  }
+
+  VillageCensusDraft? draftFor({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  }) {
+    return drafts[_draftKey(
+      villageId: villageId,
+      kind: kind,
+      definitionVersionId: definitionVersionId,
+    )];
+  }
 
   @override
   Future<List<AnimalSpecies>> fetchActiveSpecies() async => const [];
@@ -370,6 +594,36 @@ class CensusServiceMock implements ICensusService {
       latestV2;
 
   @override
+  Future<VillageCensusDraft?> getDraft({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  }) async =>
+      draftFor(
+        villageId: villageId,
+        kind: kind,
+        definitionVersionId: definitionVersionId,
+      );
+
+  @override
+  Future<void> saveDraft(VillageCensusDraft draft) async {
+    seedDraft(draft);
+  }
+
+  @override
+  Future<void> clearDraft({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  }) async {
+    drafts.remove(_draftKey(
+      villageId: villageId,
+      kind: kind,
+      definitionVersionId: definitionVersionId,
+    ));
+  }
+
+  @override
   Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
     required int villageId,
     required DateTime censusDate,
@@ -385,4 +639,12 @@ class CensusServiceMock implements ICensusService {
     required Map<String, dynamic> formData,
   }) async =>
       submitResult;
+
+  String _draftKey({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  }) {
+    return '$villageId:${kind.toUpperCase()}:${definitionVersionId ?? 'legacy'}';
+  }
 }

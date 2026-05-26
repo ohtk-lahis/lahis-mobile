@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
@@ -25,6 +27,7 @@ class CensusViewModel extends BaseViewModel {
   CensusDefinitionVersion? activeDefinition;
   CensusKindSummary? activeKindSummary;
   VillageCensusSnapshot? latestCensus;
+  VillageCensusDraft? draft;
   final measureValues = <String, Map<String, String>>{};
   final _initialMeasureValues = <String, Map<String, String>>{};
   String? message;
@@ -38,6 +41,7 @@ class CensusViewModel extends BaseViewModel {
   String? activeKind;
   final Map<String, FocusNode> _inputFocusNodes = {};
   List<String> _visibleInputKeys = const [];
+  Future<void>? _pendingDraftWrite;
 
   CensusViewModel({String? kind}) : requestedKind = _normalizeKind(kind) {
     init();
@@ -101,6 +105,10 @@ class CensusViewModel extends BaseViewModel {
   String get definitionChangedMessage =>
       localize.censusDefinitionChangedMessage;
 
+  bool get hasDraft => draft != null;
+
+  String get draftSavedNotice => localize.censusDraftSavedNotice;
+
   Future<void> init() async {
     setBusy(true);
     message = null;
@@ -131,6 +139,8 @@ class CensusViewModel extends BaseViewModel {
     measureValues.putIfAbsent(rowKey, () => {});
     measureValues[rowKey]![measureKey] = value.trim();
     _clearSubmitError();
+    _pendingDraftWrite = _saveDraft();
+    unawaited(_pendingDraftWrite!);
     notifyListeners();
   }
 
@@ -240,6 +250,8 @@ class CensusViewModel extends BaseViewModel {
       latestSnapshotUsesOlderDefinition = false;
       latestSnapshotPrefilledAnyValue = false;
       _captureInitialValues();
+      await _pendingDraftWrite;
+      await _clearDraft();
       message = localize.censusSubmittedMessage;
     } else if (result is VillageCensusSubmitValidationFailure) {
       setErrorForObject('submit', result.messages.join(', '));
@@ -295,6 +307,7 @@ class CensusViewModel extends BaseViewModel {
       await _loadFormForKind(kind, allowCachedDefinitionFallback: false);
       definitionChanged = false;
       final restoredAll = _restoreCompatibleValues(previousValues);
+      await _saveDraft(force: _hasAnyEnteredValue(measureValues));
       message = restoredAll
           ? localize.censusFormReloadedMessage
           : localize.censusFormReloadedPartialMessage;
@@ -393,6 +406,7 @@ class CensusViewModel extends BaseViewModel {
           await censusService.getLatestVillageCensus(selectedVillage!.id);
     }
     _prefillFromLatestCensus();
+    await _loadDraft();
   }
 
   Future<void> _loadCensusRows(
@@ -602,6 +616,86 @@ class CensusViewModel extends BaseViewModel {
     _captureInitialValues();
   }
 
+  Future<void> _loadDraft() async {
+    final village = selectedVillage;
+    final kind = activeKind;
+    if (village == null || kind == null) {
+      draft = null;
+      return;
+    }
+
+    final loaded = await censusService.getDraft(
+      villageId: village.id,
+      kind: kind,
+      definitionVersionId: activeDefinition?.id,
+    );
+    if (loaded == null) {
+      draft = null;
+      return;
+    }
+
+    final appliedAny = _applyCompatibleValues(loaded.measureValues);
+    if (!appliedAny) {
+      draft = null;
+      await _clearDraft();
+      return;
+    }
+    draft = loaded;
+  }
+
+  Future<void> _saveDraft({bool force = false}) async {
+    final village = selectedVillage;
+    final kind = activeKind;
+    if (village == null || kind == null || !hasRows) {
+      draft = null;
+      return;
+    }
+
+    if (!force && !_hasDraftChanges()) {
+      await _clearDraft();
+      return;
+    }
+
+    final currentDraft = VillageCensusDraft(
+      villageId: village.id,
+      kind: kind,
+      definitionVersionId: activeDefinition?.id,
+      measureValues: _cloneMeasureValues(measureValues),
+      savedAt: DateTime.now(),
+    );
+    draft = currentDraft;
+    await censusService.saveDraft(currentDraft);
+  }
+
+  Future<void> _clearDraft() async {
+    final village = selectedVillage;
+    final kind = activeKind;
+    if (village == null || kind == null) {
+      draft = null;
+      return;
+    }
+    await censusService.clearDraft(
+      villageId: village.id,
+      kind: kind,
+      definitionVersionId: activeDefinition?.id,
+    );
+    draft = null;
+  }
+
+  Future<void> discardDraft() async {
+    await _pendingDraftWrite;
+    await _clearDraft();
+    measureValues
+      ..clear()
+      ..addEntries(
+        _initialMeasureValues.entries.map(
+          (entry) => MapEntry(entry.key, Map<String, String>.from(entry.value)),
+        ),
+      );
+    message = localize.censusDraftDiscardedMessage;
+    notifyListeners();
+  }
+
   bool _restoreCompatibleValues(
     Map<String, Map<String, String>> previousValues,
   ) {
@@ -625,14 +719,62 @@ class CensusViewModel extends BaseViewModel {
     return totalPrevious == restored;
   }
 
+  bool _applyCompatibleValues(
+    Map<String, Map<String, String>> previousValues,
+  ) {
+    var appliedAny = false;
+    for (final entry in previousValues.entries) {
+      final rowValues = measureValues[entry.key];
+      if (rowValues == null) {
+        continue;
+      }
+      for (final measureEntry in entry.value.entries) {
+        if (!rowValues.containsKey(measureEntry.key)) {
+          continue;
+        }
+        rowValues[measureEntry.key] = measureEntry.value;
+        appliedAny = true;
+      }
+    }
+    return appliedAny;
+  }
+
   void _captureInitialValues() {
     _initialMeasureValues
       ..clear()
       ..addEntries(
-        measureValues.entries.map(
-          (entry) => MapEntry(entry.key, Map<String, String>.from(entry.value)),
-        ),
+        _cloneMeasureValues(measureValues).entries,
       );
+  }
+
+  Map<String, Map<String, String>> _cloneMeasureValues(
+    Map<String, Map<String, String>> values,
+  ) {
+    return values.map(
+      (rowKey, rowValues) => MapEntry(
+        rowKey,
+        Map<String, String>.from(rowValues),
+      ),
+    );
+  }
+
+  bool _hasDraftChanges() {
+    for (final row in rows) {
+      final current = measureValues[row.rowKey] ?? const {};
+      final initial = _initialMeasureValues[row.rowKey] ?? const {};
+      for (final measure in measures) {
+        if ((current[measure.key] ?? '') != (initial[measure.key] ?? '')) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool _hasAnyEnteredValue(Map<String, Map<String, String>> values) {
+    return values.values.any(
+      (rowValues) => rowValues.values.any((value) => value.isNotEmpty),
+    );
   }
 
   String _dateOnly(DateTime date) {
@@ -669,6 +811,7 @@ class CensusViewModel extends BaseViewModel {
   void _clearFormData() {
     activeDefinition = null;
     latestCensus = null;
+    draft = null;
     species = [];
     rows = [];
     measures = [];

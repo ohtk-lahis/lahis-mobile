@@ -1818,6 +1818,24 @@ abstract class AppLocalizations {
   /// **'Census submitted.'**
   String get censusSubmittedMessage;
 
+  /// No description provided for @censusDraftSavedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft saved on this device.'**
+  String get censusDraftSavedNotice;
+
+  /// No description provided for @censusDiscardDraftAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard draft'**
+  String get censusDiscardDraftAction;
+
+  /// No description provided for @censusDraftDiscardedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft discarded.'**
+  String get censusDraftDiscardedMessage;
+
   /// No description provided for @censusVillageUnavailableError.
   ///
   /// In en, this message translates to:

@@ -943,6 +943,15 @@ class AppLocalizationsLo extends AppLocalizations {
   String get censusSubmittedMessage => 'ສົ່ງສຳມະໂນແລ້ວ.';
 
   @override
+  String get censusDraftSavedNotice => 'ບັນທຶກຮ່າງໄວ້ໃນອຸປະກອນນີ້ແລ້ວ.';
+
+  @override
+  String get censusDiscardDraftAction => 'ຖິ້ມຮ່າງ';
+
+  @override
+  String get censusDraftDiscardedMessage => 'ຖິ້ມຮ່າງແລ້ວ.';
+
+  @override
   String get censusVillageUnavailableError => 'ບໍ່ສາມາດໃຊ້ສຳມະໂນບ້ານໄດ້.';
 
   @override

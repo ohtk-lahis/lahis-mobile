@@ -959,6 +959,15 @@ class AppLocalizationsKm extends AppLocalizations {
   String get censusSubmittedMessage => 'Census submitted.';
 
   @override
+  String get censusDraftSavedNotice => 'Draft saved on this device.';
+
+  @override
+  String get censusDiscardDraftAction => 'Discard draft';
+
+  @override
+  String get censusDraftDiscardedMessage => 'Draft discarded.';
+
+  @override
   String get censusVillageUnavailableError =>
       'Village census is not available.';
 
