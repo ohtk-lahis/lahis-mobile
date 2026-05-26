@@ -71,6 +71,22 @@ class CensusView extends StatelessWidget {
           return _CensusHub(viewModel: viewModel);
         }
 
+        if (viewModel.definitionInactive) {
+          return _CensusFormScaffold(
+            title: viewModel.activeKindName,
+            body: _FullState(
+              icon: Icons.pause_circle_outline,
+              iconColor: Color(0xFFA07015),
+              iconBackground: Color(0x1AA07015),
+              title: localize.censusInactiveTitle,
+              message: localize.censusInactiveMessage,
+              actionLabel: localize.backButton,
+              actionIcon: Icons.arrow_back_rounded,
+              onAction: () => _goBackToCensusHub(context),
+            ),
+          );
+        }
+
         if (viewModel.unsupportedSchema) {
           return _CensusFormScaffold(
             title: viewModel.activeKindName,
@@ -118,6 +134,7 @@ class CensusView extends StatelessWidget {
                     text: viewModel.definitionChangedMessage,
                     actionLabel:
                         AppLocalizations.of(context)!.censusReloadFormAction,
+                    actionIcon: Icons.refresh_rounded,
                     onAction: viewModel.reloadDefinition,
                   ),
                 ),
@@ -210,13 +227,7 @@ class _CensusFormScaffold extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/census');
-            }
-          },
+          onPressed: () => _goBackToCensusHub(context),
         ),
         title: Text(
           title,
@@ -235,6 +246,14 @@ class _CensusFormScaffold extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+void _goBackToCensusHub(BuildContext context) {
+  if (context.canPop()) {
+    context.pop();
+  } else {
+    context.go('/census');
   }
 }
 
@@ -281,9 +300,7 @@ class _CensusHub extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  viewModel.censusKinds.length == 1
-                      ? AppLocalizations.of(context)!.censusHubHelperSingle
-                      : AppLocalizations.of(context)!.censusHubHelperMulti,
+                  AppLocalizations.of(context)!.censusHubHelperMulti,
                   style: const TextStyle(
                     fontSize: 13,
                     height: 1.45,
@@ -542,6 +559,7 @@ class _CensusRowSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dirty = viewModel.isRowDirty(row);
+    final invalid = viewModel.hasRowErrors(row);
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(
@@ -577,16 +595,28 @@ class _CensusRowSection extends StatelessWidget {
           const SizedBox(height: 8),
           OhtkCard(
             padding: EdgeInsets.zero,
-            borderColor: dirty ? incidentsTeal : incidentsHair,
-            boxShadow: dirty
+            borderColor: invalid
+                ? incidentsErrorRed
+                : dirty
+                    ? incidentsTeal
+                    : incidentsHair,
+            boxShadow: invalid
                 ? [
                     BoxShadow(
-                      color: incidentsTeal.withValues(alpha: 0.10),
+                      color: incidentsErrorRed.withValues(alpha: 0.10),
                       spreadRadius: 3,
                       blurRadius: 0,
                     )
                   ]
-                : null,
+                : dirty
+                    ? [
+                        BoxShadow(
+                          color: incidentsTeal.withValues(alpha: 0.10),
+                          spreadRadius: 3,
+                          blurRadius: 0,
+                        )
+                      ]
+                    : null,
             child: Column(
               children: [
                 for (var i = 0; i < viewModel.measures.length; i++)
@@ -621,6 +651,8 @@ class _MeasureInputRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = measure.label.isNotEmpty ? measure.label : measure.key;
+    final errorText = viewModel.measureError(row, measure);
+    final isInvalid = errorText != null && errorText.isNotEmpty;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
@@ -644,52 +676,79 @@ class _MeasureInputRow extends StatelessWidget {
           const SizedBox(width: 12),
           SizedBox(
             width: 100,
-            child: TextFormField(
-              key: ValueKey('${row.rowKey}:${measure.key}'),
-              initialValue: viewModel.measureValue(row.rowKey, measure.key),
-              focusNode: viewModel.focusNodeFor(row, measure),
-              enabled: !viewModel.busy('submit'),
-              textAlign: TextAlign.right,
-              keyboardType: TextInputType.number,
-              textInputAction: viewModel.textInputActionFor(row, measure),
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              onEditingComplete: () =>
-                  viewModel.completeEditing(context, row, measure),
-              onChanged: (value) =>
-                  viewModel.setMeasureValue(row.rowKey, measure.key, value),
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: incidentsInk,
-              ),
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                filled: viewModel.busy('submit'),
-                fillColor: incidentsSand,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      const BorderSide(color: incidentsHair, width: 1.5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                TextFormField(
+                  key: ValueKey(
+                    '${row.rowKey}:${measure.key}:${viewModel.formValueRevision}',
+                  ),
+                  initialValue: viewModel.measureValue(row.rowKey, measure.key),
+                  focusNode: viewModel.focusNodeFor(row, measure),
+                  enabled: !viewModel.busy('submit'),
+                  textAlign: TextAlign.right,
+                  keyboardType: TextInputType.number,
+                  textInputAction: viewModel.textInputActionFor(row, measure),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onEditingComplete: () =>
+                      viewModel.completeEditing(context, row, measure),
+                  onChanged: (value) =>
+                      viewModel.setMeasureValue(row.rowKey, measure.key, value),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: incidentsInk,
+                  ),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    filled: viewModel.busy('submit') || isInvalid,
+                    fillColor: isInvalid ? Colors.white : incidentsSand,
+                    border: _measureInputBorder(
+                      isInvalid ? incidentsErrorRed : incidentsHair,
+                      1.5,
+                    ),
+                    enabledBorder: _measureInputBorder(
+                      isInvalid ? incidentsErrorRed : incidentsHair,
+                      1.5,
+                    ),
+                    focusedBorder: _measureInputBorder(
+                      isInvalid ? incidentsErrorRed : incidentsTeal,
+                      1.8,
+                    ),
+                    errorBorder: _measureInputBorder(incidentsErrorRed, 1.5),
+                    focusedErrorBorder:
+                        _measureInputBorder(incidentsErrorRed, 1.8),
+                  ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      const BorderSide(color: incidentsHair, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide:
-                      const BorderSide(color: incidentsTeal, width: 1.5),
-                ),
-              ),
+                if (isInvalid) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    errorText,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                      color: incidentsErrorRed,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
+
+OutlineInputBorder _measureInputBorder(Color color, double width) {
+  return OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: BorderSide(color: color, width: width),
+  );
 }
 
 class _StickyFooter extends StatelessWidget {
@@ -711,22 +770,87 @@ class _StickyFooter extends StatelessWidget {
         OhtkLayout.pagePad,
         18,
       ),
-      child: OhtkPrimaryButton(
-        label: AppLocalizations.of(context)!.censusSaveCurrentButton,
-        loading: viewModel.busy('submit'),
-        onPressed: viewModel.canSubmit
-            ? () async {
-                final result = await viewModel.submit();
-                if (context.mounted && result is VillageCensusSubmitSuccess) {
-                  await SubmitSuccessOverlay.show(
-                    context,
-                    message:
-                        AppLocalizations.of(context)!.censusSubmittedMessage,
-                  );
-                }
-              }
-            : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (viewModel.hasDraft) ...[
+            _DraftFooterNote(viewModel: viewModel),
+            const SizedBox(height: 10),
+            const Divider(height: 1, thickness: 1, color: OhtkColor.line),
+            const SizedBox(height: 14),
+          ],
+          OhtkPrimaryButton(
+            label: AppLocalizations.of(context)!.censusSaveCurrentButton,
+            loading: viewModel.busy('submit'),
+            onPressed: viewModel.canSubmit
+                ? () async {
+                    final result = await viewModel.submit();
+                    if (context.mounted &&
+                        result is VillageCensusSubmitSuccess) {
+                      await SubmitSuccessOverlay.show(
+                        context,
+                        message: AppLocalizations.of(context)!
+                            .censusSubmittedMessage,
+                      );
+                    }
+                  }
+                : null,
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _DraftFooterNote extends StatelessWidget {
+  final CensusViewModel viewModel;
+
+  const _DraftFooterNote({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(top: 1),
+          child: Icon(
+            Icons.circle,
+            size: 8,
+            color: Color(0xFFA07015),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            viewModel.draftSavedNotice,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              height: 1.3,
+              fontWeight: FontWeight.w600,
+              color: incidentsMuted,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        TextButton(
+          onPressed:
+              viewModel.busy('submit') ? null : () => viewModel.discardDraft(),
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFFA07015),
+            minimumSize: const Size(0, 36),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            textStyle: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          child: Text(localize.censusDiscardDraftAction),
+        ),
+      ],
     );
   }
 }
@@ -738,6 +862,7 @@ class _NoticeBanner extends StatelessWidget {
   final IconData icon;
   final String text;
   final String? actionLabel;
+  final IconData actionIcon;
   final VoidCallback? onAction;
 
   const _NoticeBanner({
@@ -745,6 +870,7 @@ class _NoticeBanner extends StatelessWidget {
     required this.icon,
     required this.text,
     this.actionLabel,
+    this.actionIcon = Icons.refresh_rounded,
     this.onAction,
   });
 
@@ -797,7 +923,7 @@ class _NoticeBanner extends StatelessWidget {
               width: double.infinity,
               child: TextButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.refresh_rounded, size: 16),
+                icon: Icon(actionIcon, size: 16),
                 label: Text(actionLabel!),
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
@@ -828,6 +954,7 @@ class _FullState extends StatelessWidget {
   final String title;
   final String message;
   final String? actionLabel;
+  final IconData actionIcon;
   final VoidCallback? onAction;
 
   const _FullState({
@@ -837,6 +964,7 @@ class _FullState extends StatelessWidget {
     this.iconColor = incidentsErrorRed,
     this.iconBackground = incidentsErrorTint,
     this.actionLabel,
+    this.actionIcon = Icons.refresh,
     this.onAction,
   });
 
@@ -881,7 +1009,7 @@ class _FullState extends StatelessWidget {
               const SizedBox(height: 22),
               ElevatedButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.refresh, size: 15),
+                icon: Icon(actionIcon, size: 15),
                 label: Text(actionLabel!.toUpperCase()),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: incidentsTeal,

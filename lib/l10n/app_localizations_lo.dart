@@ -872,7 +872,7 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get censusDefinitionChangedMessage =>
-      'ແບບຟອມສຳມະໂນມີການປ່ຽນແປງ. ໂຫຼດແບບຟອມໃໝ່ແລ້ວສົ່ງອີກຄັ້ງ.';
+      'ແບບຟອມສຳມະໂນປ່ຽນລະຫວ່າງທີ່ທ່ານກຳລັງກອກ. ໂຫຼດແບບຟອມໃໝ່ເພື່ອໃຫ້ມີລາຍການຫຼ້າສຸດ ແລ້ວສົ່ງອີກຄັ້ງ.';
 
   @override
   String get censusReloadFormAction => 'ໂຫຼດແບບຟອມໃໝ່';
@@ -899,6 +899,13 @@ class AppLocalizationsLo extends AppLocalizations {
   @override
   String get censusUnavailableMessage =>
       'ບັນຊີນີ້ບໍ່ໄດ້ຖືກມອບໝາຍໃຫ້ອັບເດດສຳມະໂນຂອງບ້ານ.';
+
+  @override
+  String get censusInactiveTitle => 'ສຳມະໂນນີ້ຖືກປິດໃຊ້ງານ';
+
+  @override
+  String get censusInactiveMessage =>
+      'ຜູ້ປະສານງານໄດ້ປິດແບບຟອມສຳມະໂນນີ້ໄວ້ໃນຕອນນີ້. ກັບຄືນເພື່ອເລືອກສຳມະໂນທີ່ຍັງເປີດໃຊ້ງານ.';
 
   @override
   String get censusLoadFailedTitle => 'ໂຫຼດສຳມະໂນບໍ່ສຳເລັດ';
@@ -941,6 +948,15 @@ class AppLocalizationsLo extends AppLocalizations {
 
   @override
   String get censusSubmittedMessage => 'ສົ່ງສຳມະໂນແລ້ວ.';
+
+  @override
+  String get censusDraftSavedNotice => 'ບັນທຶກຮ່າງໄວ້ໃນອຸປະກອນນີ້ແລ້ວ.';
+
+  @override
+  String get censusDiscardDraftAction => 'ຖິ້ມຮ່າງ';
+
+  @override
+  String get censusDraftDiscardedMessage => 'ຖິ້ມຮ່າງແລ້ວ.';
 
   @override
   String get censusVillageUnavailableError => 'ບໍ່ສາມາດໃຊ້ສຳມະໂນບ້ານໄດ້.';

@@ -84,6 +84,60 @@ class VillageCensusSnapshot {
   }
 }
 
+class VillageCensusDraft {
+  final int villageId;
+  final String kind;
+  final int? definitionVersionId;
+  final Map<String, Map<String, String>> measureValues;
+  final DateTime savedAt;
+
+  const VillageCensusDraft({
+    required this.villageId,
+    required this.kind,
+    required this.measureValues,
+    required this.savedAt,
+    this.definitionVersionId,
+  });
+
+  factory VillageCensusDraft.fromJson(Map<String, dynamic> json) {
+    Map<String, Map<String, String>> parseMeasureValues(dynamic value) {
+      final rows = value as Map? ?? const {};
+      return rows.map(
+        (rowKey, measures) => MapEntry(
+          rowKey.toString(),
+          (measures as Map? ?? const {}).map(
+            (measureKey, measureValue) => MapEntry(
+              measureKey.toString(),
+              measureValue?.toString() ?? '',
+            ),
+          ),
+        ),
+      );
+    }
+
+    return VillageCensusDraft(
+      villageId: json['villageId'] is int
+          ? json['villageId'] as int
+          : int.parse('${json['villageId']}'),
+      kind: json['kind']?.toString() ?? '',
+      definitionVersionId: _parseInt(json['definitionVersionId']),
+      measureValues: parseMeasureValues(json['measureValues']),
+      savedAt: DateTime.tryParse(json['savedAt']?.toString() ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'villageId': villageId,
+      'kind': kind,
+      'definitionVersionId': definitionVersionId,
+      'measureValues': measureValues,
+      'savedAt': savedAt.toIso8601String(),
+    };
+  }
+}
+
 abstract class VillageCensusSubmitResult {}
 
 class VillageCensusSubmitSuccess extends VillageCensusSubmitResult {

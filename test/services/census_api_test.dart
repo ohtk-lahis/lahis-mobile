@@ -438,6 +438,44 @@ void main() {
       expect(failure.messages, ['reporter is not official for this village']);
     });
 
+    test('submitVillageCensusSnapshot classifies animal species changes',
+        () async {
+      final link = QueueLink([
+        {
+          '__typename': 'Mutation',
+          'submitVillageCensusSnapshot': {
+            '__typename': 'SubmitVillageCensusSnapshotMutation',
+            'result': {
+              '__typename': 'VillageCensusSnapshotProblem',
+              'message': null,
+              'fields': [
+                {
+                  '__typename': 'AdminFieldValidationProblem',
+                  'name': 'facts',
+                  'message': 'ACTIVE_ANIMAL_SPECIES_CHANGED',
+                }
+              ],
+            }
+          }
+        }
+      ]);
+      final api = censusApiFor(link);
+
+      final result = await api.submitVillageCensusSnapshot(
+        villageId: 11,
+        censusDate: '2026-05-05',
+        facts: const [
+          AnimalCensusFactInput(
+            speciesId: 1,
+            animalQuantity: 10,
+            householdQuantity: 5,
+          ),
+        ],
+      );
+
+      expect(result, isA<CensusDefinitionChanged>());
+    });
+
     test('submitVillageCensusSnapshotV2 sends definition version and form data',
         () async {
       final formData = {
@@ -529,6 +567,72 @@ void main() {
                   '__typename': 'AdminFieldValidationProblem',
                   'name': 'definition_version_id',
                   'message': 'census definition version must be published',
+                }
+              ],
+            }
+          }
+        }
+      ]);
+      final api = censusApiFor(link);
+
+      final result = await api.submitVillageCensusSnapshotV2(
+        villageId: 11,
+        definitionVersionId: 7,
+        censusDate: '2026-05-05',
+        formData: const {'rows': []},
+      );
+
+      expect(result, isA<CensusDefinitionChanged>());
+    });
+
+    test('submitVillageCensusSnapshotV2 classifies disabled definition',
+        () async {
+      final link = QueueLink([
+        {
+          '__typename': 'Mutation',
+          'submitVillageCensusSnapshotV2': {
+            '__typename': 'SubmitVillageCensusSnapshotV2Mutation',
+            'result': {
+              '__typename': 'VillageCensusSnapshotProblem',
+              'message': null,
+              'fields': [
+                {
+                  '__typename': 'AdminFieldValidationProblem',
+                  'name': 'definition_version_id',
+                  'message': 'DEFINITION_DISABLED',
+                }
+              ],
+            }
+          }
+        }
+      ]);
+      final api = censusApiFor(link);
+
+      final result = await api.submitVillageCensusSnapshotV2(
+        villageId: 11,
+        definitionVersionId: 7,
+        censusDate: '2026-05-05',
+        formData: const {'rows': []},
+      );
+
+      expect(result, isA<CensusDefinitionChanged>());
+    });
+
+    test('submitVillageCensusSnapshotV2 classifies animal species changes',
+        () async {
+      final link = QueueLink([
+        {
+          '__typename': 'Mutation',
+          'submitVillageCensusSnapshotV2': {
+            '__typename': 'SubmitVillageCensusSnapshotV2Mutation',
+            'result': {
+              '__typename': 'VillageCensusSnapshotProblem',
+              'message': null,
+              'fields': [
+                {
+                  '__typename': 'AdminFieldValidationProblem',
+                  'name': 'form_data.rows',
+                  'message': 'ACTIVE_ANIMAL_SPECIES_CHANGED',
                 }
               ],
             }

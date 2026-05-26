@@ -339,23 +339,7 @@ class CensusApi extends GraphQlBaseApi {
           'censusDate': censusDate,
           'facts': facts.map((fact) => fact.toJson()).toList(),
         },
-        parseData: (resp) {
-          final result = resp?['result'];
-          if (result?['__typename'] == 'VillageCensusSnapshotType') {
-            return VillageCensusSubmitSuccess(
-              VillageCensusSnapshot.fromJson(result),
-            );
-          }
-
-          final fieldMessages = (result?['fields'] as List? ?? const [])
-              .map((field) => field['message'].toString())
-              .toList();
-          final message = result?['message']?.toString();
-          return VillageCensusSubmitValidationFailure([
-            ...fieldMessages,
-            if (message != null && message.isNotEmpty) message,
-          ]);
-        },
+        parseData: _parseSubmitResult,
       );
     } on OperationException catch (e) {
       return VillageCensusSubmitFailure(e);
@@ -461,7 +445,10 @@ class CensusApi extends GraphQlBaseApi {
     return messages.any(
       (message) =>
           message.contains('census definition version must be published') ||
-          message.contains('DEFINITION_VERSION_RETIRED'),
+          message.contains('DEFINITION_VERSION_RETIRED') ||
+          message.contains('DEFINITION_DISABLED') ||
+          message.contains('ACTIVE_ANIMAL_SPECIES_CHANGED') ||
+          message.contains('census definition is not enabled'),
     );
   }
 

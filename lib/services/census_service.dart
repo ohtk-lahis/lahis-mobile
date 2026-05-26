@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/api/census_api.dart';
 import 'package:podd_app/services/db_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class ICensusService {
@@ -28,6 +31,20 @@ abstract class ICensusService {
     required String kind,
   });
 
+  Future<VillageCensusDraft?> getDraft({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  });
+
+  Future<void> saveDraft(VillageCensusDraft draft);
+
+  Future<void> clearDraft({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  });
+
   Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
     required int villageId,
     required DateTime censusDate,
@@ -43,8 +60,17 @@ abstract class ICensusService {
 }
 
 class CensusService implements ICensusService {
-  final CensusApi _censusApi = locator<CensusApi>();
-  final IDbService _dbService = locator<IDbService>();
+  final CensusApi _censusApi;
+  final IDbService _dbService;
+  SharedPreferences? _prefs;
+
+  CensusService({
+    CensusApi? censusApi,
+    IDbService? dbService,
+    SharedPreferences? prefs,
+  })  : _censusApi = censusApi ?? locator<CensusApi>(),
+        _dbService = dbService ?? locator<IDbService>(),
+        _prefs = prefs;
 
   @override
   Future<List<AnimalSpecies>> fetchActiveSpecies() {
@@ -108,6 +134,60 @@ class CensusService implements ICensusService {
   }
 
   @override
+  Future<VillageCensusDraft?> getDraft({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  }) async {
+    final key = _draftKey(
+      villageId: villageId,
+      kind: kind,
+      definitionVersionId: definitionVersionId,
+    );
+    final raw = (await _preferences()).getString(key);
+    if (raw == null) {
+      return null;
+    }
+    try {
+      return VillageCensusDraft.fromJson(jsonDecode(raw));
+    } catch (_) {
+      await clearDraft(
+        villageId: villageId,
+        kind: kind,
+        definitionVersionId: definitionVersionId,
+      );
+      return null;
+    }
+  }
+
+  @override
+  Future<void> saveDraft(VillageCensusDraft draft) async {
+    await (await _preferences()).setString(
+      _draftKey(
+        villageId: draft.villageId,
+        kind: draft.kind,
+        definitionVersionId: draft.definitionVersionId,
+      ),
+      jsonEncode(draft.toJson()),
+    );
+  }
+
+  @override
+  Future<void> clearDraft({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  }) async {
+    await (await _preferences()).remove(
+      _draftKey(
+        villageId: villageId,
+        kind: kind,
+        definitionVersionId: definitionVersionId,
+      ),
+    );
+  }
+
+  @override
   Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
     required int villageId,
     required DateTime censusDate,
@@ -157,6 +237,19 @@ class CensusService implements ICensusService {
       runtime_schema_json TEXT,
       fetched_at TEXT
     )''');
+  }
+
+  Future<SharedPreferences> _preferences() async {
+    return _prefs ??= await SharedPreferences.getInstance();
+  }
+
+  String _draftKey({
+    required int villageId,
+    required String kind,
+    int? definitionVersionId,
+  }) {
+    final versionKey = definitionVersionId?.toString() ?? 'legacy';
+    return 'fao.census.draft.$villageId.${kind.toUpperCase()}.$versionKey';
   }
 
   String _dateOnly(DateTime date) {

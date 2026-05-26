@@ -880,7 +880,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get censusDefinitionChangedMessage =>
-      'แบบฟอร์มสำมะโนเปลี่ยนแล้ว โปรดโหลดแบบฟอร์มใหม่แล้วส่งอีกครั้ง';
+      'แบบฟอร์มสำมะโนเปลี่ยนระหว่างที่กำลังกรอก โปรดโหลดแบบฟอร์มใหม่เพื่อให้มีรายการล่าสุด แล้วส่งอีกครั้ง';
 
   @override
   String get censusReloadFormAction => 'โหลดแบบฟอร์มใหม่';
@@ -907,6 +907,13 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get censusUnavailableMessage =>
       'บัญชีนี้ไม่ได้รับมอบหมายให้อัปเดตสำมะโนของหมู่บ้าน';
+
+  @override
+  String get censusInactiveTitle => 'This census is inactive';
+
+  @override
+  String get censusInactiveMessage =>
+      'This census form is currently turned off by your coordinator. Go back to choose an available census.';
 
   @override
   String get censusLoadFailedTitle => 'โหลดสำมะโนไม่สำเร็จ';
@@ -950,6 +957,15 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get censusSubmittedMessage => 'ส่งสำมะโนแล้ว';
+
+  @override
+  String get censusDraftSavedNotice => 'บันทึกร่างไว้ในอุปกรณ์นี้แล้ว';
+
+  @override
+  String get censusDiscardDraftAction => 'ทิ้งร่าง';
+
+  @override
+  String get censusDraftDiscardedMessage => 'ทิ้งร่างแล้ว';
 
   @override
   String get censusVillageUnavailableError => 'ไม่สามารถใช้สำมะโนหมู่บ้านได้';
