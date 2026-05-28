@@ -1,32 +1,10 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/api/graph_ql_base_api.dart';
 
 class CensusApi extends GraphQlBaseApi {
   CensusApi(ResolveGraphqlClient client) : super(client);
-
-  Future<List<AnimalSpecies>> fetchActiveSpecies() {
-    const query = r'''
-      query AnimalSpecies {
-        animalSpecies {
-          id
-          code
-          name
-          active
-          sortOrder
-        }
-      }
-    ''';
-
-    return runGqlQuery<List<AnimalSpecies>>(
-      query: query,
-      typeConverter: (resp) => (resp['animalSpecies'] as List? ?? const [])
-          .map((species) => AnimalSpecies.fromJson(species))
-          .toList(),
-    );
-  }
 
   Future<CensusDefinitionVersion?> getActiveCensusDefinitionVersion(
     String kind,
@@ -212,80 +190,6 @@ class CensusApi extends GraphQlBaseApi {
       return null;
     }
     return VillageCensusSnapshot.fromJson(snapshot);
-  }
-
-  Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
-    required int villageId,
-    required String censusDate,
-    required List<AnimalCensusFactInput> facts,
-  }) async {
-    const mutation = r'''
-      mutation SubmitVillageCensusSnapshot(
-        $villageId: Int!,
-        $censusDate: Date!,
-        $facts: [AnimalCensusFactInput!]!
-      ) {
-        submitVillageCensusSnapshot(
-          villageId: $villageId,
-          censusDate: $censusDate,
-          facts: $facts
-        ) {
-          result {
-            __typename
-            ... on VillageCensusSnapshotType {
-              id
-              censusDate
-              submittedAt
-              formData
-              definitionVersion {
-                id
-                version
-                definition {
-                  kind
-                }
-              }
-              village {
-                id
-                code
-                name
-              }
-              facts {
-                species {
-                  id
-                  code
-                  name
-                  active
-                  sortOrder
-                }
-                animalQuantity
-                householdQuantity
-              }
-            }
-            ... on VillageCensusSnapshotProblem {
-              fields {
-                name
-                message
-              }
-              message
-            }
-          }
-        }
-      }
-    ''';
-
-    try {
-      return await runGqlMutation<VillageCensusSubmitResult>(
-        mutation: mutation,
-        variables: {
-          'villageId': villageId,
-          'censusDate': censusDate,
-          'facts': facts.map((fact) => fact.toJson()).toList(),
-        },
-        parseData: _parseSubmitResult,
-      );
-    } on OperationException catch (e) {
-      return VillageCensusSubmitFailure(e);
-    }
   }
 
   Future<VillageCensusSubmitResult> submitVillageCensusSnapshotV2({

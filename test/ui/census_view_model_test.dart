@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/locator.dart';
-import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/login_result.dart';
 import 'package:podd_app/models/user_profile.dart';
@@ -782,9 +781,6 @@ class CensusServiceMock implements ICensusService {
   }
 
   @override
-  Future<List<AnimalSpecies>> fetchActiveSpecies() async => const [];
-
-  @override
   Future<CensusDefinitionVersion?> getActiveCensusDefinitionVersion({
     required String kind,
   }) async {
@@ -842,14 +838,6 @@ class CensusServiceMock implements ICensusService {
       definitionVersionId: definitionVersionId,
     ));
   }
-
-  @override
-  Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
-    required int villageId,
-    required DateTime censusDate,
-    required List<AnimalCensusFactInput> facts,
-  }) async =>
-      submitResult;
 
   @override
   Future<VillageCensusSubmitResult> submitVillageCensusSnapshotV2({

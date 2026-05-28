@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:podd_app/locator.dart';
-import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/api/census_api.dart';
@@ -10,8 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class ICensusService {
-  Future<List<AnimalSpecies>> fetchActiveSpecies();
-
   Future<CensusDefinitionVersion?> getActiveCensusDefinitionVersion({
     required String kind,
   });
@@ -43,12 +40,6 @@ abstract class ICensusService {
     int? definitionVersionId,
   });
 
-  Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
-    required int villageId,
-    required DateTime censusDate,
-    required List<AnimalCensusFactInput> facts,
-  });
-
   Future<VillageCensusSubmitResult> submitVillageCensusSnapshotV2({
     required int villageId,
     required int definitionVersionId,
@@ -69,11 +60,6 @@ class CensusService implements ICensusService {
   })  : _censusApi = censusApi ?? locator<CensusApi>(),
         _dbService = dbService ?? locator<IDbService>(),
         _prefs = prefs;
-
-  @override
-  Future<List<AnimalSpecies>> fetchActiveSpecies() {
-    return _censusApi.fetchActiveSpecies();
-  }
 
   @override
   Future<CensusDefinitionVersion?> getActiveCensusDefinitionVersion({
@@ -181,19 +167,6 @@ class CensusService implements ICensusService {
         kind: kind,
         definitionVersionId: definitionVersionId,
       ),
-    );
-  }
-
-  @override
-  Future<VillageCensusSubmitResult> submitVillageCensusSnapshot({
-    required int villageId,
-    required DateTime censusDate,
-    required List<AnimalCensusFactInput> facts,
-  }) {
-    return _censusApi.submitVillageCensusSnapshot(
-      villageId: villageId,
-      censusDate: _dateOnly(censusDate),
-      facts: facts,
     );
   }
 

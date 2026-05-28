@@ -39,7 +39,6 @@ class CensusViewModel extends BaseViewModel {
   bool latestSnapshotUsesOlderDefinition = false;
   bool latestSnapshotPrefilledAnyValue = false;
   bool latestSnapshotPrefilledAllValues = false;
-  bool _canSubmitWithLegacyMutation = true;
   final String? requestedKind;
   String? activeKind;
   int formValueRevision = 0;
@@ -261,12 +260,8 @@ class CensusViewModel extends BaseViewModel {
           censusDate: DateTime.now(),
           formData: formData,
         );
-        if (result is VillageCensusSubmitUnsupported &&
-            _canSubmitWithLegacyMutation) {
-          result = await _submitLegacy(formData);
-        }
       } else {
-        result = await _submitLegacy(formData);
+        result = VillageCensusSubmitUnsupported();
       }
     } catch (e) {
       setErrorForObject('submit', e.toString());
@@ -445,7 +440,6 @@ class CensusViewModel extends BaseViewModel {
     CensusKindSummary? summary,
     bool allowCachedDefinitionFallback = true,
   }) async {
-    _canSubmitWithLegacyMutation = true;
     usingCachedDefinition = false;
     unsupportedSchema = false;
     definitionInactive = false;
@@ -476,10 +470,7 @@ class CensusViewModel extends BaseViewModel {
       }
     }
 
-    if (definition == null && kind == 'ANIMAL') {
-      species = await censusService.fetchActiveSpecies();
-      _useLegacySpeciesRows(species);
-    } else if (definition == null) {
+    if (definition == null) {
       definitionInactive = true;
     } else {
       activeDefinition = definition;
@@ -491,90 +482,14 @@ class CensusViewModel extends BaseViewModel {
       if (kind == 'ANIMAL') {
         species = runtimeSchema.toAnimalSpeciesRows();
         unsupportedSchema = !runtimeSchema.supportsMobileAnimalSubmit;
-        _canSubmitWithLegacyMutation = runtimeSchema.supportsLegacyAnimalSubmit;
       } else if (kind == 'HUMAN') {
         unsupportedSchema = !runtimeSchema.supportsMobileHumanSubmit;
-        _canSubmitWithLegacyMutation = false;
       } else {
         unsupportedSchema = true;
-        _canSubmitWithLegacyMutation = false;
       }
     }
 
     _ensureValueSlots();
-  }
-
-  Future<VillageCensusSubmitResult> _submitLegacy(
-    Map<String, dynamic> formData,
-  ) {
-    final facts = _buildLegacyFacts(formData);
-    if (facts == null) {
-      return Future.value(
-        VillageCensusSubmitValidationFailure([
-          localize.censusUnsupportedError,
-        ]),
-      );
-    }
-    return censusService.submitVillageCensusSnapshot(
-      villageId: selectedVillage!.id,
-      censusDate: DateTime.now(),
-      facts: facts,
-    );
-  }
-
-  List<AnimalCensusFactInput>? _buildLegacyFacts(
-    Map<String, dynamic> formData,
-  ) {
-    final formRows = formData['rows'] as List? ?? const [];
-    final facts = <AnimalCensusFactInput>[];
-    for (final row in formRows.whereType<Map>()) {
-      final measures = Map<String, dynamic>.from(row['measures'] as Map);
-      final speciesId = row['species_id'] as int?;
-      final animalQuantity = measures['animal_quantity'] as int?;
-      final householdQuantity = measures['household_quantity'] as int?;
-      if (speciesId == null ||
-          animalQuantity == null ||
-          householdQuantity == null) {
-        return null;
-      }
-      facts.add(
-        AnimalCensusFactInput(
-          speciesId: speciesId,
-          animalQuantity: animalQuantity,
-          householdQuantity: householdQuantity,
-        ),
-      );
-    }
-    return facts;
-  }
-
-  void _useLegacySpeciesRows(List<AnimalSpecies> speciesRows) {
-    activeDefinition = null;
-    rows = speciesRows
-        .map(
-          (item) => CensusSchemaRow(
-            rowKey: 'species:${item.id}',
-            label: item.name,
-            speciesId: item.id,
-            speciesCode: item.code,
-            sortOrder: item.sortOrder,
-          ),
-        )
-        .toList();
-    measures = const [
-      CensusSchemaMeasure(
-        key: 'animal_quantity',
-        label: 'Heads',
-        type: 'integer',
-        required: true,
-      ),
-      CensusSchemaMeasure(
-        key: 'household_quantity',
-        label: 'Households keeping this species',
-        type: 'integer',
-        required: true,
-      ),
-    ];
   }
 
   void _ensureValueSlots() {

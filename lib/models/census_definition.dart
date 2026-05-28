@@ -147,18 +147,6 @@ class CensusRuntimeSchema {
     );
   }
 
-  bool get supportsLegacyAnimalSubmit {
-    final measureKeys = measures.map((measure) => measure.key).toSet();
-    final speciesIds = rows.map((row) => row.speciesId).whereType<int>();
-    return rows.isNotEmpty &&
-        extraDimensions.isEmpty &&
-        rows.every((row) => row.speciesId != null) &&
-        speciesIds.length == speciesIds.toSet().length &&
-        measureKeys.length == 2 &&
-        measureKeys.contains('animal_quantity') &&
-        measureKeys.contains('household_quantity');
-  }
-
   bool get supportsMobileAnimalSubmit {
     final speciesIds = rows.map((row) => row.speciesId).whereType<int>();
     return rows.isNotEmpty &&
