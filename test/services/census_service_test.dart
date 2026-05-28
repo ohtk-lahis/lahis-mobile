@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:podd_app/locator.dart';
-import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/village.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/services/api/census_api.dart';
@@ -108,11 +107,6 @@ void main() {
     });
 
     test('falls back to cached latest V2 census when refresh fails', () async {
-      final cattle = AnimalSpecies(
-        id: 1,
-        code: 'CATTLE',
-        name: 'Cattle',
-      );
       final latest = VillageCensusSnapshot(
         id: 99,
         village: const Village(id: 11, code: 'V001', name: 'Village One'),
@@ -122,14 +116,15 @@ void main() {
         formData: const {
           'rows': [
             {
-              'species_id': 1,
+              'row_key': 'species:CATTLE',
               'measures': {'animal_quantity': 5, 'household_quantity': 2},
             },
           ],
         },
         facts: [
-          AnimalCensusFact(
-            species: cattle,
+          const AnimalCensusFact(
+            rowKey: 'species:CATTLE',
+            rowLabel: 'Cattle',
             animalQuantity: 5,
             householdQuantity: 2,
           ),

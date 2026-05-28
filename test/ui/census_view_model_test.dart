@@ -128,8 +128,6 @@ void main() {
             rowKey: 'species:1',
             label: 'Cattle',
             labelI18n: const {'la': 'ງົວ'},
-            speciesId: 1,
-            speciesCode: 'CATTLE',
           ),
         ],
         measures: [
@@ -149,7 +147,6 @@ void main() {
 
     expect(viewModel.rows.single.label, 'ງົວ');
     expect(viewModel.measures.single.label, 'ຈຳນວນສັດ');
-    expect(viewModel.species.single.name, 'ງົວ');
   });
 
   test('uses localized census kind title instead of API summary name',
@@ -299,7 +296,6 @@ void main() {
             CensusSchemaRow(
               rowKey: 'species:1',
               label: 'Cattle',
-              speciesId: 1,
             ),
           ],
         ),
@@ -640,8 +636,6 @@ CensusDefinitionVersion animalDefinition() {
         CensusSchemaRow(
           rowKey: 'species:1',
           label: 'Cattle',
-          speciesId: 1,
-          speciesCode: 'CATTLE',
         ),
       ],
       measures: [

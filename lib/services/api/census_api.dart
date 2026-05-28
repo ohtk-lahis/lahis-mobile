@@ -144,13 +144,8 @@ class CensusApi extends GraphQlBaseApi {
             name
           }
           facts {
-            species {
-              id
-              code
-              name
-              active
-              sortOrder
-            }
+            rowKey
+            rowLabel
             animalQuantity
             householdQuantity
           }
@@ -223,13 +218,8 @@ class CensusApi extends GraphQlBaseApi {
                 name
               }
               facts {
-                species {
-                  id
-                  code
-                  name
-                  active
-                  sortOrder
-                }
+                rowKey
+                rowLabel
                 animalQuantity
                 householdQuantity
               }

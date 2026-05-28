@@ -52,9 +52,6 @@ void main() {
             {
               'row_key': 'species:CATTLE',
               'label': 'Cattle',
-              'species_id': 1,
-              'species_code': 'CATTLE',
-              'sort_order': 1,
             }
           ],
           'measures': [
@@ -95,8 +92,6 @@ void main() {
                 'default': 'Cattle',
                 'la': 'ງົວ',
               },
-              'species_id': 1,
-              'species_code': 'CATTLE',
             }
           ],
           'measures': [
@@ -136,11 +131,8 @@ void main() {
             'version': 1,
             'status': 'PUBLISHED',
             'runtimeSchema': {
-              'row_source': 'ACTIVE_ANIMAL_SPECIES',
               'rows': [
                 {
-                  'species_id': '1',
-                  'species_code': 'CATTLE',
                   'label': 'Cattle',
                   'row_key': 'species:CATTLE',
                 }
@@ -169,10 +161,7 @@ void main() {
 
       expect(version?.id, 7);
       expect(version?.runtimeSchema.supportsMobileAnimalSubmit, isTrue);
-      expect(
-        version?.runtimeSchema.toAnimalSpeciesRows().single.displayName,
-        'CATTLE - Cattle',
-      );
+      expect(version?.runtimeSchema.rows.single.label, 'Cattle');
       expect(link.requests.single.variables, {'kind': 'ANIMAL'});
     });
 
@@ -224,7 +213,6 @@ void main() {
                     {
                       'row_key': 'species:CATTLE',
                       'label': 'Cattle',
-                      'species_id': 1,
                     }
                   ],
                   'measures': [
@@ -348,7 +336,7 @@ void main() {
       final formData = {
         'rows': [
           {
-            'species_id': 1,
+            'row_key': 'species:CATTLE',
             'measures': {
               'animal_quantity': 5,
               'household_quantity': 2,
@@ -384,14 +372,8 @@ void main() {
               },
               'facts': [
                 {
-                  'species': {
-                    '__typename': 'AnimalSpeciesType',
-                    'id': 1,
-                    'code': 'CATTLE',
-                    'name': 'Cattle',
-                    'active': true,
-                    'sortOrder': 1,
-                  },
+                  'rowKey': 'species:CATTLE',
+                  'rowLabel': 'Cattle',
                   'animalQuantity': 5,
                   'householdQuantity': 2,
                 }

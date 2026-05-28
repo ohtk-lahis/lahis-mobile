@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/locator.dart';
-import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/village.dart';
 import 'package:podd_app/models/village_census.dart';
@@ -20,7 +19,6 @@ class CensusViewModel extends BaseViewModel {
       locator<IFeatureCapabilityService>();
   final AppLocalizations localize = locator<AppLocalizations>();
 
-  List<AnimalSpecies> species = [];
   List<CensusKindSummary> censusKinds = [];
   List<CensusSchemaRow> rows = [];
   List<CensusSchemaMeasure> measures = [];
@@ -60,7 +58,7 @@ class CensusViewModel extends BaseViewModel {
           false) &&
       selectedVillage != null;
 
-  bool get hasSpecies => species.isNotEmpty;
+  bool get hasSpecies => rows.isNotEmpty;
 
   bool get hasRows => rows.isNotEmpty;
 
@@ -368,10 +366,8 @@ class CensusViewModel extends BaseViewModel {
       final payload = <String, dynamic>{
         'measures': measureMap,
       };
-      if (activeKind == 'HUMAN') {
+      if (activeKind == 'ANIMAL' || activeKind == 'HUMAN') {
         payload['row_key'] = row.rowKey;
-      } else if (row.speciesId != null) {
-        payload['species_id'] = row.speciesId;
       } else {
         setErrorForObject(
           'submit',
@@ -480,7 +476,6 @@ class CensusViewModel extends BaseViewModel {
       rows = runtimeSchema.rows;
       measures = runtimeSchema.measures;
       if (kind == 'ANIMAL') {
-        species = runtimeSchema.toAnimalSpeciesRows();
         unsupportedSchema = !runtimeSchema.supportsMobileAnimalSubmit;
       } else if (kind == 'HUMAN') {
         unsupportedSchema = !runtimeSchema.supportsMobileHumanSubmit;
@@ -520,12 +515,11 @@ class CensusViewModel extends BaseViewModel {
     if (submittedRows is List && submittedRows.isNotEmpty) {
       for (final submittedRow in submittedRows.whereType<Map>()) {
         final rowKey = submittedRow['row_key']?.toString();
-        final speciesId = submittedRow['species_id'];
         final row = rows.where((candidate) {
           if (rowKey != null && rowKey.isNotEmpty) {
             return candidate.rowKey == rowKey;
           }
-          return candidate.speciesId == speciesId;
+          return false;
         }).firstOrNull;
         if (row == null) {
           continue;
@@ -552,11 +546,11 @@ class CensusViewModel extends BaseViewModel {
       return;
     }
 
-    final factsBySpeciesId = {
-      for (final fact in latestCensus!.facts) fact.species.id: fact,
+    final factsByRowKey = {
+      for (final fact in latestCensus!.facts) fact.rowKey: fact,
     };
     for (final row in rows) {
-      final fact = factsBySpeciesId[row.speciesId];
+      final fact = factsByRowKey[row.rowKey];
       if (fact == null) {
         continue;
       }
@@ -772,7 +766,6 @@ class CensusViewModel extends BaseViewModel {
     latestCensus = null;
     draft = null;
     definitionInactive = false;
-    species = [];
     rows = [];
     measures = [];
     latestSnapshotUsesOlderDefinition = false;

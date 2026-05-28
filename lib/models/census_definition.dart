@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:podd_app/models/animal_species.dart';
 import 'package:podd_app/models/village_census.dart';
 
 class CensusKindSummary {
@@ -148,12 +147,13 @@ class CensusRuntimeSchema {
   }
 
   bool get supportsMobileAnimalSubmit {
-    final speciesIds = rows.map((row) => row.speciesId).whereType<int>();
+    final rowKeys =
+        rows.map((row) => row.rowKey).where((key) => key.isNotEmpty);
     return rows.isNotEmpty &&
         measures.isNotEmpty &&
         extraDimensions.isEmpty &&
-        rows.every((row) => row.speciesId != null) &&
-        speciesIds.length == speciesIds.toSet().length &&
+        rows.every((row) => row.rowKey.isNotEmpty) &&
+        rowKeys.length == rowKeys.toSet().length &&
         measures.every((measure) => measure.isInteger);
   }
 
@@ -167,50 +167,25 @@ class CensusRuntimeSchema {
         rowKeys.length == rowKeys.toSet().length &&
         measures.every((measure) => measure.isInteger);
   }
-
-  List<AnimalSpecies> toAnimalSpeciesRows() {
-    return rows
-        .where((row) => row.speciesId != null)
-        .map(
-          (row) => AnimalSpecies(
-            id: row.speciesId!,
-            code: row.speciesCode,
-            name: row.label,
-            active: true,
-            sortOrder: row.sortOrder,
-          ),
-        )
-        .toList();
-  }
 }
 
 class CensusSchemaRow {
   final String rowKey;
   final String label;
   final Map<String, String> labelI18n;
-  final int? speciesId;
-  final String speciesCode;
-  final int sortOrder;
 
   const CensusSchemaRow({
     required this.rowKey,
     required this.label,
     this.labelI18n = const {},
-    this.speciesId,
-    this.speciesCode = '',
-    this.sortOrder = 0,
   });
 
   factory CensusSchemaRow.fromJson(Map<String, dynamic> json) {
-    final speciesCode = json['species_code']?.toString() ?? '';
     final labelValue = json['label'];
     return CensusSchemaRow(
       rowKey: json['row_key']?.toString() ?? json['key']?.toString() ?? '',
-      label: _labelText(labelValue, speciesCode),
+      label: _labelText(labelValue, ''),
       labelI18n: _localizedLabelMap(json['label_i18n'] ?? labelValue),
-      speciesId: _parseInt(json['species_id']),
-      speciesCode: speciesCode,
-      sortOrder: _parseInt(json['sort_order']) ?? 0,
     );
   }
 
@@ -223,9 +198,6 @@ class CensusSchemaRow {
       rowKey: rowKey,
       label: localizedLabel,
       labelI18n: labelI18n,
-      speciesId: speciesId,
-      speciesCode: speciesCode,
-      sortOrder: sortOrder,
     );
   }
 
@@ -234,9 +206,6 @@ class CensusSchemaRow {
       'row_key': rowKey,
       'label': label,
       if (labelI18n.isNotEmpty) 'label_i18n': labelI18n,
-      'species_id': speciesId,
-      'species_code': speciesCode,
-      'sort_order': sortOrder,
     };
   }
 }
