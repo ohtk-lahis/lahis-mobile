@@ -81,6 +81,51 @@ void main() {
       expect(cached.runtimeSchema.measures.single.key, 'animal_quantity');
     });
 
+    test('runtime schema preserves and applies localized labels', () {
+      final version = CensusDefinitionVersion.fromJson({
+        'id': '7',
+        'version': 2,
+        'status': 'PUBLISHED',
+        'runtimeSchema': {
+          'rows': [
+            {
+              'row_key': 'species:CATTLE',
+              'label': 'Cattle',
+              'label_i18n': {
+                'default': 'Cattle',
+                'la': 'ງົວ',
+              },
+              'species_id': 1,
+              'species_code': 'CATTLE',
+            }
+          ],
+          'measures': [
+            {
+              'key': 'animal_quantity',
+              'label': 'Animal quantity',
+              'label_i18n': {
+                'default': 'Animal quantity',
+                'la': 'ຈຳນວນສັດ',
+              },
+              'type': 'integer',
+              'required': true,
+            }
+          ],
+        },
+      });
+
+      final cached = CensusDefinitionVersion.fromCacheMap(
+        version.toCacheMap(
+          kind: 'ANIMAL',
+          fetchedAt: DateTime.parse('2026-05-19T00:00:00Z'),
+        ),
+      );
+      final localized = cached.runtimeSchema.localized('lo');
+
+      expect(localized.rows.single.label, 'ງົວ');
+      expect(localized.measures.single.label, 'ຈຳນວນສັດ');
+    });
+
     test('fetchActiveSpecies parses active species list', () async {
       final link = QueueLink([
         {
@@ -282,19 +327,6 @@ void main() {
       final summaries = await api.getActiveVillageCensusDefinitions(11);
 
       expect(summaries, isEmpty);
-    });
-
-    test('getLatestVillageCensus returns null when no snapshot exists',
-        () async {
-      final link = QueueLink([
-        {'__typename': 'Query', 'latestVillageCensus': null}
-      ]);
-      final api = censusApiFor(link);
-
-      final latest = await api.getLatestVillageCensus(11);
-
-      expect(latest, isNull);
-      expect(link.requests.single.variables, {'villageId': 11});
     });
 
     test('getLatestVillageCensusV2 parses generic form data', () async {

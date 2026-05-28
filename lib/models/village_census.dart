@@ -39,6 +39,14 @@ class AnimalCensusFact {
         animalQuantity: json['animalQuantity'] as int? ?? 0,
         householdQuantity: json['householdQuantity'] as int? ?? 0,
       );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'species': species.toJson(),
+      'animalQuantity': animalQuantity,
+      'householdQuantity': householdQuantity,
+    };
+  }
 }
 
 class VillageCensusSnapshot {
@@ -81,6 +89,23 @@ class VillageCensusSnapshot {
           .toList(),
       formData: Map<String, dynamic>.from(json['formData'] as Map? ?? {}),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      if (village != null) 'village': village!.toJson(),
+      if (censusDate != null) 'censusDate': _dateOnly(censusDate!),
+      if (submittedAt != null) 'submittedAt': submittedAt,
+      if (definitionVersionId != null || definitionVersionNumber != null)
+        'definitionVersion': {
+          if (definitionVersionId != null) 'id': definitionVersionId,
+          if (definitionVersionNumber != null)
+            'version': definitionVersionNumber,
+        },
+      'facts': facts.map((fact) => fact.toJson()).toList(),
+      'formData': formData,
+    };
   }
 }
 
@@ -173,4 +198,11 @@ int? _parseInt(dynamic value) {
     return value;
   }
   return int.tryParse(value.toString());
+}
+
+String _dateOnly(DateTime date) {
+  final year = date.year.toString().padLeft(4, '0');
+  final month = date.month.toString().padLeft(2, '0');
+  final day = date.day.toString().padLeft(2, '0');
+  return '$year-$month-$day';
 }

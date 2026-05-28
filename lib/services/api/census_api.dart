@@ -142,64 +142,6 @@ class CensusApi extends GraphQlBaseApi {
         .toList();
   }
 
-  Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId) async {
-    const query = r'''
-      query LatestVillageCensus($villageId: Int!) {
-        latestVillageCensus(villageId: $villageId) {
-          id
-          censusDate
-          submittedAt
-          village {
-            id
-            code
-            name
-          }
-          facts {
-            species {
-              id
-              code
-              name
-              active
-              sortOrder
-            }
-            animalQuantity
-            householdQuantity
-          }
-        }
-      }
-    ''';
-
-    if (!await ensureAuthCookieIsSet()) {
-      throw GraphQlException(
-        message: 'Cookies are invalid',
-        query: query,
-        queryName: 'LatestVillageCensus',
-      );
-    }
-
-    final response = await resolveClient().query(
-      QueryOptions(
-        document: gql(query),
-        variables: {'villageId': villageId},
-        fetchPolicy: FetchPolicy.networkOnly,
-        cacheRereadPolicy: CacheRereadPolicy.ignoreAll,
-      ),
-    );
-
-    if (response.hasException) {
-      if (response.exception?.linkException != null) {
-        throw response.exception!.linkException!;
-      }
-      throw response.exception!;
-    }
-
-    final snapshot = response.data?['latestVillageCensus'];
-    if (snapshot == null) {
-      return null;
-    }
-    return VillageCensusSnapshot.fromJson(snapshot);
-  }
-
   Future<VillageCensusSnapshot?> getLatestVillageCensusV2(
     int villageId,
     String kind,

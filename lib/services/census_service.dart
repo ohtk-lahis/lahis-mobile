@@ -24,8 +24,6 @@ abstract class ICensusService {
     int villageId,
   );
 
-  Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId);
-
   Future<VillageCensusSnapshot?> getLatestVillageCensusV2({
     required int villageId,
     required String kind,
@@ -121,16 +119,15 @@ class CensusService implements ICensusService {
   }
 
   @override
-  Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId) {
-    return _censusApi.getLatestVillageCensus(villageId);
-  }
-
-  @override
   Future<VillageCensusSnapshot?> getLatestVillageCensusV2({
     required int villageId,
     required String kind,
   }) {
-    return _censusApi.getLatestVillageCensusV2(villageId, kind);
+    return _getLatestWithCache(
+      villageId: villageId,
+      kind: kind,
+      fetch: () => _censusApi.getLatestVillageCensusV2(villageId, kind),
+    );
   }
 
   @override
@@ -241,6 +238,65 @@ class CensusService implements ICensusService {
 
   Future<SharedPreferences> _preferences() async {
     return _prefs ??= await SharedPreferences.getInstance();
+  }
+
+  Future<VillageCensusSnapshot?> _getLatestWithCache({
+    required int villageId,
+    required String kind,
+    required Future<VillageCensusSnapshot?> Function() fetch,
+  }) async {
+    try {
+      final latest = await fetch();
+      await _cacheLatestCensus(
+        villageId: villageId,
+        kind: kind,
+        latestCensus: latest,
+      );
+      return latest;
+    } catch (_) {
+      return _getCachedLatestCensus(villageId: villageId, kind: kind);
+    }
+  }
+
+  Future<void> _cacheLatestCensus({
+    required int villageId,
+    required String kind,
+    required VillageCensusSnapshot? latestCensus,
+  }) async {
+    final prefs = await _preferences();
+    final key = _latestCensusKey(villageId: villageId, kind: kind);
+    if (latestCensus == null) {
+      await prefs.remove(key);
+      return;
+    }
+    await prefs.setString(key, jsonEncode(latestCensus.toJson()));
+  }
+
+  Future<VillageCensusSnapshot?> _getCachedLatestCensus({
+    required int villageId,
+    required String kind,
+  }) async {
+    final prefs = await _preferences();
+    final key = _latestCensusKey(villageId: villageId, kind: kind);
+    final raw = prefs.getString(key);
+    if (raw == null) {
+      return null;
+    }
+    try {
+      return VillageCensusSnapshot.fromJson(
+        Map<String, dynamic>.from(jsonDecode(raw) as Map),
+      );
+    } catch (_) {
+      await prefs.remove(key);
+      return null;
+    }
+  }
+
+  String _latestCensusKey({
+    required int villageId,
+    required String kind,
+  }) {
+    return 'fao.census.latest.$villageId.${kind.toUpperCase()}.cache';
   }
 
   String _draftKey({

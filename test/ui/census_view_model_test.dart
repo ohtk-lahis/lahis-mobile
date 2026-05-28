@@ -77,6 +77,100 @@ void main() {
     );
   });
 
+  test('hides old snapshot warning when all values fit current form', () async {
+    censusService.activeDefinition = humanDefinition(
+      id: 5,
+      version: 4,
+      rows: const [
+        CensusSchemaRow(rowKey: 'total', label: 'Total'),
+      ],
+    );
+    censusService.latestV2 = VillageCensusSnapshot(
+      id: 20,
+      censusDate: DateTime.parse('2026-05-26'),
+      definitionVersionId: 3,
+      definitionVersionNumber: 2,
+      formData: const {
+        'rows': [
+          {
+            'row_key': 'total',
+            'measures': {'population': 225},
+          },
+        ],
+      },
+    );
+
+    final viewModel = CensusViewModel(kind: 'HUMAN');
+    await flushAsync();
+
+    expect(viewModel.latestSnapshotUsesOlderDefinition, isTrue);
+    expect(viewModel.latestSnapshotPrefilledAnyValue, isTrue);
+    expect(viewModel.latestSnapshotPrefilledAllValues, isTrue);
+    expect(viewModel.measureValue('total', 'population'), '225');
+    expect(viewModel.oldSnapshotNotice, isNull);
+    expect(
+      viewModel.formInstruction,
+      'Update anything that has changed. Numbers from the last submission are pre-filled.',
+    );
+  });
+
+  test('uses localized census row and measure labels for current app locale',
+      () async {
+    locator.registerSingleton<AppLocalizations>(
+      await AppLocalizations.delegate.load(const Locale('lo')),
+    );
+    censusService.activeDefinition = CensusDefinitionVersion(
+      id: 7,
+      version: 1,
+      status: 'PUBLISHED',
+      runtimeSchema: CensusRuntimeSchema(
+        rows: [
+          CensusSchemaRow(
+            rowKey: 'species:1',
+            label: 'Cattle',
+            labelI18n: const {'la': 'ງົວ'},
+            speciesId: 1,
+            speciesCode: 'CATTLE',
+          ),
+        ],
+        measures: [
+          CensusSchemaMeasure(
+            key: 'animal_quantity',
+            label: 'Animal quantity',
+            labelI18n: const {'la': 'ຈຳນວນສັດ'},
+            type: 'integer',
+            required: true,
+          ),
+        ],
+      ),
+    );
+
+    final viewModel = CensusViewModel(kind: 'ANIMAL');
+    await flushAsync();
+
+    expect(viewModel.rows.single.label, 'ງົວ');
+    expect(viewModel.measures.single.label, 'ຈຳນວນສັດ');
+    expect(viewModel.species.single.name, 'ງົວ');
+  });
+
+  test('uses localized census kind title instead of API summary name',
+      () async {
+    locator.registerSingleton<AppLocalizations>(
+      await AppLocalizations.delegate.load(const Locale('lo')),
+    );
+
+    final viewModel = CensusViewModel(kind: 'ANIMAL');
+    viewModel.activeKindSummary = const CensusKindSummary(
+      kind: 'ANIMAL',
+      name: 'Animal census',
+      enabled: true,
+    );
+    viewModel.activeKind = 'ANIMAL';
+    await flushAsync();
+
+    expect(viewModel.activeKindName, 'ສຳມະໂນສັດ');
+  });
+
   test('stale definition submit shows reload state and reload preserves values',
       () async {
     censusService.activeDefinition = humanDefinition(
@@ -710,10 +804,6 @@ class CensusServiceMock implements ICensusService {
   Future<CensusDefinitionVersion?> getCachedCensusDefinitionVersion({
     required String kind,
   }) async =>
-      null;
-
-  @override
-  Future<VillageCensusSnapshot?> getLatestVillageCensus(int villageId) async =>
       null;
 
   @override

@@ -38,6 +38,7 @@ class CensusViewModel extends BaseViewModel {
   bool definitionChanged = false;
   bool latestSnapshotUsesOlderDefinition = false;
   bool latestSnapshotPrefilledAnyValue = false;
+  bool latestSnapshotPrefilledAllValues = false;
   bool _canSubmitWithLegacyMutation = true;
   final String? requestedKind;
   String? activeKind;
@@ -73,7 +74,7 @@ class CensusViewModel extends BaseViewModel {
   bool get isHubMode => activeKind == null;
 
   String get activeKindName =>
-      activeKindSummary?.displayName ?? _kindDisplayName(activeKind);
+      _kindDisplayName(activeKind ?? activeKindSummary?.kind);
 
   String? get freshnessLabel {
     if (latestCensus == null) {
@@ -90,7 +91,8 @@ class CensusViewModel extends BaseViewModel {
   }
 
   String? get oldSnapshotNotice {
-    if (!latestSnapshotUsesOlderDefinition) {
+    if (!latestSnapshotUsesOlderDefinition ||
+        latestSnapshotPrefilledAllValues) {
       return null;
     }
     if (latestSnapshotPrefilledAnyValue) {
@@ -276,6 +278,7 @@ class CensusViewModel extends BaseViewModel {
       latestCensus = _submittedSnapshot(result.snapshot, formData);
       latestSnapshotUsesOlderDefinition = false;
       latestSnapshotPrefilledAnyValue = false;
+      latestSnapshotPrefilledAllValues = false;
       _captureInitialValues();
       await _pendingDraftWrite;
       await _clearDraft();
@@ -432,9 +435,6 @@ class CensusViewModel extends BaseViewModel {
         villageId: selectedVillage!.id,
         kind: normalizedKind,
       );
-    } else if (normalizedKind == 'ANIMAL') {
-      latestCensus =
-          await censusService.getLatestVillageCensus(selectedVillage!.id);
     }
     _prefillFromLatestCensus();
     await _loadDraft();
@@ -451,6 +451,7 @@ class CensusViewModel extends BaseViewModel {
     definitionInactive = false;
     latestSnapshotUsesOlderDefinition = false;
     latestSnapshotPrefilledAnyValue = false;
+    latestSnapshotPrefilledAllValues = false;
     _clearFormData();
     CensusDefinitionVersion? definition;
 
@@ -482,16 +483,17 @@ class CensusViewModel extends BaseViewModel {
       definitionInactive = true;
     } else {
       activeDefinition = definition;
-      rows = definition.runtimeSchema.rows;
-      measures = definition.runtimeSchema.measures;
+      final runtimeSchema = definition.runtimeSchema.localized(
+        localize.localeName,
+      );
+      rows = runtimeSchema.rows;
+      measures = runtimeSchema.measures;
       if (kind == 'ANIMAL') {
-        species = definition.runtimeSchema.toAnimalSpeciesRows();
-        unsupportedSchema =
-            !definition.runtimeSchema.supportsMobileAnimalSubmit;
-        _canSubmitWithLegacyMutation =
-            definition.runtimeSchema.supportsLegacyAnimalSubmit;
+        species = runtimeSchema.toAnimalSpeciesRows();
+        unsupportedSchema = !runtimeSchema.supportsMobileAnimalSubmit;
+        _canSubmitWithLegacyMutation = runtimeSchema.supportsLegacyAnimalSubmit;
       } else if (kind == 'HUMAN') {
-        unsupportedSchema = !definition.runtimeSchema.supportsMobileHumanSubmit;
+        unsupportedSchema = !runtimeSchema.supportsMobileHumanSubmit;
         _canSubmitWithLegacyMutation = false;
       } else {
         unsupportedSchema = true;
@@ -591,11 +593,14 @@ class CensusViewModel extends BaseViewModel {
         latestCensus?.definitionVersionId != null &&
         latestCensus!.definitionVersionId != activeDefinition!.id;
     if (latestCensus == null) {
+      latestSnapshotPrefilledAllValues = false;
       _captureInitialValues();
       return;
     }
 
     var prefilledAny = false;
+    var prefilledCount = 0;
+    final expectedCount = rows.length * measures.length;
     final submittedRows = latestCensus!.formData['rows'];
     if (submittedRows is List && submittedRows.isNotEmpty) {
       for (final submittedRow in submittedRows.whereType<Map>()) {
@@ -621,10 +626,13 @@ class CensusViewModel extends BaseViewModel {
           if (value != null) {
             measureValues[row.rowKey]![measure.key] = value.toString();
             prefilledAny = true;
+            prefilledCount++;
           }
         }
       }
       latestSnapshotPrefilledAnyValue = prefilledAny;
+      latestSnapshotPrefilledAllValues =
+          expectedCount > 0 && prefilledCount == expectedCount;
       _captureInitialValues();
       return;
     }
@@ -643,8 +651,11 @@ class CensusViewModel extends BaseViewModel {
       measureValues[row.rowKey]!['household_quantity'] =
           fact.householdQuantity.toString();
       prefilledAny = true;
+      prefilledCount += 2;
     }
     latestSnapshotPrefilledAnyValue = prefilledAny;
+    latestSnapshotPrefilledAllValues =
+        expectedCount > 0 && prefilledCount == expectedCount;
     _captureInitialValues();
   }
 
@@ -851,6 +862,7 @@ class CensusViewModel extends BaseViewModel {
     measures = [];
     latestSnapshotUsesOlderDefinition = false;
     latestSnapshotPrefilledAnyValue = false;
+    latestSnapshotPrefilledAllValues = false;
     measureValues.clear();
     measureErrors.clear();
     _initialMeasureValues.clear();
