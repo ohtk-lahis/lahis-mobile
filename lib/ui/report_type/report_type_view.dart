@@ -546,24 +546,29 @@ class _ZeroReportFooter extends StackedHookView<ReportTypeViewModel> {
         ],
       ),
       padding: EdgeInsets.fromLTRB(14, 10, 14, 10 + media.padding.bottom),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: _brandTint(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              Icons.check_circle_outline,
-              size: 18,
-              color: _brandPrimary,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final shouldStackAction = constraints.maxWidth < 360 ||
+              localize.zeroReportPillLabel.length > 14;
+
+          Widget statusIcon() {
+            return Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: _brandTint(0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.check_circle_outline,
+                size: 18,
+                color: _brandPrimary,
+              ),
+            );
+          }
+
+          Widget statusCopy() {
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -582,11 +587,39 @@ class _ZeroReportFooter extends StackedHookView<ReportTypeViewModel> {
                 const SizedBox(height: 1),
                 _LastZeroReport(viewModel: viewModel),
               ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          _ZeroReportButton(viewModel: viewModel),
-        ],
+            );
+          }
+
+          final statusRow = Row(
+            children: [
+              statusIcon(),
+              const SizedBox(width: 12),
+              Expanded(child: statusCopy()),
+            ],
+          );
+
+          if (shouldStackAction) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                statusRow,
+                const SizedBox(height: 10),
+                _ZeroReportButton(viewModel: viewModel, expand: true),
+              ],
+            );
+          }
+
+          return Row(
+            children: [
+              statusIcon(),
+              const SizedBox(width: 12),
+              Expanded(child: statusCopy()),
+              const SizedBox(width: 12),
+              _ZeroReportButton(viewModel: viewModel),
+            ],
+          );
+        },
       ),
     );
   }
@@ -627,13 +660,14 @@ class _LastZeroReport extends StatelessWidget {
 
 class _ZeroReportButton extends StatelessWidget {
   final ReportTypeViewModel viewModel;
+  final bool expand;
 
-  const _ZeroReportButton({required this.viewModel});
+  const _ZeroReportButton({required this.viewModel, this.expand = false});
 
   @override
   Widget build(BuildContext context) {
     final localize = AppLocalizations.of(context)!;
-    return TextButton(
+    final button = TextButton(
       onPressed: () async {
         final success = await viewModel.submitZeroReport();
         if (context.mounted) {
@@ -650,6 +684,9 @@ class _ZeroReportButton extends StatelessWidget {
       ),
       child: Text(
         localize.zeroReportPillLabel,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
         style: const TextStyle(
           fontFamily: incidentsFontFamily,
           fontFamilyFallback: incidentsFontFamilyFallback,
@@ -658,6 +695,10 @@ class _ZeroReportButton extends StatelessWidget {
         ),
       ),
     );
+    if (expand) {
+      return SizedBox(width: double.infinity, child: button);
+    }
+    return button;
   }
 
   void _showZeroReportResult(BuildContext context, bool success) {
