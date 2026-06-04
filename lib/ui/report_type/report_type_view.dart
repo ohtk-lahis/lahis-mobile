@@ -6,12 +6,18 @@ import 'package:podd_app/components/submit_success_overlay.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/report_type.dart';
 import 'package:podd_app/router.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/report_type/report_type_view_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
 final _zeroReportTimestamp = DateFormat('dd/MM · HH:mm');
+
+Color get _brandPrimary => OhtkTheme.palette.teal700;
+Color get _brandDeep => OhtkTheme.palette.teal900;
+Color _brandTint(double alpha) =>
+    OhtkTheme.palette.teal700.withValues(alpha: alpha);
 
 class ReportTypeView extends StatelessWidget {
   const ReportTypeView({Key? key}) : super(key: key);
@@ -44,7 +50,7 @@ class _ChooserAppBar extends StatelessWidget {
     final localize = AppLocalizations.of(context)!;
     final topInset = MediaQuery.of(context).padding.top;
     return Container(
-      color: incidentsTealDeep,
+      color: _brandDeep,
       padding: EdgeInsets.fromLTRB(12, topInset + 10, 12, 10),
       child: Row(
         children: [
@@ -250,7 +256,7 @@ class _ChooserBody extends StatelessWidget {
         .toList(growable: false);
 
     return RefreshIndicator(
-      color: incidentsTeal,
+      color: _brandPrimary,
       onRefresh: () async {
         await viewModel.syncReportTypes();
       },
@@ -325,7 +331,7 @@ class _SectionEyebrow extends StatelessWidget {
             width: 3,
             height: 14,
             decoration: BoxDecoration(
-              color: incidentsTeal,
+              color: _brandPrimary,
               borderRadius: BorderRadius.circular(1.5),
             ),
           ),
@@ -417,7 +423,7 @@ class _CategoryIconTile extends StatelessWidget {
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: incidentsTeal.withValues(alpha: 0.10),
+        color: _brandTint(0.10),
         borderRadius: BorderRadius.circular(11),
       ),
       padding: const EdgeInsets.all(8),
@@ -425,19 +431,19 @@ class _CategoryIconTile extends StatelessWidget {
           ? CachedNetworkImage(
               imageUrl: iconUrl,
               fit: BoxFit.contain,
-              color: incidentsTeal,
+              color: _brandPrimary,
               colorBlendMode: BlendMode.srcIn,
               placeholder: (context, url) => const SizedBox.shrink(),
-              errorWidget: (context, url, error) => const Icon(
+              errorWidget: (context, url, error) => Icon(
                 Icons.assignment_outlined,
                 size: 22,
-                color: incidentsTeal,
+                color: _brandPrimary,
               ),
             )
-          : const Icon(
+          : Icon(
               Icons.assignment_outlined,
               size: 22,
-              color: incidentsTeal,
+              color: _brandPrimary,
             ),
     );
   }
@@ -459,13 +465,13 @@ class _EmptyState extends StatelessWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: incidentsTeal.withValues(alpha: 0.08),
+              color: _brandTint(0.08),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.qr_code_2,
               size: 32,
-              color: incidentsTeal,
+              color: _brandPrimary,
             ),
           ),
         ),
@@ -497,21 +503,20 @@ class _EmptyState extends StatelessWidget {
         Center(
           child: OutlinedButton.icon(
             onPressed: onRetry,
-            icon: const Icon(Icons.refresh, size: 16, color: incidentsTeal),
+            icon: Icon(Icons.refresh, size: 16, color: _brandPrimary),
             label: Text(
               localize.tryAgainButton,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: incidentsFontFamily,
                 fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: incidentsTeal,
+                color: _brandPrimary,
               ),
             ),
             style: OutlinedButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-              side: const BorderSide(color: incidentsTeal, width: 1.5),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+              side: BorderSide(color: _brandPrimary, width: 1.5),
               shape: const StadiumBorder(),
             ),
           ),
@@ -547,13 +552,13 @@ class _ZeroReportFooter extends StackedHookView<ReportTypeViewModel> {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: incidentsTeal.withValues(alpha: 0.12),
+              color: _brandTint(0.12),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.check_circle_outline,
               size: 18,
-              color: incidentsTeal,
+              color: _brandPrimary,
             ),
           ),
           const SizedBox(width: 12),
@@ -636,7 +641,7 @@ class _ZeroReportButton extends StatelessWidget {
         }
       },
       style: TextButton.styleFrom(
-        backgroundColor: incidentsTeal,
+        backgroundColor: _brandPrimary,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         shape: const StadiumBorder(),
@@ -686,11 +691,10 @@ class _ZeroReportButton extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             style: TextButton.styleFrom(
-              backgroundColor: incidentsTeal,
+              backgroundColor: _brandPrimary,
               foregroundColor: Colors.white,
               shape: const StadiumBorder(),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
             ),
             child: Text(
               localize.ok,

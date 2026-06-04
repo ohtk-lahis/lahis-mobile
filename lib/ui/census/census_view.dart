@@ -9,10 +9,14 @@ import 'package:podd_app/models/census_definition.dart';
 import 'package:podd_app/models/village_census.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/census/census_view_model.dart';
-import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:stacked/stacked.dart';
 
 final _censusDateFormat = DateFormat('dd/MM/yy');
+
+Color get _brandPrimary => OhtkTheme.palette.teal700;
+Color get _brandDeep => OhtkTheme.palette.teal900;
+Color get _brandSoft => OhtkTheme.palette.teal100;
+Color get _brandTint => OhtkTheme.palette.teal700.withValues(alpha: 0.10);
 
 class CensusView extends StatelessWidget {
   final String? kind;
@@ -76,8 +80,8 @@ class CensusView extends StatelessWidget {
             title: viewModel.activeKindName,
             body: _FullState(
               icon: Icons.pause_circle_outline,
-              iconColor: Color(0xFFA07015),
-              iconBackground: Color(0x1AA07015),
+              iconColor: OhtkColor.warning,
+              iconBackground: OhtkColor.warningBg,
               title: localize.censusInactiveTitle,
               message: localize.censusInactiveMessage,
               actionLabel: localize.backButton,
@@ -92,8 +96,8 @@ class CensusView extends StatelessWidget {
             title: viewModel.activeKindName,
             body: _FullState(
               icon: Icons.warning_amber_rounded,
-              iconColor: Color(0xFFA07015),
-              iconBackground: Color(0x1AA07015),
+              iconColor: OhtkColor.warning,
+              iconBackground: OhtkColor.warningBg,
               title: localize.censusUnsupportedTitle,
               message: localize.censusUnsupportedMessage,
             ),
@@ -104,7 +108,7 @@ class CensusView extends StatelessWidget {
           title: viewModel.activeKindName,
           footer: _StickyFooter(viewModel: viewModel),
           body: RefreshIndicator(
-            color: incidentsTeal,
+            color: _brandPrimary,
             onRefresh: viewModel.init,
             child: ListView(
               padding: EdgeInsets.zero,
@@ -166,7 +170,7 @@ class CensusView extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 13,
                           height: 1.45,
-                          color: incidentsMuted,
+                          color: OhtkColor.ink500,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -174,7 +178,7 @@ class CensusView extends StatelessWidget {
                         Text(
                           localize.censusNoRowsConfigured,
                           style: const TextStyle(
-                            color: incidentsBody,
+                            color: OhtkColor.ink700,
                           ),
                         )
                       else
@@ -220,9 +224,9 @@ class _CensusFormScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: incidentsSand,
+      backgroundColor: OhtkColor.cream,
       appBar: AppBar(
-        backgroundColor: incidentsTealDeep,
+        backgroundColor: _brandDeep,
         foregroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -272,8 +276,8 @@ class _CensusHub extends StatelessWidget {
           Expanded(
             child: _FullState(
               icon: Icons.info_outline,
-              iconColor: incidentsTeal,
-              iconBackground: Color(0x1A0F8A82),
+              iconColor: _brandPrimary,
+              iconBackground: _brandSoft,
               title: localize.censusNoSetupTitle,
               message: localize.censusNoSetupMessage,
             ),
@@ -283,7 +287,7 @@ class _CensusHub extends StatelessWidget {
     }
 
     return RefreshIndicator(
-      color: incidentsTeal,
+      color: _brandPrimary,
       onRefresh: viewModel.init,
       child: ListView(
         padding: EdgeInsets.zero,
@@ -304,7 +308,7 @@ class _CensusHub extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     height: 1.45,
-                    color: incidentsMuted,
+                    color: OhtkColor.ink500,
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -370,7 +374,7 @@ class _CensusKindCard extends StatelessWidget {
                             ? Icons.access_time_rounded
                             : Icons.edit_outlined,
                         size: 13,
-                        color: incidentsMuted,
+                        color: OhtkColor.ink500,
                       ),
                       const SizedBox(width: 4),
                       Flexible(
@@ -384,7 +388,7 @@ class _CensusKindCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 13,
-                            color: incidentsMuted,
+                            color: OhtkColor.ink500,
                           ),
                         ),
                       ),
@@ -396,7 +400,7 @@ class _CensusKindCard extends StatelessWidget {
             const SizedBox(width: 8),
             const Icon(
               Icons.chevron_right_rounded,
-              color: incidentsMuted,
+              color: OhtkColor.ink500,
               size: 22,
             ),
           ],
@@ -429,7 +433,7 @@ class _VillageHubHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFFEFEAE0),
+      color: OhtkColor.creamHi,
       padding: const EdgeInsets.fromLTRB(
         OhtkLayout.pagePad,
         OhtkSpace.lg,
@@ -441,15 +445,15 @@ class _VillageHubHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.location_on_outlined,
                 size: 14,
-                color: incidentsTeal,
+                color: _brandPrimary,
               ),
               const SizedBox(width: 6),
               OhtkEyebrow(
                 label: localize.villageEyebrow,
-                color: incidentsTeal,
+                color: _brandPrimary,
               ),
             ],
           ),
@@ -465,7 +469,7 @@ class _VillageHubHeader extends StatelessWidget {
             district,
             style: const TextStyle(
               fontSize: 14,
-              color: incidentsMuted,
+              color: OhtkColor.ink500,
               height: 1.35,
             ),
           ),
@@ -520,7 +524,7 @@ class _VillageHeader extends StatelessWidget {
                           ? Icons.edit_outlined
                           : Icons.access_time_rounded,
                       size: 14,
-                      color: incidentsMuted,
+                      color: OhtkColor.ink500,
                     ),
                     const SizedBox(width: 4),
                     Flexible(
@@ -532,7 +536,7 @@ class _VillageHeader extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 13,
-                          color: incidentsMuted,
+                          color: OhtkColor.ink500,
                         ),
                       ),
                     ),
@@ -575,18 +579,18 @@ class _CensusRowSection extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: incidentsInk,
+                      color: OhtkColor.ink900,
                     ),
                   ),
                 ),
                 if (dirty)
                   Text(
                     AppLocalizations.of(context)!.censusEditedBadge,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1,
-                      color: incidentsTeal,
+                      color: _brandPrimary,
                     ),
                   ),
               ],
@@ -596,14 +600,14 @@ class _CensusRowSection extends StatelessWidget {
           OhtkCard(
             padding: EdgeInsets.zero,
             borderColor: invalid
-                ? incidentsErrorRed
+                ? OhtkColor.danger
                 : dirty
-                    ? incidentsTeal
-                    : incidentsHair,
+                    ? _brandPrimary
+                    : OhtkColor.line,
             boxShadow: invalid
                 ? [
                     BoxShadow(
-                      color: incidentsErrorRed.withValues(alpha: 0.10),
+                      color: OhtkColor.danger.withValues(alpha: 0.10),
                       spreadRadius: 3,
                       blurRadius: 0,
                     )
@@ -611,7 +615,7 @@ class _CensusRowSection extends StatelessWidget {
                 : dirty
                     ? [
                         BoxShadow(
-                          color: incidentsTeal.withValues(alpha: 0.10),
+                          color: _brandTint,
                           spreadRadius: 3,
                           blurRadius: 0,
                         )
@@ -658,7 +662,7 @@ class _MeasureInputRow extends StatelessWidget {
       decoration: BoxDecoration(
         border: last
             ? null
-            : const Border(bottom: BorderSide(color: incidentsHair)),
+            : const Border(bottom: BorderSide(color: OhtkColor.line)),
       ),
       child: Row(
         children: [
@@ -669,7 +673,7 @@ class _MeasureInputRow extends StatelessWidget {
                 fontSize: 13,
                 height: 1.2,
                 fontWeight: FontWeight.w500,
-                color: incidentsBody,
+                color: OhtkColor.ink700,
               ),
             ),
           ),
@@ -697,29 +701,29 @@ class _MeasureInputRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: incidentsInk,
+                    color: OhtkColor.ink900,
                   ),
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 10),
                     filled: viewModel.busy('submit') || isInvalid,
-                    fillColor: isInvalid ? Colors.white : incidentsSand,
+                    fillColor: isInvalid ? Colors.white : OhtkColor.cream,
                     border: _measureInputBorder(
-                      isInvalid ? incidentsErrorRed : incidentsHair,
+                      isInvalid ? OhtkColor.danger : OhtkColor.line,
                       1.5,
                     ),
                     enabledBorder: _measureInputBorder(
-                      isInvalid ? incidentsErrorRed : incidentsHair,
+                      isInvalid ? OhtkColor.danger : OhtkColor.line,
                       1.5,
                     ),
                     focusedBorder: _measureInputBorder(
-                      isInvalid ? incidentsErrorRed : incidentsTeal,
+                      isInvalid ? OhtkColor.danger : _brandPrimary,
                       1.8,
                     ),
-                    errorBorder: _measureInputBorder(incidentsErrorRed, 1.5),
+                    errorBorder: _measureInputBorder(OhtkColor.danger, 1.5),
                     focusedErrorBorder:
-                        _measureInputBorder(incidentsErrorRed, 1.8),
+                        _measureInputBorder(OhtkColor.danger, 1.8),
                   ),
                 ),
                 if (isInvalid) ...[
@@ -731,7 +735,7 @@ class _MeasureInputRow extends StatelessWidget {
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
-                      color: incidentsErrorRed,
+                      color: OhtkColor.danger,
                     ),
                   ),
                 ],
@@ -817,7 +821,7 @@ class _DraftFooterNote extends StatelessWidget {
           child: Icon(
             Icons.circle,
             size: 8,
-            color: Color(0xFFA07015),
+            color: OhtkColor.warning,
           ),
         ),
         const SizedBox(width: 10),
@@ -830,7 +834,7 @@ class _DraftFooterNote extends StatelessWidget {
               fontSize: 13,
               height: 1.3,
               fontWeight: FontWeight.w600,
-              color: incidentsMuted,
+              color: OhtkColor.ink500,
             ),
           ),
         ),
@@ -839,7 +843,7 @@ class _DraftFooterNote extends StatelessWidget {
           onPressed:
               viewModel.busy('submit') ? null : () => viewModel.discardDraft(),
           style: TextButton.styleFrom(
-            foregroundColor: const Color(0xFFA07015),
+            foregroundColor: OhtkColor.warning,
             minimumSize: const Size(0, 36),
             padding: const EdgeInsets.symmetric(horizontal: 4),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -877,14 +881,14 @@ class _NoticeBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (tone) {
-      _NoticeTone.ok => incidentsTeal,
-      _NoticeTone.warn => const Color(0xFFA07015),
-      _NoticeTone.error => incidentsErrorRed,
+      _NoticeTone.ok => _brandPrimary,
+      _NoticeTone.warn => OhtkColor.warning,
+      _NoticeTone.error => OhtkColor.danger,
     };
     final background = switch (tone) {
-      _NoticeTone.ok => incidentsTeal.withValues(alpha: 0.10),
-      _NoticeTone.warn => const Color(0x1AA07015),
-      _NoticeTone.error => incidentsErrorTint,
+      _NoticeTone.ok => _brandTint,
+      _NoticeTone.warn => OhtkColor.warningBg,
+      _NoticeTone.error => OhtkColor.dangerBg,
     };
     return Container(
       margin: const EdgeInsets.fromLTRB(14, 12, 14, 0),
@@ -961,8 +965,8 @@ class _FullState extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.message,
-    this.iconColor = incidentsErrorRed,
-    this.iconBackground = incidentsErrorTint,
+    this.iconColor = OhtkColor.danger,
+    this.iconBackground = OhtkColor.dangerBg,
     this.actionLabel,
     this.actionIcon = Icons.refresh,
     this.onAction,
@@ -992,7 +996,7 @@ class _FullState extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: incidentsInk,
+                color: OhtkColor.ink900,
               ),
             ),
             const SizedBox(height: 6),
@@ -1002,7 +1006,7 @@ class _FullState extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13.5,
                 height: 1.55,
-                color: incidentsMuted,
+                color: OhtkColor.ink500,
               ),
             ),
             if (actionLabel != null && onAction != null) ...[
@@ -1012,7 +1016,7 @@ class _FullState extends StatelessWidget {
                 icon: Icon(actionIcon, size: 15),
                 label: Text(actionLabel!.toUpperCase()),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: incidentsTeal,
+                  backgroundColor: _brandPrimary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(999),
@@ -1074,7 +1078,7 @@ class _SkeletonCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: incidentsHair),
+        border: Border.all(color: OhtkColor.line),
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1102,7 +1106,7 @@ class _Skeleton extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: incidentsHair.withValues(alpha: 0.75),
+        color: OhtkColor.line.withValues(alpha: 0.75),
         borderRadius: BorderRadius.circular(6),
       ),
     );

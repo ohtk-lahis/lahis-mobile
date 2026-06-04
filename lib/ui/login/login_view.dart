@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:podd_app/components/restart_widget.dart';
 import 'package:podd_app/constants.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/login/login_view_model.dart';
 import 'package:podd_app/ui/login/picker_sheets.dart';
 import 'package:podd_app/ui/login/qr_login_view.dart';
@@ -11,16 +12,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
-const _tealHero = Color(0xFF0F8A82);
-const _tealMid = Color(0xFF0A5F5A);
-const _tealDeep = Color(0xFF08423F);
-const _sand = Color(0xFFF7F5F1);
-const _ink = Color(0xFF1A1F1D);
-const _muted = Color(0xFF6B7370);
-const _hair = Color(0xFFE4E2DC);
-const _placeholder = Color(0xFFA8ACA7);
-const _fontFamily = 'Inter';
-const _fontFamilyFallback = <String>['NotoSansThai', 'NotoSansLao'];
+Color get _tealHero => OhtkTheme.palette.teal700;
+Color get _tealMid => OhtkTheme.palette.teal800;
+Color get _tealDeep => OhtkTheme.palette.teal900;
+Color get _sand => OhtkColor.cream;
+Color get _ink => OhtkColor.ink900;
+Color get _muted => OhtkColor.ink500;
+Color get _hair => OhtkColor.line;
+Color get _placeholder => OhtkColor.ink300;
+const _fontFamily = OhtkType.family;
+const _fontFamilyFallback = OhtkType.fallback;
 
 class LoginView extends StackedView<LoginViewModel> {
   const LoginView({Key? key}) : super(key: key);
@@ -68,7 +69,7 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: RadialGradient(
           center: Alignment(0.6, -1),
           radius: 1.4,
@@ -191,7 +192,8 @@ class _LanguagePill extends StatelessWidget {
               Text(
                 _languageLabel(viewModel.language),
                 style: const TextStyle(
-                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                  fontFamily: _fontFamily,
+                  fontFamilyFallback: _fontFamilyFallback,
                   color: Colors.white,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -230,15 +232,16 @@ class _RegisterCta extends StatelessWidget {
             children: [
               Text(
                 l10n.signInRegisterCta,
-                style: const TextStyle(
-                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                style: TextStyle(
+                  fontFamily: _fontFamily,
+                  fontFamilyFallback: _fontFamilyFallback,
                   color: _tealDeep,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(width: 10),
-              const Icon(Icons.arrow_forward, color: _tealDeep, size: 18),
+              Icon(Icons.arrow_forward, color: _tealDeep, size: 18),
             ],
           ),
         ),
@@ -256,9 +259,9 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
 
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: _sand,
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Color(0x0F000000), // ~6% black
             blurRadius: 24,
@@ -284,8 +287,9 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
             const SizedBox(height: 12),
             Text(
               l10n.signInReturningEyebrow.toUpperCase(),
-              style: const TextStyle(
-                fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+              style: TextStyle(
+                fontFamily: _fontFamily,
+                fontFamilyFallback: _fontFamilyFallback,
                 color: _muted,
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
@@ -333,7 +337,8 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
               Text(
                 viewModel.error('general'),
                 style: const TextStyle(
-                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                  fontFamily: _fontFamily,
+                  fontFamilyFallback: _fontFamilyFallback,
                   color: Colors.red,
                   fontSize: 12,
                 ),
@@ -402,8 +407,9 @@ class _TextFieldShell extends StatelessWidget {
                   textInputAction: textInputAction,
                   onChanged: onChanged,
                   onSubmitted: onSubmitted,
-                  style: const TextStyle(
-                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                  style: TextStyle(
+                    fontFamily: _fontFamily,
+                    fontFamilyFallback: _fontFamilyFallback,
                     color: _ink,
                     fontSize: 14,
                   ),
@@ -415,8 +421,9 @@ class _TextFieldShell extends StatelessWidget {
                     focusedBorder: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 14),
                     hintText: hint,
-                    hintStyle: const TextStyle(
-                      fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                    hintStyle: TextStyle(
+                      fontFamily: _fontFamily,
+                      fontFamilyFallback: _fontFamilyFallback,
                       color: _placeholder,
                       fontSize: 14,
                     ),
@@ -434,7 +441,8 @@ class _TextFieldShell extends StatelessWidget {
             child: Text(
               errorText!,
               style: const TextStyle(
-                fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                fontFamily: _fontFamily,
+                fontFamilyFallback: _fontFamilyFallback,
                 color: Colors.red,
                 fontSize: 11,
               ),
@@ -485,7 +493,8 @@ class _SignInButton extends StatelessWidget {
             : Text(
                 l10n.signInButton,
                 style: const TextStyle(
-                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                  fontFamily: _fontFamily,
+                  fontFamilyFallback: _fontFamilyFallback,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
@@ -519,6 +528,9 @@ class _QrSignInButton extends StatelessWidget {
                   content: Text(error),
                   actions: [
                     TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: _tealHero,
+                      ),
                       child: const Text('OK'),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -536,12 +548,13 @@ class _QrSignInButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.qr_code_scanner, color: _tealHero, size: 18),
+                Icon(Icons.qr_code_scanner, color: _tealHero, size: 18),
                 const SizedBox(width: 8),
                 Text(
                   l10n.signInQrCodeButton,
-                  style: const TextStyle(
-                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                  style: TextStyle(
+                    fontFamily: _fontFamily,
+                    fontFamilyFallback: _fontFamilyFallback,
                     color: _ink,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -591,7 +604,7 @@ class _ServerFooter extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.only(top: 12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(top: BorderSide(color: _hair, width: 1)),
       ),
       child: Row(
@@ -601,8 +614,9 @@ class _ServerFooter extends StatelessWidget {
             child: RichText(
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
-                style: const TextStyle(
-                  fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                style: TextStyle(
+                  fontFamily: _fontFamily,
+                  fontFamilyFallback: _fontFamilyFallback,
                   color: _muted,
                   fontSize: 11,
                 ),
@@ -610,8 +624,9 @@ class _ServerFooter extends StatelessWidget {
                   TextSpan(text: '${l10n.signInServerLabel}: '),
                   TextSpan(
                     text: _serverLabel(),
-                    style: const TextStyle(
-                      fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                    style: TextStyle(
+                      fontFamily: _fontFamily,
+                      fontFamilyFallback: _fontFamilyFallback,
                       color: _ink,
                       fontWeight: FontWeight.w600,
                     ),
@@ -630,8 +645,9 @@ class _ServerFooter extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 child: Text(
                   '${l10n.signInChangeServerButton} ›',
-                  style: const TextStyle(
-                    fontFamily: _fontFamily, fontFamilyFallback: _fontFamilyFallback,
+                  style: TextStyle(
+                    fontFamily: _fontFamily,
+                    fontFamilyFallback: _fontFamilyFallback,
                     color: _tealHero,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
