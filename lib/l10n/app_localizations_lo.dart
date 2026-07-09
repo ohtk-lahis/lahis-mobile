@@ -944,6 +944,19 @@ class AppLocalizationsLo extends AppLocalizations {
   String get censusEditedBadge => 'ແກ້ໄຂແລ້ວ';
 
   @override
+  String get censusHouseholdSummaryTitle => 'ສະຫຼຸບຄົວເຮືອຂອງບ້ານ';
+
+  @override
+  String get censusVillageHouseholdQuantityLabel => 'ຈຳນວນຄົວເຮືອໃນບ້ານ';
+
+  @override
+  String get censusAnimalHouseholdQuantityLabel => 'ຈຳນວນຄົວເຮືອທີ່ມີສັດ';
+
+  @override
+  String get censusAnimalHouseholdsExceedVillageError =>
+      'ຈຳນວນຄົວເຮືອທີ່ມີສັດຕ້ອງບໍ່ເກີນຈຳນວນຄົວເຮືອໃນບ້ານ.';
+
+  @override
   String get censusSaveCurrentButton => 'ບັນທຶກສຳມະໂນປັດຈຸບັນ';
 
   @override

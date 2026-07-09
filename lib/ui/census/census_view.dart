@@ -20,13 +20,21 @@ Color get _brandTint => OhtkTheme.palette.teal700.withValues(alpha: 0.10);
 
 class CensusView extends StatelessWidget {
   final String? kind;
+  final bool trainingMode;
 
-  const CensusView({Key? key, this.kind}) : super(key: key);
+  const CensusView({
+    Key? key,
+    this.kind,
+    this.trainingMode = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<CensusViewModel>.reactive(
-      viewModelBuilder: () => CensusViewModel(kind: kind),
+      viewModelBuilder: () => CensusViewModel(
+        kind: kind,
+        initialTrainingMode: trainingMode,
+      ),
       builder: (context, viewModel, _) {
         final localize = AppLocalizations.of(context)!;
         if (viewModel.isBusy) {
@@ -91,6 +99,28 @@ class CensusView extends StatelessWidget {
           );
         }
 
+        if (viewModel.noActiveRound) {
+          final canSwitchToTraining =
+              !viewModel.trainingMode && viewModel.hasTrainingOccurrence;
+          return _CensusFormScaffold(
+            title: _formTitle(viewModel),
+            body: _FullState(
+              icon: Icons.event_busy_rounded,
+              iconColor: OhtkColor.warning,
+              iconBackground: OhtkColor.warningBg,
+              title: viewModel.noActiveRoundTitle,
+              message: viewModel.noActiveRoundMessage,
+              actionLabel: canSwitchToTraining ? 'ทดสอบ' : localize.backButton,
+              actionIcon: canSwitchToTraining
+                  ? Icons.warning_amber_rounded
+                  : Icons.arrow_back_rounded,
+              onAction: canSwitchToTraining
+                  ? () => viewModel.setTrainingMode(true)
+                  : () => _goBackToCensusHub(context),
+            ),
+          );
+        }
+
         if (viewModel.unsupportedSchema) {
           return _CensusFormScaffold(
             title: viewModel.activeKindName,
@@ -105,7 +135,7 @@ class CensusView extends StatelessWidget {
         }
 
         return _CensusFormScaffold(
-          title: viewModel.activeKindName,
+          title: _formTitle(viewModel),
           footer: _StickyFooter(viewModel: viewModel),
           body: RefreshIndicator(
             color: _brandPrimary,
@@ -173,6 +203,13 @@ class CensusView extends StatelessWidget {
                           color: OhtkColor.ink500,
                         ),
                       ),
+                      if (viewModel.activeOccurrence != null) ...[
+                        const SizedBox(height: 12),
+                        _ActiveRoundBanner(
+                          occurrence: viewModel.activeOccurrence!,
+                          training: viewModel.isTrainingSubmission,
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       if (!viewModel.hasRows)
                         Text(
@@ -181,12 +218,17 @@ class CensusView extends StatelessWidget {
                             color: OhtkColor.ink700,
                           ),
                         )
-                      else
+                      else ...[
+                        if (viewModel.requiresAnimalSummary) ...[
+                          _AnimalSummarySection(viewModel: viewModel),
+                          const SizedBox(height: 18),
+                        ],
                         for (var i = 0; i < viewModel.rows.length; i++)
                           _CensusRowSection(
                             row: viewModel.rows[i],
                             viewModel: viewModel,
                           ),
+                      ],
                     ],
                   ),
                 ),
@@ -195,6 +237,81 @@ class CensusView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+String _formTitle(CensusViewModel viewModel) {
+  if (viewModel.isTrainingSubmission) {
+    return 'ทดสอบ: ${viewModel.activeKindName}';
+  }
+  return viewModel.activeKindName;
+}
+
+class _ActiveRoundBanner extends StatelessWidget {
+  final CensusRoundOccurrence occurrence;
+  final bool training;
+
+  const _ActiveRoundBanner({
+    required this.occurrence,
+    required this.training,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dueDate = occurrence.softFinishDate != null
+        ? _censusDateFormat.format(occurrence.softFinishDate!)
+        : '-';
+    final borderColor = training ? OhtkColor.warning : _brandSoft;
+    final iconColor = training ? OhtkColor.warning : _brandPrimary;
+    final bgColor = training ? OhtkColor.warningBg : _brandTint;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            training
+                ? Icons.warning_amber_rounded
+                : Icons.event_available_rounded,
+            color: iconColor,
+            size: 22,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  training
+                      ? 'ทดสอบ ${occurrence.occurrenceKey}'
+                      : occurrence.occurrenceKey,
+                  style: TextStyle(
+                    color: training ? OhtkColor.warning : _brandDeep,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  training
+                      ? 'Practice submission. Due $dueDate'
+                      : 'Due $dueDate',
+                  style: const TextStyle(
+                    color: OhtkColor.ink500,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -311,19 +428,122 @@ class _CensusHub extends StatelessWidget {
                     color: OhtkColor.ink500,
                   ),
                 ),
+                if (viewModel.hasTrainingOccurrence) ...[
+                  const SizedBox(height: 12),
+                  _CensusTrainingChip(
+                    on: viewModel.trainingMode,
+                    onToggle: () =>
+                        viewModel.setTrainingMode(!viewModel.trainingMode),
+                  ),
+                ],
                 const SizedBox(height: 14),
                 for (final summary in viewModel.censusKinds)
                   _CensusKindCard(
                     summary: summary,
                     onTap: () async {
-                      await context
-                          .push('/census/${summary.kind.toLowerCase()}');
+                      final trainingQuery =
+                          viewModel.trainingMode && summary.kind == 'ANIMAL'
+                              ? '?training=1'
+                              : '';
+                      await context.push(
+                        '/census/${summary.kind.toLowerCase()}$trainingQuery',
+                      );
                       if (context.mounted) {
                         await viewModel.init();
                       }
                     },
                   ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CensusTrainingChip extends StatelessWidget {
+  final bool on;
+  final VoidCallback onToggle;
+
+  const _CensusTrainingChip({
+    required this.on,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = on ? OhtkColor.warning : OhtkColor.ink500;
+    final bg = on ? OhtkColor.warningBg : OhtkColor.cream;
+    final border = on ? OhtkColor.warning : OhtkColor.line;
+    return InkWell(
+      onTap: onToggle,
+      borderRadius: BorderRadius.circular(100),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(10, 6, 12, 6),
+        decoration: BoxDecoration(
+          color: bg,
+          border: Border.all(color: border, width: 1),
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.warning_amber_rounded, size: 15, color: fg),
+            const SizedBox(width: 8),
+            Text(
+              'ทดสอบ',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.3,
+                color: fg,
+              ),
+            ),
+            const SizedBox(width: 8),
+            _MiniSwitch(on: on, color: fg),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniSwitch extends StatelessWidget {
+  final bool on;
+  final Color color;
+
+  const _MiniSwitch({required this.on, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 28,
+      height: 16,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            width: 28,
+            height: 16,
+            decoration: BoxDecoration(
+              color: on ? color.withValues(alpha: 0.25) : OhtkColor.line,
+              borderRadius: BorderRadius.circular(100),
+            ),
+          ),
+          AnimatedAlign(
+            duration: const Duration(milliseconds: 160),
+            curve: Curves.easeOut,
+            alignment: on ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              width: 12,
+              height: 12,
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              decoration: BoxDecoration(
+                color: on ? color : OhtkColor.ink400,
+                shape: BoxShape.circle,
+              ),
             ),
           ),
         ],
@@ -639,6 +859,198 @@ class _CensusRowSection extends StatelessWidget {
   }
 }
 
+class _AnimalSummarySection extends StatelessWidget {
+  final CensusViewModel viewModel;
+
+  const _AnimalSummarySection({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    final invalid = viewModel.summaryErrors.isNotEmpty;
+    final dirty = viewModel.isSummaryDirty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  localize.censusHouseholdSummaryTitle,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: OhtkColor.ink900,
+                  ),
+                ),
+              ),
+              if (dirty)
+                Text(
+                  localize.censusEditedBadge,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                    color: _brandPrimary,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        OhtkCard(
+          padding: EdgeInsets.zero,
+          borderColor: invalid
+              ? OhtkColor.danger
+              : dirty
+                  ? _brandPrimary
+                  : OhtkColor.line,
+          boxShadow: invalid
+              ? [
+                  BoxShadow(
+                    color: OhtkColor.danger.withValues(alpha: 0.10),
+                    spreadRadius: 3,
+                    blurRadius: 0,
+                  )
+                ]
+              : dirty
+                  ? [
+                      BoxShadow(
+                        color: _brandTint,
+                        spreadRadius: 3,
+                        blurRadius: 0,
+                      )
+                    ]
+                  : null,
+          child: Column(
+            children: [
+              _SummaryInputRow(
+                label: localize.censusVillageHouseholdQuantityLabel,
+                valueKey: CensusViewModel.villageHouseholdQuantityKey,
+                viewModel: viewModel,
+              ),
+              _SummaryInputRow(
+                label: localize.censusAnimalHouseholdQuantityLabel,
+                valueKey: CensusViewModel.animalHouseholdQuantityKey,
+                viewModel: viewModel,
+                last: true,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SummaryInputRow extends StatelessWidget {
+  final String label;
+  final String valueKey;
+  final CensusViewModel viewModel;
+  final bool last;
+
+  const _SummaryInputRow({
+    required this.label,
+    required this.valueKey,
+    required this.viewModel,
+    this.last = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final errorText = viewModel.summaryError(valueKey);
+    final isInvalid = errorText != null && errorText.isNotEmpty;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      decoration: BoxDecoration(
+        border: last
+            ? null
+            : const Border(bottom: BorderSide(color: OhtkColor.line)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                height: 1.2,
+                fontWeight: FontWeight.w500,
+                color: OhtkColor.ink700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 100,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                TextFormField(
+                  key: ValueKey(
+                    'summary:$valueKey:${viewModel.formValueRevision}',
+                  ),
+                  initialValue: viewModel.summaryValue(valueKey),
+                  enabled: !viewModel.busy('submit'),
+                  textAlign: TextAlign.right,
+                  keyboardType: TextInputType.number,
+                  textInputAction:
+                      last ? TextInputAction.next : TextInputAction.next,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: OhtkColor.ink900,
+                  ),
+                  onChanged: (value) =>
+                      viewModel.setSummaryValue(valueKey, value),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    filled: viewModel.busy('submit') || isInvalid,
+                    fillColor: isInvalid ? Colors.white : OhtkColor.cream,
+                    border: _measureInputBorder(
+                      isInvalid ? OhtkColor.danger : OhtkColor.line,
+                      1.5,
+                    ),
+                    enabledBorder: _measureInputBorder(
+                      isInvalid ? OhtkColor.danger : OhtkColor.line,
+                      1.5,
+                    ),
+                    focusedBorder: _measureInputBorder(
+                      isInvalid ? OhtkColor.danger : _brandPrimary,
+                      1.8,
+                    ),
+                    errorBorder: _measureInputBorder(OhtkColor.danger, 1.5),
+                    focusedErrorBorder:
+                        _measureInputBorder(OhtkColor.danger, 1.8),
+                  ),
+                ),
+                if (isInvalid) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    errorText,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                      color: OhtkColor.danger,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _MeasureInputRow extends StatelessWidget {
   final CensusSchemaRow row;
   final CensusSchemaMeasure measure;
@@ -762,6 +1174,7 @@ class _StickyFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -784,7 +1197,9 @@ class _StickyFooter extends StatelessWidget {
             const SizedBox(height: 14),
           ],
           OhtkPrimaryButton(
-            label: AppLocalizations.of(context)!.censusSaveCurrentButton,
+            label: viewModel.isTrainingSubmission
+                ? 'บันทึกทดสอบ'
+                : localize.censusSaveCurrentButton,
             loading: viewModel.busy('submit'),
             onPressed: viewModel.canSubmit
                 ? () async {
@@ -793,8 +1208,7 @@ class _StickyFooter extends StatelessWidget {
                         result is VillageCensusSubmitSuccess) {
                       await SubmitSuccessOverlay.show(
                         context,
-                        message: AppLocalizations.of(context)!
-                            .censusSubmittedMessage,
+                        message: viewModel.submitSuccessMessage,
                       );
                     }
                   }
