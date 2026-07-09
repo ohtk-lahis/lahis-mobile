@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:podd_app/components/restart_widget.dart';
-import 'package:podd_app/constants.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/login/login_view_model.dart';
 import 'package:podd_app/ui/login/picker_sheets.dart';
 import 'package:podd_app/ui/login/qr_login_view.dart';
 import 'package:podd_app/ui/register/register_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
@@ -136,8 +134,7 @@ class _LanguagePill extends StatelessWidget {
           Navigator.of(context).pop();
           return;
         }
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(languageKey, code);
+        await viewModel.changeLanguage(code);
         if (!context.mounted) return;
         Navigator.of(context).pop();
         if (!context.mounted) return;

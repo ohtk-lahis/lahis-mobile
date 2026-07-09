@@ -18,14 +18,14 @@ void main() {
 
   test('loads stored theme preset', () async {
     SharedPreferences.setMockInitialValues({
-      themePresetKey: OhtkThemePreset.crimson.name,
+      themePresetKey: OhtkThemePreset.lahis.name,
     });
 
     final appTheme = AppTheme();
     await appTheme.init();
 
-    expect(appTheme.preset, OhtkThemePreset.crimson);
-    expect(OhtkTheme.palette.teal700, OhtkThemePreset.crimson.palette.teal700);
+    expect(appTheme.preset, OhtkThemePreset.lahis);
+    expect(OhtkTheme.palette.teal700, OhtkThemePreset.lahis.palette.teal700);
   });
 
   test('persists selected preset and notifies listeners', () async {
@@ -56,6 +56,7 @@ void main() {
         'Plum',
         'Slate',
         'Crimson',
+        'LAHIS',
       ],
     );
   });

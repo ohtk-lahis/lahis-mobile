@@ -117,6 +117,17 @@ enum OhtkThemePreset {
       teal50: Color(0xFFFEF2F2),
     ),
     'Crimson',
+  ),
+  lahis(
+    OhtkBrandPalette(
+      teal900: Color(0xFF13396B),
+      teal800: Color(0xFF184A8A),
+      teal700: Color(0xFF1D5AA8),
+      teal600: Color(0xFF2F6FBE),
+      teal100: Color(0xFFDCE6F4),
+      teal50: Color(0xFFEEF3FB),
+    ),
+    'LAHIS',
   );
 
   final OhtkBrandPalette palette;
@@ -144,6 +155,8 @@ enum OhtkThemePreset {
         return OhtkThemePreset.slate;
       case 'crimson':
         return OhtkThemePreset.crimson;
+      case 'lahis':
+        return OhtkThemePreset.lahis;
       default:
         return OhtkThemePreset.lagoon;
     }
