@@ -11,231 +11,252 @@ class FormFilesField extends StatefulWidget {
 
 class _FormFilesFieldState extends State<FormFilesField> {
   final IFileService _fileService = locator<IFileService>();
-  final AppTheme apptheme = locator<AppTheme>();
 
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (BuildContext context) {
-      var numberOfCurrentFiles = widget.field.length;
-
-      return ValidationWrapper(
-        widget.field,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.field.label != null && widget.field.label != "")
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  widget.field.label!,
-                  style: TextStyle(color: Colors.grey.shade700),
-                ),
-              ),
-            DottedBorder(
-              color: apptheme.sub3,
-              dashPattern: const [6, 6],
-              borderType: BorderType.RRect,
-              radius: Radius.circular(apptheme.borderRadius),
-              padding: const EdgeInsets.all(8),
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  // width / height: fixed for *all* items
-                  childAspectRatio: 1,
-                ),
-                itemCount: numberOfCurrentFiles + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return _buildAddFileBox();
-                  }
-                  // minus 1 because of dummy file is the first.
-                  var fileIdExt = widget.field.value[index - 1];
-
-                  return FutureBuilder<ReportFile>(
-                    future: _getFile(fileIdExt),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return RemoveableFile(
-                          file: snapshot.data!,
-                          onRemove: _removeFile,
-                        );
-                      }
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  );
-                },
-              ),
+      final entries = widget.field.value.toList(growable: false);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < entries.length; i++)
+            _FileRow(
+              key: ValueKey(entries[i]),
+              fileIdExt: entries[i],
+              showTopDivider: i == 0,
+              loader: _getFile,
+              onRemove: _removeFile,
             ),
-          ],
-        ),
+          if (entries.isNotEmpty) const SizedBox(height: 10),
+          _AttachFileButton(onTap: _onAddFile),
+        ],
       );
     });
   }
 
   Future<ReportFile> _getFile(String fileIdExt) async {
     final id = fileIdExt.split('.')[0];
-    var reportFile = await _fileService.getReportFile(id);
-    return reportFile;
+    return _fileService.getReportFile(id);
   }
 
-  _buildAddFileBox() {
-    return CircleAvatar(
-      backgroundColor: apptheme.sub4,
-      child: IconButton(
-        icon: Icon(Icons.add_card, color: apptheme.primary),
-        onPressed: () async {
-          var reportFile = await _pickFile();
-          if (reportFile != null) {
-            _addFile(reportFile.idExt, reportFile.name);
-          }
-        },
-      ),
-    );
+  Future<void> _onAddFile() async {
+    final reportFile = await _pickFile();
+    if (reportFile != null) {
+      widget.field.add(reportFile.idExt, reportFile.name);
+    }
   }
 
-  _addFile(String idExt, String nameExt) {
-    widget.field.add(idExt, nameExt);
-  }
-
-  _removeFile(String id, String idExt) {
+  void _removeFile(String id, String idExt) {
     widget.field.remove(idExt);
     _fileService.removeLocalFileFromAppDirectory(id);
     _fileService.removeReportFile(id);
   }
 
   Future<ReportFile?> _pickFile() async {
-    ReportFile? reportFile;
-    FilePickerResult? result = await FilePicker.pickFiles();
+    final result = await FilePicker.pickFiles();
+    if (result == null) return null;
+    final path = result.files.first.path;
+    if (path == null) return null;
 
-    if (result != null) {
-      var path = result.files.first.path;
-      if (path == null) {
-        return null;
-      }
-      var name = result.files.first.name;
-      var extension = result.files.first.extension ?? '';
+    final name = result.files.first.name;
+    final extension = result.files.first.extension ?? '';
+    final mimeType = lookupMimeType(path) ?? '';
+    final cacheFile = File(path);
+    final fileBytes = await cacheFile.readAsBytes();
+    final uuid = const Uuid().v4();
 
-      var mimeType = lookupMimeType(path) ?? '';
-      var cacheFile = File(path);
-      var fileBytes = await cacheFile.readAsBytes();
-      var uuid = const Uuid().v4();
+    final file = await _fileService.createLocalFileInAppDirectory(
+        uuid, widget.field.form.id, extension);
+    await file.writeAsBytes(fileBytes);
 
-      final file = await _fileService.createLocalFileInAppDirectory(
-          uuid, widget.field.form.id, extension);
-      await file.writeAsBytes(fileBytes);
-
-      reportFile = ReportFile(
-          uuid, widget.field.form.id, name, file.path, extension, mimeType);
-
-      await _fileService.saveReportFile(reportFile);
-      // Remove picker's cache file after report file was saved to appData
-      await cacheFile.delete();
-    } else {
-      // User canceled the picker
-    }
+    final reportFile = ReportFile(
+        uuid, widget.field.form.id, name, file.path, extension, mimeType);
+    await _fileService.saveReportFile(reportFile);
+    await cacheFile.delete();
     return reportFile;
-  }
-}
-
-class FileDisplay extends StatelessWidget {
-  final AppTheme apptheme = locator<AppTheme>();
-  final String name;
-  final String mimeType;
-
-  FileDisplay({Key? key, required this.mimeType, required this.name})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: apptheme.bg1,
-          content: Text(name),
-        ));
-      },
-      child: SizedBox(
-        width: 200.w,
-        height: 200.w,
-        child: Center(child: _display(mimeType)),
-      ),
-    );
-  }
-
-  Widget? _display(String mimeType) {
-    Widget? content;
-    double size = 36.0;
-    if (mimeType.contains('audio')) {
-      content = Icon(
-        Icons.audiotrack_outlined,
-        size: size,
-        color: apptheme.bg1,
-      );
-    } else if (mimeType.contains('video')) {
-      content = Icon(
-        Icons.video_camera_back_outlined,
-        size: size,
-        color: apptheme.bg1,
-      );
-    } else if (mimeType.contains('application')) {
-      content = Icon(
-        Icons.edit_document,
-        size: size,
-        color: apptheme.bg1,
-      );
-    } else {
-      content = Icon(
-        Icons.question_mark,
-        size: size,
-        color: apptheme.bg1,
-      );
-    }
-    return content;
   }
 }
 
 typedef FileRemoveCallback = void Function(String fileId, String fileIdExt);
 
-class RemoveableFile extends StatelessWidget {
-  final ReportFile file;
+class _FileRow extends StatelessWidget {
+  final String fileIdExt;
+  final bool showTopDivider;
+  final Future<ReportFile> Function(String) loader;
   final FileRemoveCallback onRemove;
-  final AppTheme apptheme = locator<AppTheme>();
 
-  RemoveableFile({required this.file, required this.onRemove, Key? key})
-      : super(key: key);
+  const _FileRow({
+    Key? key,
+    required this.fileIdExt,
+    required this.showTopDivider,
+    required this.loader,
+    required this.onRemove,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(4),
-          child: DottedBorder(
-            color: apptheme.sub3,
-            radius: const Radius.circular(12),
-            dashPattern: const [4, 4],
-            padding: const EdgeInsets.all(4),
-            child: FileDisplay(name: file.name, mimeType: file.fileType),
+    return FutureBuilder<ReportFile>(
+      future: loader(fileIdExt),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              border: Border(
+                top: showTopDivider
+                    ? const BorderSide(color: incidentsHair, width: 1)
+                    : BorderSide.none,
+                bottom: const BorderSide(color: incidentsHair, width: 1),
+              ),
+            ),
+            child: SizedBox(
+              height: 16,
+              width: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: _ohtkFormBrand,
+              ),
+            ),
+          );
+        }
+        final file = snapshot.data!;
+        return Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          decoration: BoxDecoration(
+            border: Border(
+              top: showTopDivider
+                  ? const BorderSide(color: incidentsHair, width: 1)
+                  : BorderSide.none,
+              bottom: const BorderSide(color: incidentsHair, width: 1),
+            ),
           ),
-        ),
-        Positioned(
-          top: 0,
-          right: 0,
           child: GestureDetector(
-            onTap: () {
-              onRemove(file.id, file.idExt);
-            },
-            child: CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 9,
-                child: Icon(Icons.cancel, color: apptheme.primary, size: 18)),
+            onTap: () => _showFileInfo(context, file.name),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  _FileGlyph(mimeType: file.fileType),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      file.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontFamily: incidentsFontFamily,
+                        fontFamilyFallback: incidentsFontFamilyFallback,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: incidentsInk,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 18),
+                    color: incidentsMuted,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                    onPressed: () => onRemove(file.id, file.idExt),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showFileInfo(BuildContext context, String name) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: incidentsInk,
+        behavior: SnackBarBehavior.floating,
+        content: Text(name),
+      ),
+    );
+  }
+}
+
+class _FileGlyph extends StatelessWidget {
+  final String mimeType;
+  const _FileGlyph({required this.mimeType});
+
+  IconData _iconFor(String mt) {
+    if (mt.contains('audio')) return Icons.audiotrack_outlined;
+    if (mt.contains('video')) return Icons.video_camera_back_outlined;
+    if (mt.contains('image')) return Icons.image_outlined;
+    if (mt.contains('pdf')) return Icons.picture_as_pdf_outlined;
+    if (mt.contains('application')) return Icons.description_outlined;
+    return Icons.insert_drive_file_outlined;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: _ohtkFormBrandTint(0.08),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(_iconFor(mimeType), size: 18, color: _ohtkFormBrand),
+    );
+  }
+}
+
+class _AttachFileButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AttachFileButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: DottedBorder(
+        color: _ohtkFormBrand,
+        strokeWidth: 1.5,
+        dashPattern: const [5, 4],
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(10),
+        padding: EdgeInsets.zero,
+        child: Container(
+          height: 44,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: _ohtkFormBrandTint(0.06),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add, size: 18, color: _ohtkFormBrand),
+              const SizedBox(width: 6),
+              Text(
+                localize.attachFileButton.toUpperCase(),
+                style: TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                  color: _ohtkFormBrand,
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

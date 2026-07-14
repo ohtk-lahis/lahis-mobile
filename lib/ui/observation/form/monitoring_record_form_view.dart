@@ -52,8 +52,6 @@ class ObservationMonitoringRecordFormView extends StatelessWidget {
                         flex: 1,
                         child: FormConfirmSubmit(
                           busy: viewModel.isBusy,
-                          child: const Text(
-                              "Press the submit button to submit your report"),
                           onSubmit: () async {
                             var result = await viewModel.submit();
                             if (result is MonitoringRecordSubmitSuccess ||

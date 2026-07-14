@@ -10,66 +10,63 @@ class FormTextField extends StatefulWidget {
 }
 
 class _FormTextFieldState extends State<FormTextField> {
-  final AppTheme appTheme = locator<AppTheme>();
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (BuildContext context) {
-      var value = widget.field.value ?? '';
-
-      if (!widget.field.display) {
-        return Container();
-      }
+      if (!widget.field.display) return const SizedBox.shrink();
+      final value = widget.field.value ?? '';
       if (value != _controller.text) {
         _controller.value = TextEditingValue(
           text: value,
           selection: TextSelection.collapsed(offset: value.length),
         );
       }
+      final isInvalid = !widget.field.isValid;
+      final focusController = FormTextInputFocusScope.maybeOf(context);
       return TextField(
         controller: _controller,
-        style: TextStyle(
-          color: appTheme.inputTextColor,
-          fontFamily: appTheme.font,
-          fontWeight: FontWeight.w400,
-        ),
-        textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-          // border: const OutlineInputBorder(),
-          labelText: widget.field.label,
+        focusNode: focusController?.nodeFor(widget.field),
+        style: ohtkInputTextStyle,
+        textInputAction: focusController?.textInputActionFor(widget.field) ??
+            TextInputAction.next,
+        onEditingComplete: focusController == null
+            ? null
+            : () => focusController.completeEditing(context, widget.field),
+        decoration: ohtkInputDecoration(
+          hintText: widget.field.label,
           suffixText: widget.field.suffixLabel,
-          helperText: widget.field.description,
-          errorText: widget.field.isValid ? null : widget.field.invalidMessage,
+          isInvalid: isInvalid,
           suffixIcon: (widget.field.scan != null && widget.field.scan!)
-              ? IconButton(
-                  splashColor: Colors.blueGrey.shade200,
-                  icon: Icon(
-                    Icons.qr_code_scanner,
-                    color: Theme.of(context).primaryColor,
-                    size: 20.w,
-                  ),
-                  onPressed: () async {
-                    var result = await Navigator.push<String>(
+              ? _QrScanSuffix(
+                  onScan: () async {
+                    final result = await Navigator.push<String>(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const QrScanner(),
                       ),
                     );
-
-                    if (context.mounted) {
-                      if (result != null) {
-                        widget.field.value = result;
-                      } else {
-                        var errorMessage = SnackBar(
+                    if (!context.mounted) return;
+                    if (result != null) {
+                      widget.field.value = result;
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: incidentsErrorRed,
+                          behavior: SnackBarBehavior.floating,
                           content: Text(
-                              AppLocalizations.of(context)?.invalidQrcode ??
-                                  'Invalid qrcode'),
-                          backgroundColor: Colors.red,
-                        );
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(errorMessage);
-                      }
+                            AppLocalizations.of(context)?.invalidQrcode ??
+                                'Invalid qrcode',
+                          ),
+                        ),
+                      );
                     }
                   },
                 )
@@ -77,8 +74,39 @@ class _FormTextFieldState extends State<FormTextField> {
         ),
         onChanged: (val) {
           widget.field.value = val;
+          if (isInvalid) widget.field.clearError();
         },
       );
     });
+  }
+}
+
+class _QrScanSuffix extends StatelessWidget {
+  final VoidCallback onScan;
+
+  const _QrScanSuffix({required this.onScan});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 4, 6, 4),
+      child: Material(
+        color: _ohtkFormBrandTint(0.10),
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: onScan,
+          borderRadius: BorderRadius.circular(8),
+          child: SizedBox(
+            width: 32,
+            height: 32,
+            child: Icon(
+              Icons.qr_code_scanner,
+              color: _ohtkFormBrand,
+              size: 18,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

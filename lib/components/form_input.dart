@@ -1,71 +1,132 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:podd_app/components/form_footer.dart';
+import 'package:podd_app/opsv_form/opsv_form.dart' as opsv;
 import 'package:podd_app/opsv_form/widgets/widgets.dart';
 import 'package:podd_app/ui/report/form_base_view_model.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class FormInput extends StatelessWidget {
+class FormInput extends StatefulWidget {
   final FormBaseViewModel viewModel;
   final OnLastSectionValid? onLastSectionValid;
-  final ItemScrollController _scrollController = ItemScrollController();
 
-  FormInput({
+  const FormInput({
     required this.viewModel,
     this.onLastSectionValid,
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var appbarHeight = AppBar().preferredSize.height;
-    var top = MediaQuery.of(context).padding.top;
-    var bottom = MediaQuery.of(context).padding.bottom;
-    var footerHeight = 50.h;
-    var stepperHeight = viewModel.formStore.numberOfSections > 1 ? 60.h : 0;
-    var testBannerHeight = viewModel.isTestMode ? 30.h : 0;
-    var spare = MediaQuery.of(context).viewInsets.bottom == 0 ? 0 : 170.h;
+  State<FormInput> createState() => _FormInputState();
+}
 
+class _FormInputState extends State<FormInput> {
+  final ScrollController _scrollController = ScrollController();
+  final FormTextInputFocusController _textInputFocusController =
+      FormTextInputFocusController();
+  final Map<opsv.Question, GlobalKey> _questionKeys = {};
+  int? _previousSectionIdx;
+
+  GlobalKey _keyFor(opsv.Question q) =>
+      _questionKeys.putIfAbsent(q, () => GlobalKey());
+
+  void _scrollToTop() {
+    if (!_scrollController.hasClients) return;
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _scrollToInvalid(int index) {
+    final questions = widget.viewModel.formStore.currentSection.questions;
+    if (index < 0 || index >= questions.length) return;
+    final ctx = _questionKeys[questions[index]]?.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 200),
+      alignment: 0.1,
+    );
+  }
+
+  @override
+  void dispose() {
+    _textInputFocusController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Observer(
-      builder: (_) => Stack(
-        children: [
-          SingleChildScrollView(
-            child: SizedBox(
-              height: height -
-                  appbarHeight -
-                  top -
-                  bottom -
-                  stepperHeight -
-                  footerHeight -
-                  testBannerHeight -
-                  spare -
-                  80.w,
-              child: ScrollablePositionedList.builder(
-                itemScrollController: _scrollController,
-                itemBuilder: (context, index) {
-                  return FormQuestion(
-                    question:
-                        viewModel.formStore.currentSection.questions[index],
-                  );
-                },
-                itemCount: viewModel.formStore.currentSection.questions.length,
+      builder: (_) {
+        final form = widget.viewModel.formStore;
+        final currentIdx = form.currentSectionIdx;
+        final questions = form.currentSection.questions;
+        _textInputFocusController.sync(questions);
+
+        final isForward =
+            _previousSectionIdx == null || currentIdx >= _previousSectionIdx!;
+        _previousSectionIdx = currentIdx;
+
+        return FormTextInputFocusScope(
+          controller: _textInputFocusController,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      final inOffset = isForward
+                          ? const Offset(0.25, 0)
+                          : const Offset(-0.25, 0);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: inOffset,
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    layoutBuilder: (currentChild, previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: <Widget>[
+                          ...previousChildren,
+                          if (currentChild != null) currentChild,
+                        ],
+                      );
+                    },
+                    child: Column(
+                      key: ValueKey(currentIdx),
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (final q in questions)
+                          FormQuestion(key: _keyFor(q), question: q),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-              child: FormFooter(
-                viewModel: viewModel,
-                scrollController: _scrollController,
-                onLastSectionValid: onLastSectionValid,
+              FormFooter(
+                viewModel: widget.viewModel,
+                onScrollToTop: _scrollToTop,
+                onScrollToInvalid: _scrollToInvalid,
+                onLastSectionValid: widget.onLastSectionValid,
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -6,13 +6,17 @@ import 'package:stacked/stacked.dart';
 class UserMessageListViewModel extends ReactiveViewModel {
   INotificationService notificationService = locator<INotificationService>();
 
+  bool hasFetchError = false;
+
   UserMessageListViewModel() {
     fetch();
   }
 
-  fetch() async {
+  Future<void> fetch() async {
     setBusy(true);
-    await notificationService.fetchMyMessages(true);
+    hasFetchError = false;
+    final success = await notificationService.fetchMyMessages(true);
+    hasFetchError = !success;
     setBusy(false);
   }
 
@@ -20,7 +24,7 @@ class UserMessageListViewModel extends ReactiveViewModel {
     if (message.isSeen) {
       return;
     } else {
-      message.isSeen = true;
+      notificationService.markMessageSeenLocally(message.id);
       notifyListeners();
     }
   }

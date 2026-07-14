@@ -10,43 +10,45 @@ class FormTextareaField extends StatefulWidget {
 }
 
 class _FormTextareaFieldState extends State<FormTextareaField> {
-  final AppTheme appTheme = locator<AppTheme>();
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (BuildContext context) {
-      var value = widget.field.value ?? '';
-
-      if (!widget.field.display) {
-        return Container();
-      }
+      if (!widget.field.display) return const SizedBox.shrink();
+      final value = widget.field.value ?? '';
       if (value != _controller.text) {
         _controller.value = TextEditingValue(
           text: value,
           selection: TextSelection.collapsed(offset: value.length),
         );
       }
+      final isInvalid = !widget.field.isValid;
+      final focusController = FormTextInputFocusScope.maybeOf(context);
       return TextField(
         controller: _controller,
-        style: TextStyle(
-          color: appTheme.inputTextColor,
-          fontFamily: appTheme.font,
-          fontWeight: FontWeight.w400,
-        ),
-        textInputAction: TextInputAction.next,
+        focusNode: focusController?.nodeFor(widget.field),
+        style: ohtkInputTextStyle,
+        textInputAction: focusController?.textInputActionFor(widget.field) ??
+            TextInputAction.newline,
         minLines: widget.field.rows,
         maxLines: null,
         keyboardType: TextInputType.multiline,
-        decoration: InputDecoration(
-          // border: const OutlineInputBorder(),
-          labelText: widget.field.label,
+        decoration: ohtkInputDecoration(
+          hintText: widget.field.label,
           suffixText: widget.field.suffixLabel,
-          helperText: widget.field.description,
-          errorText: widget.field.isValid ? null : widget.field.invalidMessage,
+          isInvalid: isInvalid,
+          isMultiline: true,
         ),
         onChanged: (val) {
           widget.field.value = val;
+          if (isInvalid) widget.field.clearError();
         },
       );
     });

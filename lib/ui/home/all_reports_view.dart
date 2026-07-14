@@ -52,9 +52,6 @@ class _ReportList extends StackedHookView<AllReportsViewModel> {
           ? ReportListView(
               viewModel: viewModel,
               key: const PageStorageKey('all-reports-storage-key'),
-              trailingFn: (report) {
-                return null;
-              },
             )
           : const Center(
               child: OhtkProgressIndicator(

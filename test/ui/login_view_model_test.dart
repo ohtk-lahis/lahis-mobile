@@ -6,6 +6,7 @@ import 'package:podd_app/models/user_profile.dart';
 import 'package:podd_app/models/village.dart';
 import 'package:podd_app/services/auth_service.dart';
 import 'package:podd_app/services/config_service.dart';
+import 'package:podd_app/services/feature_capability_service.dart';
 import 'package:podd_app/services/gql_service.dart';
 import 'package:podd_app/services/secure_storage_service.dart';
 import 'package:podd_app/ui/login/login_view_model.dart';
@@ -117,11 +118,27 @@ class SecureStorageServiceMock implements ISecureStorageService {
   }
 }
 
+class FeatureCapabilityServiceMock extends IFeatureCapabilityService {
+  @override
+  bool get villageCapabilityKnown => true;
+
+  @override
+  bool get villageEnabled => true;
+
+  @override
+  Future<void> refresh() async {}
+
+  @override
+  void reset() {}
+}
+
 void main() {
   group('Login View Model', () {
     AuthServiceMock authService = AuthServiceMock();
     ConfigServiceMock configService = ConfigServiceMock();
     SecureStorageServiceMock secureStorageService = SecureStorageServiceMock();
+    FeatureCapabilityServiceMock featureCapabilityService =
+        FeatureCapabilityServiceMock();
 
     setUpAll(() async {
       TestWidgetsFlutterBinding.ensureInitialized();
@@ -145,6 +162,9 @@ void main() {
       locator.registerSingleton<IAuthService>(authService);
       locator.registerSingleton<ConfigService>(configService);
       locator.registerSingleton<ISecureStorageService>(secureStorageService);
+      locator.registerSingleton<IFeatureCapabilityService>(
+        featureCapabilityService,
+      );
 
       GqlServiceMock gqlService = GqlServiceMock();
       locator.registerSingleton<GqlService>(gqlService);

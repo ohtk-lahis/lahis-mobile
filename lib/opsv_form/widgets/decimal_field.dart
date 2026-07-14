@@ -12,33 +12,39 @@ class FormDecimalField extends StatefulWidget {
 class _FormDecimalFieldState extends State<FormDecimalField> {
   final TextEditingController _controller = TextEditingController();
   final _logger = locator<Logger>();
-  final AppTheme appTheme = locator<AppTheme>();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (BuildContext context) {
-      var value = widget.field.value?.toString() ?? '';
-
-      if (!widget.field.display) {
-        return Container();
-      }
-
+      if (!widget.field.display) return const SizedBox.shrink();
+      final value = widget.field.value?.toString() ?? '';
       if (value != _controller.text) {
         _controller.value = TextEditingValue(
-            text: value,
-            selection: TextSelection.collapsed(offset: value.length));
+          text: value,
+          selection: TextSelection.collapsed(offset: value.length),
+        );
       }
-
+      final isInvalid = !widget.field.isValid;
+      final focusController = FormTextInputFocusScope.maybeOf(context);
       return TextField(
         controller: _controller,
-        textInputAction: TextInputAction.next,
-        style: TextStyle(
-          color: appTheme.inputTextColor,
-          fontFamily: appTheme.font,
-          fontWeight: FontWeight.w400,
+        focusNode: focusController?.nodeFor(widget.field),
+        style: ohtkInputTextStyle,
+        textInputAction: focusController?.textInputActionFor(widget.field) ??
+            TextInputAction.next,
+        onEditingComplete: focusController == null
+            ? null
+            : () => focusController.completeEditing(context, widget.field),
+        keyboardType: const TextInputType.numberWithOptions(
+          decimal: true,
+          signed: false,
         ),
-        keyboardType:
-            const TextInputType.numberWithOptions(decimal: true, signed: false),
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
           TextInputFormatter.withFunction((oldValue, newValue) {
@@ -52,20 +58,19 @@ class _FormDecimalFieldState extends State<FormDecimalField> {
             return oldValue;
           }),
         ],
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          labelText: widget.field.label,
+        decoration: ohtkInputDecoration(
+          hintText: widget.field.label,
           suffixText: widget.field.suffixLabel,
-          helperText: widget.field.description,
-          errorText: widget.field.isValid ? null : widget.field.invalidMessage,
+          isInvalid: isInvalid,
         ),
         onChanged: (val) {
           try {
-            widget.field.value = Decimal.parse(val);
+            widget.field.value = val.isEmpty ? null : Decimal.parse(val);
           } on FormatException catch (_) {
             _logger.e("parsing error ${val.toString()}");
             widget.field.value = null;
           }
+          if (isInvalid) widget.field.clearError();
         },
       );
     });

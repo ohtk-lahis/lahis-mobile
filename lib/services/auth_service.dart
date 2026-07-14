@@ -6,6 +6,7 @@ import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/login_result.dart';
 import 'package:podd_app/models/user_profile.dart';
 import 'package:podd_app/models/village.dart';
+import 'package:podd_app/services/feature_capability_service.dart';
 import 'package:podd_app/services/gql_service.dart';
 import 'package:podd_app/services/jwt.dart';
 import 'package:podd_app/services/observation_definition_service.dart';
@@ -55,6 +56,8 @@ class AuthService with ListenableServiceMixin implements IAuthService {
 
   final _authApi = locator<AuthApi>();
 
+  final _featureCapabilityService = locator<IFeatureCapabilityService>();
+
   final _reportTypeService = locator<IReportTypeService>();
 
   final _reportService = locator<IReportService>();
@@ -100,6 +103,11 @@ class AuthService with ListenableServiceMixin implements IAuthService {
       if (isExpired) {
         _isLogin.value = false;
       } else {
+        if (_userProfile != null) {
+          await _refreshFeatureCapabilitiesAndAssignedVillages(_userProfile!);
+          await _syncSelectedVillage();
+          await _secureStorageService.setUserProfile(_userProfile!);
+        }
         _isLogin.value = true;
       }
     } else {
@@ -150,6 +158,7 @@ class AuthService with ListenableServiceMixin implements IAuthService {
     await _observationDefinitionService.removeAll();
     await _gqlService.clearCookies();
     await _gqlService.clearGraphqlCache();
+    _featureCapabilityService.reset();
   }
 
   @override
@@ -166,12 +175,25 @@ class AuthService with ListenableServiceMixin implements IAuthService {
 
   _fetchProfile() async {
     var profile = await _authApi.getUserProfile();
+    await _refreshFeatureCapabilitiesAndAssignedVillages(profile);
     _userProfile = profile;
     await _syncSelectedVillage();
 
     await _secureStorageService.setUserProfile(profile);
     await _reportTypeService.sync();
     await _observationDefinitionService.sync();
+  }
+
+  Future<void> _refreshFeatureCapabilitiesAndAssignedVillages(
+      UserProfile profile) async {
+    await _featureCapabilityService.refresh();
+    if (_featureCapabilityService.villageEnabled) {
+      try {
+        profile.assignedVillages = await _authApi.getAssignedVillages();
+      } catch (e) {
+        _logger.w('Cannot fetch assigned villages: $e');
+      }
+    }
   }
 
   // return true if token is expired and cannot refresh

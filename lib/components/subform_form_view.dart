@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart' hide Form;
-import 'package:podd_app/app_theme.dart';
-import 'package:podd_app/components/back_appbar_action.dart';
 import 'package:podd_app/components/confirm.dart';
+import 'package:podd_app/components/form_chrome.dart';
 import 'package:podd_app/components/form_input.dart';
-import 'package:podd_app/components/form_stepper.dart';
-import 'package:podd_app/components/form_test_banner.dart';
 import 'package:podd_app/components/subform_form_view_model.dart';
-import 'package:podd_app/locator.dart';
 import 'package:podd_app/opsv_form/opsv_form.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
+import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:stacked/stacked.dart';
 
 class SubformFormView extends StatelessWidget {
-  final AppTheme apptheme = locator<AppTheme>();
   final String name;
   final Form form;
   final bool testFlag;
 
-  SubformFormView(this.testFlag, this.name, this.form, {Key? key})
+  const SubformFormView(this.testFlag, this.name, this.form, {Key? key})
       : super(key: key);
 
   @override
@@ -26,27 +23,36 @@ class SubformFormView extends StatelessWidget {
       onViewModelReady: (viewModel) => viewModel.gotoStart(),
       builder: (context, viewModel, child) {
         if (!viewModel.isReady) {
-          return const Center(child: CircularProgressIndicator());
+          return Scaffold(
+            backgroundColor: incidentsSand,
+            body: Center(
+              child: CircularProgressIndicator(
+                color: OhtkTheme.palette.teal700,
+              ),
+            ),
+          );
         }
         return ConfirmPopScope(
           onWillPop: () => _onWillpPop(context),
           child: GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Scaffold(
-              resizeToAvoidBottomInset: false,
-              appBar: AppBar(
-                leading: const BackAppBarAction(),
-                title: Text(viewModel.formName),
-                backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-                foregroundColor: testFlag
-                    ? Colors.black87
-                    : Theme.of(context).appBarTheme.foregroundColor,
+              resizeToAvoidBottomInset: true,
+              backgroundColor: incidentsSand,
+              appBar: FormChromeAppBar(
+                title: viewModel.formName,
+                onBack: () async {
+                  if (await _onWillpPop(context) && context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
               ),
               body: SafeArea(
+                top: false,
                 child: Column(
                   children: [
-                    FormTestBanner(testFlag: testFlag),
-                    FormStepper(form: viewModel.formStore),
+                    FormChromeTestBanner(testFlag: testFlag),
+                    FormChromeProgressStrip(form: viewModel.formStore),
                     Expanded(
                       flex: 1,
                       child: FormInput(
@@ -67,6 +73,6 @@ class SubformFormView extends StatelessWidget {
   }
 
   Future<bool> _onWillpPop(BuildContext context) async {
-    return confirm(context);
+    return showExitConfirmDialog(context);
   }
 }

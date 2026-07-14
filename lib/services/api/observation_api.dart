@@ -59,7 +59,7 @@ class ObservationApi extends GraphQlBaseApi {
   Future<SubjectRecordQueryResult> fetchSubjectRecords(int definitionId,
       {limit = 20, offset = 0, String? q}) async {
     const query = r'''
-      query observationSubjects($limit: Int, $offset: Int, $definitionId: ID, $q: String) {
+      query observationSubjects($limit: Int, $offset: Int, $definitionId: String, $q: String) {
         observationSubjects(
           limit: $limit, 
           offset: $offset, 

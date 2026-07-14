@@ -5,7 +5,9 @@ import 'package:podd_app/ui/census/census_view.dart';
 import 'package:podd_app/ui/home/home_view.dart';
 import 'package:podd_app/ui/home/observation/observation_home_view.dart';
 import 'package:podd_app/ui/home/report_home_view.dart';
+import 'package:podd_app/components/restart_widget.dart';
 import 'package:podd_app/ui/login/login_view.dart';
+import 'package:podd_app/ui/welcome/welcome_view.dart';
 import 'package:podd_app/ui/observation/form/monitoring_record_form_view.dart';
 import 'package:podd_app/ui/observation/form/subject_form_view.dart';
 import 'package:podd_app/ui/observation/monitoring/observation_monitoring_view.dart';
@@ -21,6 +23,21 @@ import 'package:podd_app/ui/report/report_form_view.dart';
 import 'package:podd_app/ui/report_type/report_type_view.dart';
 
 import 'locator.dart';
+
+CustomTransitionPage<void> _tabFadePage({
+  required Widget child,
+  LocalKey? key,
+}) {
+  return CustomTransitionPage<void>(
+    key: key,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 180),
+    reverseTransitionDuration: const Duration(milliseconds: 180),
+    transitionsBuilder: (context, animation, _, child) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+  );
+}
 
 class OhtkRouter {
   static final OhtkRouter _instance = OhtkRouter._internal();
@@ -49,24 +66,31 @@ class OhtkRouter {
   }
   OhtkRouter._internal();
 
-  GoRouter getRouter() {
+  GoRouter getRouter({bool setupComplete = true}) {
     final IAuthService authService = locator<IAuthService>();
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: initialLocation,
       refreshListenable: authService,
-      // redirect to the login page if the user is not logged in
+      // redirect to the welcome gate (first launch) or login page (returning
+      // user) until both setup and authentication are complete
       redirect: (BuildContext context, GoRouterState state) {
-        // if the user is not logged in, they need to login
         final bool loggedIn = authService.isLogin ?? false;
         final bool loggingIn = state.matchedLocation == '/login';
-        if (!loggedIn) {
+        final bool onWelcome = state.matchedLocation == '/welcome';
+
+        // First-launch gate: no language or no server picked yet
+        if (!setupComplete && !onWelcome) {
+          return '/welcome';
+        }
+
+        // Standard auth gate: not logged in → /login
+        if (!loggedIn && !loggingIn && !onWelcome) {
           return '/login';
         }
 
-        // if the user is logged in but still on the login page, send them to
-        // the home page (shell route) on first view, default to 'reports'
-        if (loggingIn) {
+        // Logged-in users shouldn't sit on /login; bounce them home
+        if (loggedIn && loggingIn) {
           return initialLocation;
         }
 
@@ -79,6 +103,14 @@ class OhtkRouter {
           builder: (BuildContext context, GoRouterState state) =>
               const LoginView(),
         ),
+        GoRoute(
+          path: '/welcome',
+          builder: (BuildContext context, GoRouterState state) => WelcomeView(
+            onContinue: () {
+              if (context.mounted) RestartWidget.restartApp(context);
+            },
+          ),
+        ),
 
         /// Application shell
         ShellRoute(
@@ -89,19 +121,9 @@ class OhtkRouter {
           routes: <RouteBase>[
             GoRoute(
               path: '/reports',
-              pageBuilder: (context, state) => CustomTransitionPage<void>(
+              pageBuilder: (context, state) => _tabFadePage(
                 key: state.pageKey,
-                child: ReportHomeView(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(-1, 0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
+                child: const ReportHomeView(),
               ),
               routes: <RouteBase>[
                 GoRoute(
@@ -158,13 +180,24 @@ class OhtkRouter {
             GoRoute(
               name: census,
               path: '/census',
-              pageBuilder: (context, state) => const NoTransitionPage<void>(
-                child: CensusView(),
+              pageBuilder: (context, state) => _tabFadePage(
+                key: state.pageKey,
+                child: const CensusView(),
               ),
+              routes: [
+                GoRoute(
+                  path: ':kind',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => CensusView(
+                    kind: state.pathParameters['kind'],
+                    trainingMode: state.uri.queryParameters['training'] == '1',
+                  ),
+                ),
+              ],
             ),
             GoRoute(
               path: '/observations',
-              pageBuilder: (context, state) => NoTransitionPage<void>(
+              pageBuilder: (context, state) => _tabFadePage(
                 key: state.pageKey,
                 child: const ObservationHomeView(),
               ),
@@ -237,19 +270,9 @@ class OhtkRouter {
             ),
             GoRoute(
               path: '/profile',
-              pageBuilder: (context, state) => CustomTransitionPage<void>(
+              pageBuilder: (context, state) => _tabFadePage(
                 key: state.pageKey,
                 child: const ProfileView(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
               ),
               routes: [
                 GoRoute(

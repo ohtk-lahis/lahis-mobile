@@ -7,6 +7,6 @@ class BaseReportImage {
   BaseReportImage(Map<String, dynamic> json)
       : id = json["id"],
         filePath = json["file"],
-        thumbnailPath = json["thumbnail"],
-        imageUrl = json["imageUrl"];
+        thumbnailPath = json["thumbnail"] ?? json["imageUrl"] ?? json["file"],
+        imageUrl = json["imageUrl"] ?? json["file"];
 }
