@@ -13,8 +13,10 @@ ConditionOperator _parse(String operator) {
     case 'has_one_of':
     case 'hasOneOf':
     case 'isOneOf':
+    case 'in':
       return ConditionOperator.isOneOf;
     case 'isNotOneOf':
+    case 'not_in':
       return ConditionOperator.isNotOneOf;
     default:
       return ConditionOperator.none;
