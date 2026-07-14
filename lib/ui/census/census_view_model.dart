@@ -25,6 +25,9 @@ class CensusViewModel extends BaseViewModel {
   List<CensusKindSummary> censusKinds = [];
   List<CensusSchemaRow> rows = [];
   List<CensusSchemaMeasure> measures = [];
+  List<CensusSchemaGroup> groups = [];
+  /// `flat` | `grouped_species`
+  String schemaLayout = 'flat';
   CensusDefinitionVersion? activeDefinition;
   CensusKindSummary? activeKindSummary;
   CensusRoundOccurrence? activeOccurrence;
@@ -80,7 +83,27 @@ class CensusViewModel extends BaseViewModel {
 
   bool get hasRows => rows.isNotEmpty;
 
+  bool get isGroupedAnimalSchema =>
+      activeKind == 'ANIMAL' && schemaLayout == 'grouped_species';
+
   bool get requiresAnimalSummary => activeKind == 'ANIMAL' && hasRows;
+
+  /// Per-row measures (Option A group/species) or global schema measures (flat).
+  List<CensusSchemaMeasure> measuresFor(CensusSchemaRow row) {
+    if (row.measures.isNotEmpty) {
+      return row.measures;
+    }
+    return measures;
+  }
+
+  CensusSchemaRow? rowByKey(String rowKey) {
+    for (final row in rows) {
+      if (row.rowKey == rowKey) {
+        return row;
+      }
+    }
+    return null;
+  }
 
   bool get canSubmit =>
       hasRows &&
@@ -199,7 +222,7 @@ class CensusViewModel extends BaseViewModel {
   bool isRowDirty(CensusSchemaRow row) {
     final current = measureValues[row.rowKey] ?? const {};
     final initial = _initialMeasureValues[row.rowKey] ?? const {};
-    return measures.any(
+    return measuresFor(row).any(
       (measure) => (current[measure.key] ?? '') != (initial[measure.key] ?? ''),
     );
   }
@@ -255,7 +278,7 @@ class CensusViewModel extends BaseViewModel {
   }
 
   bool hasRowErrors(CensusSchemaRow row) {
-    return measures.any((measure) => hasMeasureError(row, measure));
+    return measuresFor(row).any((measure) => hasMeasureError(row, measure));
   }
 
   String? measureError(CensusSchemaRow row, CensusSchemaMeasure measure) {
@@ -452,8 +475,9 @@ class CensusViewModel extends BaseViewModel {
     summaryErrors.clear();
     final summary = _buildAnimalSummary();
     for (final row in rows) {
+      final rowMeasures = measuresFor(row);
       final measureMap = <String, int>{};
-      for (final measure in measures) {
+      for (final measure in rowMeasures) {
         final value = measureValue(row.rowKey, measure.key);
         final quantity = _parseQuantity(value);
         if (quantity == null) {
@@ -465,7 +489,7 @@ class CensusViewModel extends BaseViewModel {
         }
         measureMap[measure.key] = quantity;
       }
-      if (measureMap.length != measures.length) {
+      if (measureMap.length != rowMeasures.length) {
         continue;
       }
 
@@ -494,10 +518,87 @@ class CensusViewModel extends BaseViewModel {
       notifyListeners();
       return null;
     }
+    if (isGroupedAnimalSchema && summary != null) {
+      if (!_validateGroupedAnimalQuantities(summary, formRows)) {
+        setErrorForObject('submit', null);
+        _focusFirstInvalidMeasure();
+        return null;
+      }
+    }
     return {
       if (summary != null) 'summary': summary,
       'rows': formRows,
     };
+  }
+
+  /// Client-side Option A rules (server enforces the same).
+  bool _validateGroupedAnimalQuantities(
+    Map<String, int> summary,
+    List<Map<String, dynamic>> formRows,
+  ) {
+    final animalHouseholds = summary[animalHouseholdQuantityKey] ?? 0;
+    final measuresByRow = <String, Map>{
+      for (final row in formRows)
+        if (row['row_key'] is String && row['measures'] is Map)
+          row['row_key'] as String: row['measures'] as Map,
+    };
+
+    for (final group in groups) {
+      final groupMeasures = measuresByRow[group.householdRowKey];
+      if (groupMeasures == null) {
+        continue;
+      }
+      final groupHh = groupMeasures['household_quantity'];
+      if (groupHh is! int) {
+        continue;
+      }
+      if (groupHh > animalHouseholds) {
+        final groupRow = rowByKey(group.householdRowKey);
+        if (groupRow != null) {
+          for (final measure in measuresFor(groupRow)) {
+            if (measure.key == 'household_quantity') {
+              measureErrors[_inputKey(groupRow, measure)] =
+                  localize.censusAnimalHouseholdsExceedVillageError;
+            }
+          }
+        }
+        return false;
+      }
+
+      var totalHeads = 0;
+      for (final speciesKey in group.speciesRowKeys) {
+        final speciesMeasures = measuresByRow[speciesKey];
+        final heads = speciesMeasures?['animal_quantity'];
+        if (heads is int) {
+          totalHeads += heads;
+        }
+      }
+      if (totalHeads > 0 && groupHh < 1) {
+        final groupRow = rowByKey(group.householdRowKey);
+        if (groupRow != null) {
+          for (final measure in measuresFor(groupRow)) {
+            if (measure.key == 'household_quantity') {
+              measureErrors[_inputKey(groupRow, measure)] =
+                  'Households must be at least 1 when animals are reported';
+            }
+          }
+        }
+        return false;
+      }
+      if (groupHh == 0 && totalHeads > 0) {
+        final groupRow = rowByKey(group.householdRowKey);
+        if (groupRow != null) {
+          for (final measure in measuresFor(groupRow)) {
+            if (measure.key == 'household_quantity') {
+              measureErrors[_inputKey(groupRow, measure)] =
+                  'Clear animal counts when households is zero';
+            }
+          }
+        }
+        return false;
+      }
+    }
+    return true;
   }
 
   Map<String, int>? _buildAnimalSummary() {
@@ -668,6 +769,8 @@ class CensusViewModel extends BaseViewModel {
       );
       rows = runtimeSchema.rows;
       measures = runtimeSchema.measures;
+      groups = runtimeSchema.groups;
+      schemaLayout = runtimeSchema.layout;
       if (kind == 'ANIMAL') {
         unsupportedSchema = !runtimeSchema.supportsMobileAnimalSubmit;
       } else if (kind == 'HUMAN') {
@@ -683,12 +786,20 @@ class CensusViewModel extends BaseViewModel {
   void _ensureValueSlots() {
     for (final row in rows) {
       measureValues.putIfAbsent(row.rowKey, () => {});
-      for (final measure in measures) {
+      for (final measure in measuresFor(row)) {
         measureValues[row.rowKey]!.putIfAbsent(measure.key, () => '');
       }
     }
     _syncInputFocusNodes();
     _captureInitialValues();
+  }
+
+  int get _expectedMeasureSlotCount {
+    var count = 0;
+    for (final row in rows) {
+      count += measuresFor(row).length;
+    }
+    return count;
   }
 
   void _prefillFromLatestCensus() {
@@ -704,7 +815,7 @@ class CensusViewModel extends BaseViewModel {
     _prefillSummaryFromLatestCensus();
     var prefilledAny = false;
     var prefilledCount = 0;
-    final expectedCount = rows.length * measures.length;
+    final expectedCount = _expectedMeasureSlotCount;
     final submittedRows = latestCensus!.formData['rows'];
     if (submittedRows is List && submittedRows.isNotEmpty) {
       for (final submittedRow in submittedRows.whereType<Map>()) {
@@ -724,7 +835,7 @@ class CensusViewModel extends BaseViewModel {
           continue;
         }
         measureValues.putIfAbsent(row.rowKey, () => {});
-        for (final measure in measures) {
+        for (final measure in measuresFor(row)) {
           final value = submittedMeasures[measure.key];
           if (value != null) {
             measureValues[row.rowKey]![measure.key] = value.toString();
@@ -749,12 +860,19 @@ class CensusViewModel extends BaseViewModel {
         continue;
       }
       measureValues.putIfAbsent(row.rowKey, () => {});
-      measureValues[row.rowKey]!['animal_quantity'] =
-          fact.animalQuantity.toString();
-      measureValues[row.rowKey]!['household_quantity'] =
-          fact.householdQuantity.toString();
-      prefilledAny = true;
-      prefilledCount += 2;
+      for (final measure in measuresFor(row)) {
+        if (measure.key == 'animal_quantity') {
+          measureValues[row.rowKey]!['animal_quantity'] =
+              fact.animalQuantity.toString();
+          prefilledAny = true;
+          prefilledCount++;
+        } else if (measure.key == 'household_quantity') {
+          measureValues[row.rowKey]!['household_quantity'] =
+              fact.householdQuantity.toString();
+          prefilledAny = true;
+          prefilledCount++;
+        }
+      }
     }
     latestSnapshotPrefilledAnyValue = prefilledAny;
     latestSnapshotPrefilledAllValues =
@@ -1003,7 +1121,7 @@ class CensusViewModel extends BaseViewModel {
     for (final row in rows) {
       final current = measureValues[row.rowKey] ?? const {};
       final initial = _initialMeasureValues[row.rowKey] ?? const {};
-      for (final measure in measures) {
+      for (final measure in measuresFor(row)) {
         if ((current[measure.key] ?? '') != (initial[measure.key] ?? '')) {
           return true;
         }
@@ -1063,6 +1181,8 @@ class CensusViewModel extends BaseViewModel {
     definitionInactive = false;
     rows = [];
     measures = [];
+    groups = [];
+    schemaLayout = 'flat';
     _clearFormDataValues();
   }
 
@@ -1087,7 +1207,7 @@ class CensusViewModel extends BaseViewModel {
   void _syncInputFocusNodes() {
     final nextKeys = [
       for (final row in rows)
-        for (final measure in measures) _inputKey(row, measure),
+        for (final measure in measuresFor(row)) _inputKey(row, measure),
     ];
     final nextKeySet = nextKeys.toSet();
     final removedKeys = _inputFocusNodes.keys
@@ -1118,7 +1238,7 @@ class CensusViewModel extends BaseViewModel {
 
   void _focusFirstInvalidMeasure() {
     for (final row in rows) {
-      for (final measure in measures) {
+      for (final measure in measuresFor(row)) {
         final key = _inputKey(row, measure);
         if (!measureErrors.containsKey(key)) {
           continue;

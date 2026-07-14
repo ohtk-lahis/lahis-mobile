@@ -223,11 +223,20 @@ class CensusView extends StatelessWidget {
                           _AnimalSummarySection(viewModel: viewModel),
                           const SizedBox(height: 18),
                         ],
-                        for (var i = 0; i < viewModel.rows.length; i++)
-                          _CensusRowSection(
-                            row: viewModel.rows[i],
-                            viewModel: viewModel,
-                          ),
+                        if (viewModel.isGroupedAnimalSchema &&
+                            viewModel.groups.isNotEmpty)
+                          ...viewModel.groups.map(
+                            (group) => _CensusGroupSection(
+                              group: group,
+                              viewModel: viewModel,
+                            ),
+                          )
+                        else
+                          for (var i = 0; i < viewModel.rows.length; i++)
+                            _CensusRowSection(
+                              row: viewModel.rows[i],
+                              viewModel: viewModel,
+                            ),
                       ],
                     ],
                   ),
@@ -771,19 +780,76 @@ class _VillageHeader extends StatelessWidget {
   }
 }
 
+/// Option A paper-like section: group HH then species head counts.
+class _CensusGroupSection extends StatelessWidget {
+  final CensusSchemaGroup group;
+  final CensusViewModel viewModel;
+
+  const _CensusGroupSection({
+    required this.group,
+    required this.viewModel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final householdRow = viewModel.rowByKey(group.householdRowKey);
+    final speciesRows = group.speciesRowKeys
+        .map(viewModel.rowByKey)
+        .whereType<CensusSchemaRow>()
+        .toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              group.label,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: OhtkColor.ink900,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (householdRow != null)
+            _CensusRowSection(
+              row: householdRow,
+              viewModel: viewModel,
+              compactLabel: 'Households (HH No.)',
+            ),
+          for (final speciesRow in speciesRows)
+            _CensusRowSection(
+              row: speciesRow,
+              viewModel: viewModel,
+              compactLabel: '${speciesRow.label} No.',
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CensusRowSection extends StatelessWidget {
   final CensusSchemaRow row;
   final CensusViewModel viewModel;
+  final String? compactLabel;
 
   const _CensusRowSection({
     required this.row,
     required this.viewModel,
+    this.compactLabel,
   });
 
   @override
   Widget build(BuildContext context) {
     final dirty = viewModel.isRowDirty(row);
     final invalid = viewModel.hasRowErrors(row);
+    final rowMeasures = viewModel.measuresFor(row);
+    final title = compactLabel ?? row.label;
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(
@@ -795,7 +861,7 @@ class _CensusRowSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    row.label,
+                    title,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -843,12 +909,12 @@ class _CensusRowSection extends StatelessWidget {
                     : null,
             child: Column(
               children: [
-                for (var i = 0; i < viewModel.measures.length; i++)
+                for (var i = 0; i < rowMeasures.length; i++)
                   _MeasureInputRow(
                     row: row,
-                    measure: viewModel.measures[i],
+                    measure: rowMeasures[i],
                     viewModel: viewModel,
-                    last: i == viewModel.measures.length - 1,
+                    last: i == rowMeasures.length - 1,
                   ),
               ],
             ),

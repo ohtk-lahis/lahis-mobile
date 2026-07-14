@@ -99,18 +99,28 @@ class CensusDefinitionVersion {
 }
 
 class CensusRuntimeSchema {
+  final int? schemaVersion;
+  final String layout;
   final List<CensusSchemaRow> rows;
   final List<CensusSchemaMeasure> measures;
+  final List<CensusSchemaGroup> groups;
   final List<Map<String, dynamic>> extraDimensions;
 
   const CensusRuntimeSchema({
+    this.schemaVersion,
+    this.layout = 'flat',
     required this.rows,
     required this.measures,
+    this.groups = const [],
     this.extraDimensions = const [],
   });
 
+  bool get isGroupedSpecies => layout == 'grouped_species';
+
   factory CensusRuntimeSchema.fromJson(Map<String, dynamic> json) =>
       CensusRuntimeSchema(
+        schemaVersion: _parseInt(json['schema_version']),
+        layout: json['layout']?.toString() ?? 'flat',
         rows: (json['rows'] as List? ?? const [])
             .whereType<Map>()
             .map((row) => CensusSchemaRow.fromJson(
@@ -123,6 +133,12 @@ class CensusRuntimeSchema {
                   Map<String, dynamic>.from(measure),
                 ))
             .toList(),
+        groups: (json['groups'] as List? ?? const [])
+            .whereType<Map>()
+            .map((group) => CensusSchemaGroup.fromJson(
+                  Map<String, dynamic>.from(group),
+                ))
+            .toList(),
         extraDimensions: (json['extra_dimensions'] as List? ?? const [])
             .whereType<Map>()
             .map((dimension) => Map<String, dynamic>.from(dimension))
@@ -131,17 +147,24 @@ class CensusRuntimeSchema {
 
   Map<String, dynamic> toJson() {
     return {
+      if (schemaVersion != null) 'schema_version': schemaVersion,
+      'layout': layout,
       'rows': rows.map((row) => row.toJson()).toList(),
       'measures': measures.map((measure) => measure.toJson()).toList(),
+      if (groups.isNotEmpty)
+        'groups': groups.map((group) => group.toJson()).toList(),
       'extra_dimensions': extraDimensions,
     };
   }
 
   CensusRuntimeSchema localized(String localeName) {
     return CensusRuntimeSchema(
+      schemaVersion: schemaVersion,
+      layout: layout,
       rows: rows.map((row) => row.localized(localeName)).toList(),
       measures:
           measures.map((measure) => measure.localized(localeName)).toList(),
+      groups: groups.map((group) => group.localized(localeName)).toList(),
       extraDimensions: extraDimensions,
     );
   }
@@ -149,12 +172,22 @@ class CensusRuntimeSchema {
   bool get supportsMobileAnimalSubmit {
     final rowKeys =
         rows.map((row) => row.rowKey).where((key) => key.isNotEmpty);
-    return rows.isNotEmpty &&
-        measures.isNotEmpty &&
-        extraDimensions.isEmpty &&
-        rows.every((row) => row.rowKey.isNotEmpty) &&
-        rowKeys.length == rowKeys.toSet().length &&
-        measures.every((measure) => measure.isInteger);
+    if (rows.isEmpty ||
+        extraDimensions.isNotEmpty ||
+        rows.any((row) => row.rowKey.isEmpty) ||
+        rowKeys.length != rowKeys.toSet().length) {
+      return false;
+    }
+    if (isGroupedSpecies) {
+      // Option A: each row carries its own measure list (HH on group, heads on species)
+      return rows.every((row) {
+        final rowMeasures =
+            row.measures.isNotEmpty ? row.measures : measures;
+        return rowMeasures.isNotEmpty &&
+            rowMeasures.every((measure) => measure.isInteger);
+      });
+    }
+    return measures.isNotEmpty && measures.every((measure) => measure.isInteger);
   }
 
   bool get supportsMobileHumanSubmit {
@@ -169,16 +202,84 @@ class CensusRuntimeSchema {
   }
 }
 
+class CensusSchemaGroup {
+  final String key;
+  final String label;
+  final Map<String, String> labelI18n;
+  final String householdRowKey;
+  final List<String> speciesRowKeys;
+
+  const CensusSchemaGroup({
+    required this.key,
+    required this.label,
+    this.labelI18n = const {},
+    required this.householdRowKey,
+    required this.speciesRowKeys,
+  });
+
+  factory CensusSchemaGroup.fromJson(Map<String, dynamic> json) {
+    final labelValue = json['label'];
+    return CensusSchemaGroup(
+      key: json['key']?.toString() ?? '',
+      label: _labelText(labelValue, ''),
+      labelI18n: _localizedLabelMap(json['label_i18n'] ?? labelValue),
+      householdRowKey: json['household_row_key']?.toString() ??
+          (json['key'] != null ? 'group:${json['key']}' : ''),
+      speciesRowKeys: (json['species_row_keys'] as List? ?? const [])
+          .map((item) => item.toString())
+          .where((item) => item.isNotEmpty)
+          .toList(),
+    );
+  }
+
+  CensusSchemaGroup localized(String localeName) {
+    final localizedLabel = _localizedLabelText(labelI18n, localeName, label);
+    if (localizedLabel == label) {
+      return this;
+    }
+    return CensusSchemaGroup(
+      key: key,
+      label: localizedLabel,
+      labelI18n: labelI18n,
+      householdRowKey: householdRowKey,
+      speciesRowKeys: speciesRowKeys,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'key': key,
+      'label': label,
+      if (labelI18n.isNotEmpty) 'label_i18n': labelI18n,
+      'household_row_key': householdRowKey,
+      'species_row_keys': speciesRowKeys,
+    };
+  }
+}
+
 class CensusSchemaRow {
   final String rowKey;
   final String label;
   final Map<String, String> labelI18n;
+  /// `group` | `species` | empty for legacy flat rows
+  final String rowKind;
+  final String? group;
+  /// Per-row measures (Option A). Empty => use schema-level measures.
+  final List<CensusSchemaMeasure> measures;
 
   const CensusSchemaRow({
     required this.rowKey,
     required this.label,
     this.labelI18n = const {},
+    this.rowKind = '',
+    this.group,
+    this.measures = const [],
   });
+
+  bool get isGroupRow => rowKind == 'group' || rowKey.startsWith('group:');
+
+  bool get isSpeciesRow =>
+      rowKind == 'species' || rowKey.startsWith('species:');
 
   factory CensusSchemaRow.fromJson(Map<String, dynamic> json) {
     final labelValue = json['label'];
@@ -186,18 +287,28 @@ class CensusSchemaRow {
       rowKey: json['row_key']?.toString() ?? json['key']?.toString() ?? '',
       label: _labelText(labelValue, ''),
       labelI18n: _localizedLabelMap(json['label_i18n'] ?? labelValue),
+      rowKind: json['row_kind']?.toString() ?? '',
+      group: json['group']?.toString(),
+      measures: (json['measures'] as List? ?? const [])
+          .whereType<Map>()
+          .map((measure) => CensusSchemaMeasure.fromJson(
+                Map<String, dynamic>.from(measure),
+              ))
+          .toList(),
     );
   }
 
   CensusSchemaRow localized(String localeName) {
     final localizedLabel = _localizedLabelText(labelI18n, localeName, label);
-    if (localizedLabel == label) {
-      return this;
-    }
+    final localizedMeasures =
+        measures.map((measure) => measure.localized(localeName)).toList();
     return CensusSchemaRow(
       rowKey: rowKey,
       label: localizedLabel,
       labelI18n: labelI18n,
+      rowKind: rowKind,
+      group: group,
+      measures: localizedMeasures,
     );
   }
 
@@ -206,6 +317,10 @@ class CensusSchemaRow {
       'row_key': rowKey,
       'label': label,
       if (labelI18n.isNotEmpty) 'label_i18n': labelI18n,
+      if (rowKind.isNotEmpty) 'row_kind': rowKind,
+      if (group != null) 'group': group,
+      if (measures.isNotEmpty)
+        'measures': measures.map((m) => m.toJson()).toList(),
     };
   }
 }
