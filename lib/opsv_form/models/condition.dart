@@ -16,7 +16,9 @@ ConditionOperator _parse(String operator) {
     case 'in':
       return ConditionOperator.isOneOf;
     case 'isNotOneOf':
+    case 'is_not_one_of':
     case 'not_in':
+    case 'notIn':
       return ConditionOperator.isNotOneOf;
     default:
       return ConditionOperator.none;

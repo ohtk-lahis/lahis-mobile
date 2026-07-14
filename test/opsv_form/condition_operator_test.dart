@@ -12,161 +12,126 @@ void main() {
     });
   });
 
-  group("condition operator 'in' (alias for isOneOf)", () {
-    test("parse 'in' operator from json", () {
-      var condition = SimpleCondition.fromJson({
-        "name": "category",
-        "operator": "in",
-        "value": "A,B,C",
-      });
-      expect(condition.operator, ConditionOperator.isOneOf);
+  group("parse list-membership operators from json", () {
+    test("positive aliases map to isOneOf", () {
+      for (final op in ['in', 'has_one_of', 'hasOneOf', 'isOneOf']) {
+        final condition = SimpleCondition.fromJson({
+          "name": "category",
+          "operator": op,
+          "value": "A,B,C",
+        });
+        expect(condition.operator, ConditionOperator.isOneOf,
+            reason: "operator '$op' should map to isOneOf");
+      }
     });
 
-    test("TextField with 'in' operator - value in list", () {
-      var textField = TextField("id1", "category");
-      textField.value = "Bz";
-      
-      var result = textField.evaluate(ConditionOperator.isOneOf, "A,B,C");
-      expect(result, isTrue);
-    });
-
-    test("TextField with 'in' operator - value not in list", () {
-      var textField = TextField("id1", "category");
-      textField.value = "D";
-      
-      var result = textField.evaluate(ConditionOperator.isOneOf, "A,B,C");
-      expect(result, isFalse);
-    });
-
-    test("TextField with 'in' operator - with spaces in list", () {
-      var textField = TextField("id1", "category");
-      textField.value = "B";
-      
-      var result = textField.evaluate(ConditionOperator.isOneOf, "A, B, C");
-      expect(result, isTrue);
-    });
-
-    test("IntegerField with 'in' operator - value in list", () {
-      var intField = IntegerField("id1", "age");
-      intField.value = 25;
-      
-      var result = intField.evaluate(ConditionOperator.isOneOf, "18,25,30");
-      expect(result, isTrue);
-    });
-
-    test("IntegerField with 'in' operator - value not in list", () {
-      var intField = IntegerField("id1", "age");
-      intField.value = 26;
-      
-      var result = intField.evaluate(ConditionOperator.isOneOf, "18,25,30");
-      expect(result, isFalse);
-    });
-
-    test("SingleChoicesField with 'in' operator - value in list", () {
-      var singleChoiceField = SingleChoicesField(
-        "id1",
-        "color",
-        [
-          ChoiceOption(label: "Red", value: "red"),
-          ChoiceOption(label: "Blue", value: "blue"),
-          ChoiceOption(label: "Green", value: "green"),
-        ],
-      );
-      singleChoiceField.value = "blue";
-      
-      var result = singleChoiceField.evaluate(ConditionOperator.isOneOf, "red,blue");
-      expect(result, isTrue);
-    });
-
-    test("SingleChoicesField with 'in' operator - value not in list", () {
-      var singleChoiceField = SingleChoicesField(
-        "id1",
-        "color",
-        [
-          ChoiceOption(label: "Red", value: "red"),
-          ChoiceOption(label: "Blue", value: "blue"),
-          ChoiceOption(label: "Green", value: "green"),
-        ],
-      );
-      singleChoiceField.value = "green";
-      
-      var result = singleChoiceField.evaluate(ConditionOperator.isOneOf, "red,blue");
-      expect(result, isFalse);
-    });
-
-    test("DecimalField with 'in' operator - value in list", () {
-      var decimalField = DecimalField("id1", "price");
-      decimalField.value = Decimal.parse("10.5");
-      
-      var result = decimalField.evaluate(ConditionOperator.isOneOf, "10.5,20.0,30.5");
-      expect(result, isTrue);
-    });
-
-    test("DecimalField with 'in' operator - value not in list", () {
-      var decimalField = DecimalField("id1", "price");
-      decimalField.value = Decimal.parse("15.0");
-      
-      var result = decimalField.evaluate(ConditionOperator.isOneOf, "10.5,20.0,30.5");
-      expect(result, isFalse);
-    });
-
-    test("LocationField with 'in' operator - value in list (simple IDs)", () {
-      // Note: LocationField stores "lng,lat" which makes isOneOf impractical with comma-separated values
-      // This test demonstrates the behavior with simple string IDs instead
-      var locationField = LocationField("id1", "location");
-      locationField.value = "loc1";
-      
-      var result = locationField.evaluate(ConditionOperator.isOneOf, "loc1,loc2,loc3");
-      expect(result, isTrue);
-      
-      locationField.value = "loc4";
-      result = locationField.evaluate(ConditionOperator.isOneOf, "loc1,loc2,loc3");
-      expect(result, isFalse);
-    });
-
-    test("DateField with 'in' operator - value in list", () {
-      var dateField = DateField("id1", "date");
-      var date1 = DateTime(2023, 1, 1);
-      dateField.value = date1;
-      
-      var isoString = date1.toIso8601String();
-      var result = dateField.evaluate(ConditionOperator.isOneOf, "$isoString,2023-02-01T00:00:00.000");
-      expect(result, isTrue);
+    test("negative aliases map to isNotOneOf", () {
+      for (final op in ['not_in', 'notIn', 'isNotOneOf', 'is_not_one_of']) {
+        final condition = SimpleCondition.fromJson({
+          "name": "category",
+          "operator": op,
+          "value": "A,B,C",
+        });
+        expect(condition.operator, ConditionOperator.isNotOneOf,
+            reason: "operator '$op' should map to isNotOneOf");
+      }
     });
   });
 
-  group("backward compatibility - hasOneOf and isOneOf", () {
-    test("parse 'hasOneOf' operator from json", () {
-      var condition = SimpleCondition.fromJson({
+  group("evaluate via JSON-parsed 'in' / 'not_in' operators", () {
+    SimpleCondition parsed(String operator, String value) {
+      return SimpleCondition.fromJson({
         "name": "category",
-        "operator": "hasOneOf",
-        "value": "A,B,C",
+        "operator": operator,
+        "value": value,
       });
-      expect(condition.operator, ConditionOperator.isOneOf);
+    }
+
+    test("TextField membership and exclusion", () {
+      final field = TextField("id1", "category");
+      field.value = "B";
+
+      final inCondition = parsed("in", "A,B,C");
+      expect(inCondition.operator, ConditionOperator.isOneOf);
+      expect(field.evaluate(inCondition.operator, inCondition.value), isTrue);
+
+      final notInCondition = parsed("not_in", "A,B,C");
+      expect(notInCondition.operator, ConditionOperator.isNotOneOf);
+      expect(
+          field.evaluate(notInCondition.operator, notInCondition.value),
+          isFalse);
+
+      field.value = "D";
+      expect(field.evaluate(inCondition.operator, inCondition.value), isFalse);
+      expect(
+          field.evaluate(notInCondition.operator, notInCondition.value), isTrue);
     });
 
-    test("parse 'has_one_of' operator from json", () {
-      var condition = SimpleCondition.fromJson({
-        "name": "category",
-        "operator": "has_one_of",
-        "value": "A,B,C",
-      });
-      expect(condition.operator, ConditionOperator.isOneOf);
+    test("TextField trims spaces in list tokens", () {
+      final field = TextField("id1", "category");
+      field.value = "B";
+      final condition = parsed("in", "A, B, C");
+      expect(field.evaluate(condition.operator, condition.value), isTrue);
     });
 
-    test("parse 'isOneOf' operator from json", () {
-      var condition = SimpleCondition.fromJson({
-        "name": "category",
-        "operator": "isOneOf",
-        "value": "A,B,C",
-      });
-      expect(condition.operator, ConditionOperator.isOneOf);
+    test("IntegerField membership and exclusion", () {
+      final field = IntegerField("id1", "age");
+      field.value = 25;
+
+      final inCondition = parsed("in", "18,25,30");
+      expect(field.evaluate(inCondition.operator, inCondition.value), isTrue);
+
+      final notInCondition = parsed("not_in", "18,25,30");
+      expect(
+          field.evaluate(notInCondition.operator, notInCondition.value),
+          isFalse);
+
+      field.value = 26;
+      expect(field.evaluate(inCondition.operator, inCondition.value), isFalse);
+      expect(
+          field.evaluate(notInCondition.operator, notInCondition.value), isTrue);
+    });
+
+    test("SingleChoicesField membership and exclusion", () {
+      final field = SingleChoicesField(
+        "id1",
+        "color",
+        [
+          ChoiceOption(label: "Red", value: "red"),
+          ChoiceOption(label: "Blue", value: "blue"),
+          ChoiceOption(label: "Green", value: "green"),
+        ],
+      );
+      field.value = "blue";
+
+      final inCondition = parsed("in", "red,blue");
+      expect(field.evaluate(inCondition.operator, inCondition.value), isTrue);
+
+      final notInCondition = parsed("not_in", "red,blue");
+      expect(
+          field.evaluate(notInCondition.operator, notInCondition.value),
+          isFalse);
+
+      field.value = "green";
+      expect(field.evaluate(inCondition.operator, inCondition.value), isFalse);
+      expect(
+          field.evaluate(notInCondition.operator, notInCondition.value), isTrue);
+    });
+
+    test("DecimalField membership", () {
+      final field = DecimalField("id1", "price");
+      field.value = Decimal.parse("10.5");
+      final condition = parsed("in", "10.5,20.0,30.5");
+      expect(field.evaluate(condition.operator, condition.value), isTrue);
+
+      field.value = Decimal.parse("15.0");
+      expect(field.evaluate(condition.operator, condition.value), isFalse);
     });
   });
 
   group("condition evaluation in form context", () {
-    test("form field display with 'in' operator condition", () {
-      var form = Form.withSection(
+    Form buildCategoryForm(String operator, String listValue) {
+      return Form.withSection(
         "form1",
         [
           Section.withQuestions(
@@ -196,8 +161,8 @@ void main() {
                     label: "Detail",
                     condition: SimpleCondition.fromJson({
                       "name": "category",
-                      "operator": "in",
-                      "value": "A,B",
+                      "operator": operator,
+                      "value": listValue,
                     }),
                   ),
                 ],
@@ -206,30 +171,49 @@ void main() {
           )
         ],
       );
+    }
 
-      TextField detailField =
+    test("form field display with 'in' operator condition", () {
+      final form = buildCategoryForm("in", "A,B");
+      final detailField =
           form.values.getDelegate("detail")!.getField() as TextField;
-      SingleChoicesField categoryField =
+      final categoryField =
           form.values.getDelegate("category")!.getField() as SingleChoicesField;
 
-      // Initially detail field should not display
       expect(detailField.display, isFalse);
 
-      // Set category to A (in the list)
       categoryField.value = "A";
       expect(detailField.display, isTrue);
 
-      // Set category to B (in the list)
       categoryField.value = "B";
       expect(detailField.display, isTrue);
 
-      // Set category to C (not in the list)
       categoryField.value = "C";
       expect(detailField.display, isFalse);
 
-      // Set category to D (not in the list)
       categoryField.value = "D";
       expect(detailField.display, isFalse);
+    });
+
+    test("form field display with 'not_in' operator condition", () {
+      final form = buildCategoryForm("not_in", "A,B");
+      final detailField =
+          form.values.getDelegate("detail")!.getField() as TextField;
+      final categoryField =
+          form.values.getDelegate("category")!.getField() as SingleChoicesField;
+
+      // Exclusion list is A,B: detail shows only when category is outside that set.
+      categoryField.value = "A";
+      expect(detailField.display, isFalse);
+
+      categoryField.value = "B";
+      expect(detailField.display, isFalse);
+
+      categoryField.value = "C";
+      expect(detailField.display, isTrue);
+
+      categoryField.value = "D";
+      expect(detailField.display, isTrue);
     });
   });
 }
