@@ -70,6 +70,6 @@ class DefaultFirebaseOptions {
     projectId: 'open-surveillance',
     storageBucket: 'open-surveillance.appspot.com',
     iosClientId: '264236047317-p9jmbe1uaur309ca26gtr214nnlgm377.apps.googleusercontent.com',
-    iosBundleId: 'org.poddtoolkit.poddMobile',
+    iosBundleId: 'org.poddtoolkit.lahis',
   );
 }

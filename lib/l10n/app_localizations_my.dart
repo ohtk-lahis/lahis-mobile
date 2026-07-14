@@ -9,7 +9,7 @@ class AppLocalizationsMy extends AppLocalizations {
   AppLocalizationsMy([String locale = 'my']) : super(locale);
 
   @override
-  String get appName => 'OHTK Mobile';
+  String get appName => 'LAHIS';
 
   @override
   String get loginTitle => 'သင့်အကောင့်သို့ ဝင်ရောက်ပါ။';
@@ -930,7 +930,7 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get censusUnsupportedMessage =>
-      'The village census has been updated and isn\'t supported on this version of OHTK Mobile. Please update the app, then try again.';
+      'The village census has been updated and isn\'t supported on this version of LAHIS. Please update the app, then try again.';
 
   @override
   String get censusNoRowsConfigured => 'No active census rows are configured.';

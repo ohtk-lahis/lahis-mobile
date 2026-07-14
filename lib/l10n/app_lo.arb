@@ -1,5 +1,5 @@
 {
-  "appName": "OHTK Mobile",
+  "appName": "LAHIS",
   "loginTitle": "ເຂົ້າສູ່ລະບົບບັນຊີຂອງທ່ານ.",
   "signupTitle": "ລົງ​ທະ​ບຽນ",
   "signupSubTitle": "ກະລຸນາໃສ່ລະຫັດເຊີນ\nສຳລັບການລົງທະບຽນ",
@@ -297,7 +297,7 @@
   "censusInactiveMessage": "ຜູ້ປະສານງານໄດ້ປິດແບບຟອມສຳມະໂນນີ້ໄວ້ໃນຕອນນີ້. ກັບຄືນເພື່ອເລືອກສຳມະໂນທີ່ຍັງເປີດໃຊ້ງານ.",
   "censusLoadFailedTitle": "ໂຫຼດສຳມະໂນບໍ່ສຳເລັດ",
   "censusUnsupportedTitle": "ສຳມະໂນນີ້ຕ້ອງໃຊ້ແອັບເວີຊັນໃໝ່ກວ່າ",
-  "censusUnsupportedMessage": "ສຳມະໂນຂອງບ້ານຖືກອັບເດດແລ້ວ ແລະ OHTK Mobile ເວີຊັນນີ້ບໍ່ຮອງຮັບ. ກະລຸນາອັບເດດແອັບແລ້ວລອງໃໝ່.",
+  "censusUnsupportedMessage": "ສຳມະໂນຂອງບ້ານຖືກອັບເດດແລ້ວ ແລະ LAHIS ເວີຊັນນີ້ບໍ່ຮອງຮັບ. ກະລຸນາອັບເດດແອັບແລ້ວລອງໃໝ່.",
   "censusNoRowsConfigured": "ຍັງບໍ່ໄດ້ກຳນົດແຖວສຳມະໂນທີ່ໃຊ້ງານ.",
   "censusNoSetupTitle": "ຍັງບໍ່ໄດ້ຕັ້ງຄ່າສຳມະໂນ",
   "censusNoSetupMessage": "ບ້ານນີ້ຍັງບໍ່ມີແບບຟອມສຳມະໂນທີ່ໃຊ້ງານ.",

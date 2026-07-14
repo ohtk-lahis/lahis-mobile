@@ -1,4 +1,4 @@
-package org.poddtoolkit.poddMobile
+package org.poddtoolkit.lahis
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -57,7 +57,7 @@ class OhtkApp extends StatelessWidget {
               listenable: Listenable.merge([appViewModel, appTheme]),
               builder: (context, child) => MaterialApp.router(
                 debugShowCheckedModeBanner: false,
-                title: 'OHTK Mobile',
+                title: 'LAHIS',
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,
@@ -104,7 +104,7 @@ class OhtkApp extends StatelessWidget {
   }) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'OHTK Mobile',
+      title: 'LAHIS',
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

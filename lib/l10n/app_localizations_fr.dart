@@ -9,7 +9,7 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get appName => 'OHTK Mobile';
+  String get appName => 'LAHIS';
 
   @override
   String get loginTitle => 'Connectez-vous à votre compte';
@@ -933,7 +933,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get censusUnsupportedMessage =>
-      'The village census has been updated and isn\'t supported on this version of OHTK Mobile. Please update the app, then try again.';
+      'The village census has been updated and isn\'t supported on this version of LAHIS. Please update the app, then try again.';
 
   @override
   String get censusNoRowsConfigured => 'No active census rows are configured.';

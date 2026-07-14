@@ -169,7 +169,7 @@ class OhtkThemeConfig {
   static const defineName = 'OHTK_THEME';
   static const configuredPresetName = String.fromEnvironment(
     defineName,
-    defaultValue: 'lagoon',
+    defaultValue: 'lahis',
   );
 
   static OhtkThemePreset? _runtimePreset;

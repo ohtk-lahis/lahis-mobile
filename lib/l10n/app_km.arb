@@ -1,5 +1,5 @@
 {
-  "appName": "OHTK Mobile",
+  "appName": "LAHIS",
   "loginTitle": "ចូលទៅគណនីរបស់អ្នក។",
   "signupTitle": "ចុះ​ឈ្មោះ",
   "signupSubTitle": "Please enter Invitation Code\nfor registration",
@@ -274,7 +274,7 @@
   "censusUnavailableMessage": "This account is not assigned to update a village census.",
   "censusLoadFailedTitle": "Couldn't load the census",
   "censusUnsupportedTitle": "This census needs a newer app",
-  "censusUnsupportedMessage": "The village census has been updated and isn't supported on this version of OHTK Mobile. Please update the app, then try again.",
+  "censusUnsupportedMessage": "The village census has been updated and isn't supported on this version of LAHIS. Please update the app, then try again.",
   "censusNoRowsConfigured": "No active census rows are configured.",
   "censusNoSetupTitle": "No census set up",
   "censusNoSetupMessage": "This village does not have an active census form configured.",

@@ -152,7 +152,7 @@ class _IncidentsAppBar extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              AppLocalizations.of(context)?.appName ?? 'OHTK Mobile',
+              AppLocalizations.of(context)?.appName ?? 'LAHIS',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,

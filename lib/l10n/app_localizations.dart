@@ -111,7 +111,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'OHTK Mobile'**
+  /// **'LAHIS'**
   String get appName;
 
   /// No description provided for @loginTitle.
@@ -1767,7 +1767,7 @@ abstract class AppLocalizations {
   /// No description provided for @censusUnsupportedMessage.
   ///
   /// In en, this message translates to:
-  /// **'The village census has been updated and isn\'t supported on this version of OHTK Mobile. Please update the app, then try again.'**
+  /// **'The village census has been updated and isn\'t supported on this version of LAHIS. Please update the app, then try again.'**
   String get censusUnsupportedMessage;
 
   /// No description provided for @censusNoRowsConfigured.

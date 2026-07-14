@@ -9,7 +9,7 @@ class AppLocalizationsTh extends AppLocalizations {
   AppLocalizationsTh([String locale = 'th']) : super(locale);
 
   @override
-  String get appName => 'OHTK Mobile';
+  String get appName => 'LAHIS';
 
   @override
   String get loginTitle => 'ลงชื่อเข้าใช้บัญชีของคุณ';
@@ -923,7 +923,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get censusUnsupportedMessage =>
-      'สำมะโนหมู่บ้านถูกอัปเดตแล้วและแอป OHTK Mobile เวอร์ชันนี้ยังไม่รองรับ โปรดอัปเดตแอปแล้วลองอีกครั้ง';
+      'สำมะโนหมู่บ้านถูกอัปเดตแล้วและแอป LAHIS เวอร์ชันนี้ยังไม่รองรับ โปรดอัปเดตแอปแล้วลองอีกครั้ง';
 
   @override
   String get censusNoRowsConfigured => 'ยังไม่ได้กำหนดแถวสำมะโนที่ใช้งาน';

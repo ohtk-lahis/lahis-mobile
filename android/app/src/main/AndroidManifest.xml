@@ -16,7 +16,7 @@
         tools:node="remove" />
 
     <application
-        android:label="OHTK Mobile"
+        android:label="LAHIS"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:networkSecurityConfig="@xml/network_security_config"

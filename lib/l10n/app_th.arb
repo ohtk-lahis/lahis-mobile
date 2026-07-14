@@ -1,5 +1,5 @@
 {
-  "appName": "OHTK Mobile",
+  "appName": "LAHIS",
   "loginTitle": "ลงชื่อเข้าใช้บัญชีของคุณ",
   "signupTitle": "ลงทะเบียนผ่าน Code",
   "signupSubTitle": "กรุณากรอก Invitation Code\nสำหรับใช้ลงทะเบียน",
@@ -280,7 +280,7 @@
   "censusUnavailableMessage": "บัญชีนี้ไม่ได้รับมอบหมายให้อัปเดตสำมะโนของหมู่บ้าน",
   "censusLoadFailedTitle": "โหลดสำมะโนไม่สำเร็จ",
   "censusUnsupportedTitle": "สำมะโนนี้ต้องใช้แอปเวอร์ชันใหม่กว่า",
-  "censusUnsupportedMessage": "สำมะโนหมู่บ้านถูกอัปเดตแล้วและแอป OHTK Mobile เวอร์ชันนี้ยังไม่รองรับ โปรดอัปเดตแอปแล้วลองอีกครั้ง",
+  "censusUnsupportedMessage": "สำมะโนหมู่บ้านถูกอัปเดตแล้วและแอป LAHIS เวอร์ชันนี้ยังไม่รองรับ โปรดอัปเดตแอปแล้วลองอีกครั้ง",
   "censusNoRowsConfigured": "ยังไม่ได้กำหนดแถวสำมะโนที่ใช้งาน",
   "censusNoSetupTitle": "ยังไม่ได้ตั้งค่าสำมะโน",
   "censusNoSetupMessage": "หมู่บ้านนี้ยังไม่มีแบบฟอร์มสำมะโนที่ใช้งาน",
