@@ -57,6 +57,9 @@ class RegisterApi extends GraphQlBaseApi {
     String? email,
     String? phone,
     String? address,
+    String? gender,
+    int? age,
+    bool consent = false,
   }) async {
     String mutation = r'''
       mutation UserRegister(
@@ -66,7 +69,10 @@ class RegisterApi extends GraphQlBaseApi {
         $lastName: String!,
         $telephone: String = null,
         $address: String = null,
-        $username: String!      
+        $username: String!,
+        $gender: String = null,
+        $age: Int = null,
+        $consent: Boolean = false
       ) {
         authorityUserRegister(
           email: $email, 
@@ -75,7 +81,10 @@ class RegisterApi extends GraphQlBaseApi {
           lastName: $lastName,
           telephone: $telephone,
           address: $address,
-          username: $username
+          username: $username,
+          gender: $gender,
+          age: $age,
+          consent: $consent
         ) {
           me {
             id
@@ -83,6 +92,9 @@ class RegisterApi extends GraphQlBaseApi {
             firstName
             lastName
             authorityName
+            gender
+            age
+            consent
           },
           refreshToken,
           token
@@ -100,7 +112,10 @@ class RegisterApi extends GraphQlBaseApi {
           "lastName": lastName,
           "telephone": phone,
           "address": address,
-          "username": username
+          "username": username,
+          "gender": gender,
+          "age": age,
+          "consent": consent,
         },
         parseData: (resp) => RegisterSuccess(
           loginSuccess: AuthSuccess(

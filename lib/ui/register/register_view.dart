@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:podd_app/components/confirm.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/register_result.dart';
@@ -632,6 +633,9 @@ class _DetailStep extends StackedHookView<RegisterViewModel> {
     final phone = useTextEditingController(text: viewModel.phone);
     final email = useTextEditingController(text: viewModel.email);
     final address = useTextEditingController(text: viewModel.address);
+    final age = useTextEditingController(
+      text: viewModel.age != null ? '${viewModel.age}' : '',
+    );
 
     Future<void> onSubmit() async {
       FocusManager.instance.primaryFocus?.unfocus();
@@ -712,10 +716,43 @@ class _DetailStep extends StackedHookView<RegisterViewModel> {
                         controller: address,
                         onChanged: viewModel.setAddress,
                         placeholder: l10n.registerAddressPlaceholder,
-                        textInputAction: TextInputAction.done,
+                        textInputAction: TextInputAction.next,
                         optional: l10n.registerOptional,
                         errorText: _errorOrNull(viewModel, 'address'),
                       ),
+                      const SizedBox(height: 14),
+                      _GenderField(
+                        value: viewModel.gender,
+                        onChanged: viewModel.setGender,
+                        optionalLabel: viewModel.genderRequired
+                            ? null
+                            : l10n.registerOptional,
+                        errorText: _errorOrNull(viewModel, 'gender'),
+                      ),
+                      const SizedBox(height: 14),
+                      _RegisterField(
+                        label: l10n.ageLabel,
+                        controller: age,
+                        onChanged: viewModel.setAge,
+                        placeholder: l10n.registerAgePlaceholder,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        optional: viewModel.ageRequired
+                            ? null
+                            : l10n.registerOptional,
+                        errorText: _errorOrNull(viewModel, 'age'),
+                      ),
+                      if (viewModel.showConsent) ...[
+                        const SizedBox(height: 14),
+                        _ConsentCheckbox(
+                          value: viewModel.consentAccepted,
+                          onChanged: viewModel.setConsentAccepted,
+                          label: viewModel.consentCheckboxLabel,
+                          viewTermsLabel: l10n.registerViewTerms,
+                          consentContent: viewModel.consentContent,
+                          errorText: _errorOrNull(viewModel, 'consent'),
+                        ),
+                      ],
                       const SizedBox(height: 14),
                       _NoPasswordCard(message: l10n.registerNoPasswordInfo),
                       if (viewModel.hasErrorForKey('submit')) ...[
@@ -1056,6 +1093,273 @@ class _Pill extends StatelessWidget {
           color: fg,
         ),
       ),
+    );
+  }
+}
+
+class _GenderField extends StatelessWidget {
+  final String? value;
+  final ValueChanged<String?> onChanged;
+  final String? optionalLabel;
+  final String? errorText;
+
+  const _GenderField({
+    required this.value,
+    required this.onChanged,
+    this.optionalLabel,
+    this.errorText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final hasError = errorText != null && errorText!.isNotEmpty;
+    final options = <String, String>{
+      RegisterGender.male: l10n.registerGenderMale,
+      RegisterGender.female: l10n.registerGenderFemale,
+      RegisterGender.other: l10n.registerGenderOther,
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Flexible(
+              child: Text(
+                l10n.genderLabel,
+                style: const TextStyle(
+                  fontFamily: _fontFamily,
+                  fontFamilyFallback: _fontFamilyFallback,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: _ink,
+                ),
+              ),
+            ),
+            if (optionalLabel != null) ...[
+              const SizedBox(width: 8),
+              _Pill(
+                label: optionalLabel!,
+                bg: _hair,
+                fg: _muted,
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: hasError ? _errStroke : _hair,
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              hint: Text(
+                l10n.registerGenderPlaceholder,
+                style: const TextStyle(
+                  fontFamily: _fontFamily,
+                  fontFamilyFallback: _fontFamilyFallback,
+                  color: _placeholder,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              icon: const Icon(Icons.expand_more, color: _muted, size: 22),
+              style: const TextStyle(
+                fontFamily: _fontFamily,
+                fontFamilyFallback: _fontFamilyFallback,
+                fontSize: 15,
+                color: _ink,
+                fontWeight: FontWeight.w500,
+              ),
+              items: options.entries
+                  .map(
+                    (entry) => DropdownMenuItem<String>(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    ),
+                  )
+                  .toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+        if (hasError) ...[
+          const SizedBox(height: 5),
+          Text(
+            errorText!,
+            style: const TextStyle(
+              fontFamily: _fontFamily,
+              fontFamilyFallback: _fontFamilyFallback,
+              fontSize: 11,
+              color: _errStroke,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ConsentCheckbox extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool?> onChanged;
+  final String label;
+  final String viewTermsLabel;
+  final String consentContent;
+  final String? errorText;
+
+  const _ConsentCheckbox({
+    required this.value,
+    required this.onChanged,
+    required this.label,
+    required this.viewTermsLabel,
+    required this.consentContent,
+    this.errorText,
+  });
+
+  void _openTerms(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        final height = MediaQuery.of(context).size.height * 0.75;
+        return SafeArea(
+          child: SizedBox(
+            height: height,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          viewTermsLabel,
+                          style: const TextStyle(
+                            fontFamily: _fontFamily,
+                            fontFamilyFallback: _fontFamilyFallback,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: _ink,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: _muted),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, color: _hair),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Html(data: consentContent),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasError = errorText != null && errorText!.isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: hasError ? _errStroke : _hair,
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CheckboxListTile(
+                value: value,
+                onChanged: onChanged,
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                activeColor: _tealHero,
+                title: Text(
+                  label,
+                  style: const TextStyle(
+                    fontFamily: _fontFamily,
+                    fontFamilyFallback: _fontFamilyFallback,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: _ink,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () => _openTerms(context),
+                    style: TextButton.styleFrom(
+                      foregroundColor: _tealHero,
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      viewTermsLabel,
+                      style: const TextStyle(
+                        fontFamily: _fontFamily,
+                        fontFamilyFallback: _fontFamilyFallback,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (hasError) ...[
+          const SizedBox(height: 5),
+          Text(
+            errorText!,
+            style: const TextStyle(
+              fontFamily: _fontFamily,
+              fontFamilyFallback: _fontFamilyFallback,
+              fontSize: 11,
+              color: _errStroke,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
