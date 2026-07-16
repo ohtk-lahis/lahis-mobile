@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:podd_app/components/brand_logo.dart';
 import 'package:podd_app/components/restart_widget.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
@@ -75,45 +76,24 @@ class _Hero extends StatelessWidget {
           stops: [0.0, 0.4, 1.0],
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       child: SafeArea(
         bottom: false,
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 60,
-              child: IgnorePointer(
-                child: SizedBox(
-                  height: 60,
-                  child: CustomPaint(
-                    painter: _ConnectedDotsPainter(),
-                  ),
-                ),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    _LanguagePill(viewModel: viewModel),
-                  ],
-                ),
-                const SizedBox(height: 28),
-                Center(
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    height: 110,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                const SizedBox(height: 28),
-                _RegisterCta(),
+                _LanguagePill(viewModel: viewModel),
               ],
             ),
+            const SizedBox(height: 16),
+            const Center(
+              child: BrandLogo(),
+            ),
+            const SizedBox(height: 20),
+            _RegisterCta(),
           ],
         ),
       ),
@@ -266,87 +246,99 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
           ),
         ],
       ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      child: SafeArea(
+        top: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: _hair,
-                  borderRadius: BorderRadius.circular(2),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: _hair,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      l10n.signInReturningEyebrow.toUpperCase(),
+                      style: TextStyle(
+                        fontFamily: _fontFamily,
+                        fontFamilyFallback: _fontFamilyFallback,
+                        color: _muted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _TextFieldShell(
+                      icon: Icons.person_outline,
+                      controller: username,
+                      hint: l10n.usernameLabel,
+                      errorText: viewModel.error('username'),
+                      obscure: false,
+                      onChanged: viewModel.setUsername,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 8),
+                    _TextFieldShell(
+                      icon: Icons.lock_outline,
+                      controller: password,
+                      hint: l10n.passwordLabel,
+                      errorText: viewModel.error('password'),
+                      obscure: viewModel.obscureText,
+                      onChanged: viewModel.setPassword,
+                      onSubmitted: (value) {
+                        viewModel.setPassword(value);
+                        viewModel.authenticate();
+                      },
+                      textInputAction: TextInputAction.done,
+                      trailing: IconButton(
+                        tooltip: 'Toggle password visibility',
+                        icon: Icon(
+                          viewModel.obscureText
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: _muted,
+                          size: 20,
+                        ),
+                        onPressed: () =>
+                            viewModel.setObscureText(!viewModel.obscureText),
+                      ),
+                    ),
+                    if (viewModel.hasErrorForKey('general')) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        viewModel.error('general'),
+                        style: const TextStyle(
+                          fontFamily: _fontFamily,
+                          fontFamilyFallback: _fontFamilyFallback,
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    _SignInButton(viewModel: viewModel, l10n: l10n),
+                    const SizedBox(height: 8),
+                    _QrSignInButton(),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.signInReturningEyebrow.toUpperCase(),
-              style: TextStyle(
-                fontFamily: _fontFamily,
-                fontFamilyFallback: _fontFamilyFallback,
-                color: _muted,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.5,
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+              child: _ServerFooter(viewModel: viewModel),
             ),
-            const SizedBox(height: 14),
-            _TextFieldShell(
-              icon: Icons.person_outline,
-              controller: username,
-              hint: l10n.usernameLabel,
-              errorText: viewModel.error('username'),
-              obscure: false,
-              onChanged: viewModel.setUsername,
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 10),
-            _TextFieldShell(
-              icon: Icons.lock_outline,
-              controller: password,
-              hint: l10n.passwordLabel,
-              errorText: viewModel.error('password'),
-              obscure: viewModel.obscureText,
-              onChanged: viewModel.setPassword,
-              onSubmitted: (value) {
-                viewModel.setPassword(value);
-                viewModel.authenticate();
-              },
-              textInputAction: TextInputAction.done,
-              trailing: IconButton(
-                tooltip: 'Toggle password visibility',
-                icon: Icon(
-                  viewModel.obscureText
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  color: _muted,
-                  size: 20,
-                ),
-                onPressed: () =>
-                    viewModel.setObscureText(!viewModel.obscureText),
-              ),
-            ),
-            if (viewModel.hasErrorForKey('general')) ...[
-              const SizedBox(height: 8),
-              Text(
-                viewModel.error('general'),
-                style: const TextStyle(
-                  fontFamily: _fontFamily,
-                  fontFamilyFallback: _fontFamilyFallback,
-                  color: Colors.red,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-            const SizedBox(height: 14),
-            _SignInButton(viewModel: viewModel, l10n: l10n),
-            const SizedBox(height: 10),
-            _QrSignInButton(),
-            const SizedBox(height: 16),
-            _ServerFooter(viewModel: viewModel),
           ],
         ),
       ),
@@ -600,7 +592,7 @@ class _ServerFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      padding: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: _hair, width: 1)),
       ),
@@ -657,47 +649,4 @@ class _ServerFooter extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ConnectedDotsPainter extends CustomPainter {
-  static const _dots = <List<double>>[
-    [40, 20, 3],
-    [100, 40, 2],
-    [180, 15, 2.5],
-    [260, 35, 3],
-    [320, 20, 2],
-  ];
-
-  static const _lines = <List<int>>[
-    [0, 1],
-    [1, 2],
-    [2, 3],
-    [3, 4],
-  ];
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final scale = size.width / 360.0;
-    final fill = Paint()..color = Colors.white.withValues(alpha: 0.15);
-    final stroke = Paint()
-      ..color = Colors.white.withValues(alpha: 0.15)
-      ..strokeWidth = 0.6;
-
-    for (final line in _lines) {
-      final a = _dots[line[0]];
-      final b = _dots[line[1]];
-      canvas.drawLine(
-        Offset(a[0] * scale, a[1]),
-        Offset(b[0] * scale, b[1]),
-        stroke,
-      );
-    }
-
-    for (final dot in _dots) {
-      canvas.drawCircle(Offset(dot[0] * scale, dot[1]), dot[2], fill);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

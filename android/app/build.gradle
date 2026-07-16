@@ -59,7 +59,9 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
 
-        manifestPlaceholders += [googleMapApiKey: localProperties.getProperty('google.map.key')]
+        // Empty string fallback avoids AGP NPE on processDebugMainManifest when
+        // google.map.key is missing from local.properties.
+        manifestPlaceholders += [googleMapApiKey: localProperties.getProperty('google.map.key') ?: '']
         multiDexEnabled true
     }
 

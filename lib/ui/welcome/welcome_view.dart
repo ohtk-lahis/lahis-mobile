@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:podd_app/components/brand_logo.dart';
 import 'package:podd_app/components/language_dropdown.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
@@ -86,14 +87,10 @@ class WelcomeView extends StackedView<WelcomeViewModel> {
 class _BrandStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 16),
       child: Center(
-        child: Image.asset(
-          'assets/images/logo.png',
-          height: 44,
-          fit: BoxFit.contain,
-        ),
+        child: BrandLogo.compact(),
       ),
     );
   }
