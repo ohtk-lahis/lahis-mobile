@@ -322,6 +322,10 @@ class AppLocalizationsTh extends AppLocalizations {
       'หลังส่งรายงานแล้วจะไม่สามารถแก้ไขได้ กรุณาตรวจสอบสรุปด้านบนให้เรียบร้อยก่อนส่ง';
 
   @override
+  String get reviewAccuracyConfirmLabel =>
+      'I confirm that the information provided is accurate';
+
+  @override
   String get reviewBackToFormButton => 'กลับไปแก้แบบฟอร์ม';
 
   @override

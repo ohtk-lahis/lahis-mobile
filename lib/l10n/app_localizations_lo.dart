@@ -321,6 +321,10 @@ class AppLocalizationsLo extends AppLocalizations {
       'ຫຼັງສົ່ງລາຍງານແລ້ວຈະບໍ່ສາມາດແກ້ໄຂໄດ້ ກະລຸນາກວດກາສະຫຼຸບຂ້າງເທິງກ່ອນສົ່ງ';
 
   @override
+  String get reviewAccuracyConfirmLabel =>
+      'I confirm that the information provided is accurate';
+
+  @override
   String get reviewBackToFormButton => 'ກັບໄປແບບຟອມ';
 
   @override

@@ -120,6 +120,7 @@
   "authorityHelper": "ใช้สำหรับส่งรายงานไปยังทีมที่รับผิดชอบ",
   "reviewEditButton": "แก้ไข",
   "reviewReminderBody": "หลังส่งรายงานแล้วจะไม่สามารถแก้ไขได้ กรุณาตรวจสอบสรุปด้านบนให้เรียบร้อยก่อนส่ง",
+  "reviewAccuracyConfirmLabel": "I confirm that the information provided is accurate",
   "reviewBackToFormButton": "กลับไปแก้แบบฟอร์ม",
   "recentSectionLabel": "ล่าสุด",
   "earlierSectionLabel": "ก่อนหน้านี้",

@@ -120,6 +120,7 @@
   "authorityHelper": "ໃຊ້ສຳລັບສົ່ງລາຍງານໄປຫາທີມທີ່ຮັບຜິດຊອບ",
   "reviewEditButton": "ແກ້ໄຂ",
   "reviewReminderBody": "ຫຼັງສົ່ງລາຍງານແລ້ວຈະບໍ່ສາມາດແກ້ໄຂໄດ້ ກະລຸນາກວດກາສະຫຼຸບຂ້າງເທິງກ່ອນສົ່ງ",
+  "reviewAccuracyConfirmLabel": "I confirm that the information provided is accurate",
   "reviewBackToFormButton": "ກັບໄປແບບຟອມ",
   "recentSectionLabel": "ຫຼ້າສຸດ",
   "earlierSectionLabel": "ກ່ອນໜ້ານີ້",

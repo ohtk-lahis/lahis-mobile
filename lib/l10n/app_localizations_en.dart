@@ -325,6 +325,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Once submitted, this report can\'t be edited. Double-check the summary above before sending.';
 
   @override
+  String get reviewAccuracyConfirmLabel =>
+      'I confirm that the information provided is accurate';
+
+  @override
   String get reviewBackToFormButton => 'Back to form';
 
   @override
