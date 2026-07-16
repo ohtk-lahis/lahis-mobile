@@ -15,6 +15,8 @@ class UserProfile {
   List<Village> assignedVillages;
   String? avatarUrl;
   String? address;
+  String? gender;
+  int? age;
 
   UserProfile({
     required this.id,
@@ -31,6 +33,8 @@ class UserProfile {
     this.assignedVillages = const [],
     this.avatarUrl,
     this.address,
+    this.gender,
+    this.age,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
@@ -52,6 +56,10 @@ class UserProfile {
             .toList(),
         avatarUrl: json['avatarUrl']?.toString(),
         address: json['address']?.toString(),
+        gender: json['gender']?.toString(),
+        age: json['age'] is int
+            ? json['age'] as int
+            : int.tryParse(json['age']?.toString() ?? ''),
       );
 
   Map<String, dynamic> toJson() {
@@ -71,6 +79,8 @@ class UserProfile {
           assignedVillages.map((village) => village.toJson()).toList(),
       'avatarUrl': avatarUrl,
       'address': address,
+      'gender': gender,
+      'age': age,
     };
   }
 

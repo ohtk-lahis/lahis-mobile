@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:podd_app/components/form_chrome.dart';
@@ -7,6 +8,7 @@ import 'package:podd_app/models/profile_result.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 import 'package:podd_app/ui/profile/profile_widgets.dart';
+import 'package:podd_app/ui/register/register_view_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 import 'profile_view_model.dart';
@@ -62,11 +64,15 @@ class _ProfileForm extends StackedHookView<ProfileViewModel> {
     final lastName = useTextEditingController(text: vm.lastName ?? '');
     final telephone = useTextEditingController(text: vm.telephone ?? '');
     final address = useTextEditingController(text: vm.address ?? '');
+    final age = useTextEditingController(
+      text: vm.age != null ? vm.age.toString() : '',
+    );
 
     final firstNameNode = useFocusNode();
     final lastNameNode = useFocusNode();
     final telephoneNode = useFocusNode();
     final addressNode = useFocusNode();
+    final ageNode = useFocusNode();
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -119,12 +125,152 @@ class _ProfileForm extends StackedHookView<ProfileViewModel> {
             label: localize?.addressLabel ?? 'Address',
             optionalLabel: localize?.registerOptional ?? 'Optional',
             maxLines: 3,
-            textInputAction: TextInputAction.newline,
+            textInputAction: TextInputAction.next,
             onChanged: vm.setAddress,
+            onSubmitted: (_) => ageNode.requestFocus(),
             errorText: vm.error('address'),
+          ),
+          const SizedBox(height: 12),
+          _ProfileGenderField(
+            value: vm.gender,
+            onChanged: vm.setGender,
+            optionalLabel: localize?.registerOptional ?? 'Optional',
+            errorText: vm.error('gender'),
+          ),
+          const SizedBox(height: 12),
+          ProfileTextField(
+            controller: age,
+            focusNode: ageNode,
+            label: localize?.ageLabel ?? 'Age',
+            optionalLabel: localize?.registerOptional ?? 'Optional',
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
+            helper: localize?.registerAgePlaceholder ?? 'Years',
+            onChanged: vm.setAge,
+            errorText: vm.error('age'),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ProfileGenderField extends StatelessWidget {
+  final String? value;
+  final ValueChanged<String?> onChanged;
+  final String? optionalLabel;
+  final String? errorText;
+
+  const _ProfileGenderField({
+    required this.value,
+    required this.onChanged,
+    this.optionalLabel,
+    this.errorText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context);
+    final hasError = errorText != null && errorText!.isNotEmpty;
+    final options = <String, String>{
+      RegisterGender.male: localize?.registerGenderMale ?? 'Male',
+      RegisterGender.female: localize?.registerGenderFemale ?? 'Female',
+      RegisterGender.other: localize?.registerGenderOther ?? 'Other',
+    };
+    // Drop invalid stored values so DropdownButton does not assert.
+    final safeValue =
+        value != null && options.containsKey(value) ? value : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text.rich(
+            TextSpan(
+              text: localize?.genderLabel ?? 'Gender',
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: incidentsInk,
+                height: 1.3,
+              ),
+              children: [
+                if (optionalLabel != null)
+                  TextSpan(
+                    text: '  ·  $optionalLabel',
+                    style: const TextStyle(
+                      color: incidentsMuted,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: hasError ? const Color(0xFFE8B6AB) : incidentsHair,
+              width: 1.5,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: safeValue,
+              isExpanded: true,
+              hint: Text(
+                localize?.registerGenderPlaceholder ?? 'Select gender',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: incidentsMuted,
+                ),
+              ),
+              icon: const Icon(Icons.expand_more, color: incidentsMuted, size: 22),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: incidentsInk,
+              ),
+              items: [
+                DropdownMenuItem<String>(
+                  value: null,
+                  child: Text(
+                    localize?.registerGenderPlaceholder ?? 'Select gender',
+                    style: const TextStyle(color: incidentsMuted),
+                  ),
+                ),
+                ...options.entries.map(
+                  (entry) => DropdownMenuItem<String>(
+                    value: entry.key,
+                    child: Text(entry.value),
+                  ),
+                ),
+              ],
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+        if (hasError) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              errorText!,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: incidentsErrorRed,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

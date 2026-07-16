@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';
 
@@ -341,6 +342,7 @@ class ProfileTextField extends StatelessWidget {
   final bool isRequired;
   final bool obscureText;
   final Widget? suffix;
+  final List<TextInputFormatter>? inputFormatters;
 
   const ProfileTextField({
     super.key,
@@ -358,6 +360,7 @@ class ProfileTextField extends StatelessWidget {
     this.isRequired = false,
     this.obscureText = false,
     this.suffix,
+    this.inputFormatters,
   });
 
   @override
@@ -419,6 +422,7 @@ class ProfileTextField extends StatelessWidget {
             obscureText: obscureText,
             textInputAction: textInputAction,
             keyboardType: keyboardType,
+            inputFormatters: inputFormatters,
             maxLines: obscureText ? 1 : maxLines,
             style: const TextStyle(
               fontSize: 15,

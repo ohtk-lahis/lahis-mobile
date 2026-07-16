@@ -5,6 +5,7 @@ import 'package:podd_app/models/profile_result.dart';
 import 'package:podd_app/models/village.dart';
 import 'package:podd_app/services/auth_service.dart';
 import 'package:podd_app/services/profile_service.dart';
+import 'package:podd_app/ui/register/register_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
@@ -21,6 +22,8 @@ class ProfileViewModel extends BaseViewModel {
   String? email;
   String? telephone;
   String? address;
+  String? gender;
+  int? age;
   String? assignedVillageNames;
   List<Village> assignedVillages = [];
   Village? selectedVillage;
@@ -51,6 +54,8 @@ class ProfileViewModel extends BaseViewModel {
           : null;
       avatarUrl = userProfile.avatarUrl;
       address = userProfile.address;
+      gender = userProfile.gender;
+      age = userProfile.age;
       notifyListeners();
     }
     final prefs = await SharedPreferences.getInstance();
@@ -92,6 +97,28 @@ class ProfileViewModel extends BaseViewModel {
     _clearErrorForKey('address');
   }
 
+  void setGender(String? value) {
+    gender = (value == null || value.isEmpty) ? null : value;
+    _clearErrorForKey('gender');
+    notifyListeners();
+  }
+
+  void setAge(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      age = null;
+      _clearErrorForKey('age');
+      return;
+    }
+    age = int.tryParse(trimmed);
+    if (age == null) {
+      setErrorForObject('age', localize.registerAgeInvalid);
+    } else {
+      _clearErrorForKey('age');
+    }
+    notifyListeners();
+  }
+
   Future<void> setPhoto(XFile value) async {
     photo = value;
     await uploadAvatar();
@@ -122,6 +149,16 @@ class ProfileViewModel extends BaseViewModel {
       setErrorForObject("lastName", localize.fieldRequired);
       isValidData = false;
     }
+    if (gender != null &&
+        gender!.isNotEmpty &&
+        !RegisterGender.values.contains(gender)) {
+      setErrorForObject("gender", localize.fieldRequired);
+      isValidData = false;
+    }
+    if (age != null && (age! < 1 || age! > 120)) {
+      setErrorForObject("age", localize.registerAgeInvalid);
+      isValidData = false;
+    }
 
     if (!isValidData) {
       setBusy(false);
@@ -133,6 +170,8 @@ class ProfileViewModel extends BaseViewModel {
       lastName: lastName!,
       telephone: telephone,
       address: address,
+      gender: (gender == null || gender!.isEmpty) ? null : gender,
+      age: age,
     );
 
     if (result is ProfileSuccess) {

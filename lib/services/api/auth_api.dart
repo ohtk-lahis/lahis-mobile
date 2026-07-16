@@ -69,6 +69,8 @@ class AuthApi extends GraphQlBaseApi {
           telephone
           email
           address
+          gender
+          age
           authorityId
           authorityName
           role
