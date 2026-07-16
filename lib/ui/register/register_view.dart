@@ -6,29 +6,31 @@ import 'package:go_router/go_router.dart';
 import 'package:podd_app/components/confirm.dart';
 import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/register_result.dart';
+import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/register/register_view_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
-const _tealHero = Color(0xFF0F8A82);
-const _tealDeep = Color(0xFF08423F);
-const _sand = Color(0xFFF7F5F1);
-const _sand2 = Color(0xFFF4F2EC);
-const _ink = Color(0xFF1A1F1D);
-const _muted = Color(0xFF6B7370);
-const _hair = Color(0xFFE4E2DC);
-const _placeholder = Color(0xFFA8ACA7);
-const _errBg = Color(0xFFFDECEC);
-const _errBorder = Color(0xFFF4C4C4);
-const _errFg = Color(0xFF7A2222);
-const _errInputBg = Color(0xFFFDF2F2);
-const _errInputFg = Color(0xFFA52D2D);
-const _errStroke = Color(0xFFD14848);
-const _autoBg = Color(0xFFFFF5E6);
-const _autoBorder = Color(0xFFF0C060);
-const _autoFg = Color(0xFF7A4A08);
-const _fontFamily = 'Inter';
-const _fontFamilyFallback = <String>['NotoSansThai', 'NotoSansLao'];
+// Brand / surface colors follow the active OhtkTheme preset (LAHIS, lagoon, …).
+Color get _tealHero => OhtkTheme.palette.teal700;
+Color get _tealDeep => OhtkTheme.palette.teal900;
+Color get _sand => OhtkColor.cream;
+Color get _sand2 => OhtkColor.creamHi;
+Color get _ink => OhtkColor.ink900;
+Color get _muted => OhtkColor.ink500;
+Color get _hair => OhtkColor.line;
+Color get _placeholder => OhtkColor.ink300;
+Color get _errBg => OhtkColor.dangerBg;
+Color get _errBorder => OhtkColor.danger.withValues(alpha: 0.35);
+Color get _errFg => OhtkColor.danger;
+Color get _errInputBg => OhtkColor.dangerBg;
+Color get _errInputFg => OhtkColor.danger;
+Color get _errStroke => OhtkColor.danger;
+Color get _autoBg => OhtkColor.warningBg;
+Color get _autoBorder => OhtkColor.warning.withValues(alpha: 0.45);
+Color get _autoFg => OhtkColor.warning;
+const _fontFamily = OhtkType.family;
+const _fontFamilyFallback = OhtkType.fallback;
 
 const _codeLength = 7;
 
@@ -119,14 +121,14 @@ class _StepIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: isStep2
-            ? const Border(bottom: BorderSide(color: _hair, width: 1))
+            ? Border(bottom: BorderSide(color: _hair, width: 1))
             : null,
       ),
       child: Row(
         children: [
           Text(
             label.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: _fontFamily,
               fontFamilyFallback: _fontFamilyFallback,
               fontSize: 11,
@@ -143,7 +145,7 @@ class _StepIndicator extends StatelessWidget {
                 value: progress,
                 minHeight: 4,
                 backgroundColor: _hair,
-                valueColor: const AlwaysStoppedAnimation(_tealHero),
+                valueColor: AlwaysStoppedAnimation(_tealHero),
               ),
             ),
           ),
@@ -211,7 +213,7 @@ class _CodeStep extends StackedHookView<RegisterViewModel> {
               children: [
                 Text(
                   l10n.registerCodeTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: _fontFamily,
                     fontFamilyFallback: _fontFamilyFallback,
                     fontSize: 22,
@@ -224,7 +226,7 @@ class _CodeStep extends StackedHookView<RegisterViewModel> {
                 const SizedBox(height: 6),
                 Text(
                   l10n.registerCodeSubtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: _fontFamily,
                     fontFamilyFallback: _fontFamilyFallback,
                     fontSize: 13,
@@ -401,7 +403,7 @@ class _ErrorBanner extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: _fontFamily,
                 fontFamilyFallback: _fontFamilyFallback,
                 fontSize: 12,
@@ -425,7 +427,7 @@ class _VerifyingRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(
+        SizedBox(
           width: 14,
           height: 14,
           child: CircularProgressIndicator(
@@ -437,7 +439,7 @@ class _VerifyingRow extends StatelessWidget {
         const SizedBox(width: 10),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: _fontFamily,
             fontFamilyFallback: _fontFamilyFallback,
             fontSize: 13,
@@ -504,7 +506,7 @@ class _HelpLink extends StatelessWidget {
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: _fontFamily,
             fontFamilyFallback: _fontFamilyFallback,
             fontSize: 12,
@@ -515,7 +517,7 @@ class _HelpLink extends StatelessWidget {
             TextSpan(text: '$prefix '),
             TextSpan(
               text: link,
-              style: const TextStyle(
+              style: TextStyle(
                 color: _tealHero,
                 fontWeight: FontWeight.w600,
               ),
@@ -537,7 +539,7 @@ class _NumPad extends StatelessWidget {
   Widget build(BuildContext context) {
     final keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'];
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: _sand2,
         border: Border(top: BorderSide(color: _hair, width: 1)),
       ),
@@ -601,10 +603,10 @@ class _NumPadKey extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: isBackspace
-              ? const Icon(Icons.backspace_outlined, size: 20, color: _ink)
+              ? Icon(Icons.backspace_outlined, size: 20, color: _ink)
               : Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: _fontFamily,
                     fontFamilyFallback: _fontFamilyFallback,
                     fontSize: 20,
@@ -875,7 +877,7 @@ class _ContextCard extends StatelessWidget {
               children: [
                 Text(
                   l10n.registerCodeAccepted.toUpperCase(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: _fontFamily,
                     fontFamilyFallback: _fontFamilyFallback,
                     fontSize: 10,
@@ -924,7 +926,7 @@ class _ContextRow extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: _fontFamily,
             fontFamilyFallback: _fontFamilyFallback,
             fontSize: 11,
@@ -996,7 +998,7 @@ class _RegisterField extends StatelessWidget {
             Flexible(
               child: Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: _fontFamily,
                   fontFamilyFallback: _fontFamilyFallback,
                   fontSize: 12,
@@ -1047,7 +1049,7 @@ class _RegisterField extends StatelessWidget {
                   // Providing onEditingComplete replaces Flutter's default
                   // nextFocus/unfocus so we move exactly once along our chain.
                   onEditingComplete: onMoveFocus,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: _fontFamily,
                     fontFamilyFallback: _fontFamilyFallback,
                     fontSize: 15,
@@ -1062,7 +1064,7 @@ class _RegisterField extends StatelessWidget {
                     focusedBorder: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     hintText: placeholder,
-                    hintStyle: const TextStyle(
+                    hintStyle: TextStyle(
                       fontFamily: _fontFamily,
                       fontFamilyFallback: _fontFamilyFallback,
                       color: _placeholder,
@@ -1083,7 +1085,7 @@ class _RegisterField extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             errorText!,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: _fontFamily,
               fontFamilyFallback: _fontFamilyFallback,
               fontSize: 11,
@@ -1095,7 +1097,7 @@ class _RegisterField extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             hint!,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: _fontFamily,
               fontFamilyFallback: _fontFamilyFallback,
               fontSize: 11,
@@ -1178,7 +1180,7 @@ class _GenderField extends StatelessWidget {
             Flexible(
               child: Text(
                 l10n.genderLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: _fontFamily,
                   fontFamilyFallback: _fontFamilyFallback,
                   fontSize: 12,
@@ -1214,7 +1216,7 @@ class _GenderField extends StatelessWidget {
               isExpanded: true,
               hint: Text(
                 l10n.registerGenderPlaceholder,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: _fontFamily,
                   fontFamilyFallback: _fontFamilyFallback,
                   color: _placeholder,
@@ -1222,8 +1224,8 @@ class _GenderField extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              icon: const Icon(Icons.expand_more, color: _muted, size: 22),
-              style: const TextStyle(
+              icon: Icon(Icons.expand_more, color: _muted, size: 22),
+              style: TextStyle(
                 fontFamily: _fontFamily,
                 fontFamilyFallback: _fontFamilyFallback,
                 fontSize: 15,
@@ -1246,7 +1248,7 @@ class _GenderField extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             errorText!,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: _fontFamily,
               fontFamilyFallback: _fontFamilyFallback,
               fontSize: 11,
@@ -1340,7 +1342,7 @@ class _ConsentSection extends StatelessWidget {
                       Expanded(
                         child: Text(
                           sectionTitle,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: _fontFamily,
                             fontFamilyFallback: _fontFamilyFallback,
                             fontSize: 16,
@@ -1350,13 +1352,13 @@ class _ConsentSection extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: _muted),
+                        icon: Icon(Icons.close, color: _muted),
                         onPressed: () => Navigator.of(sheetContext).pop(false),
                       ),
                     ],
                   ),
                 ),
-                const Divider(height: 1, color: _hair),
+                Divider(height: 1, color: _hair),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
@@ -1375,7 +1377,7 @@ class _ConsentSection extends StatelessWidget {
                             ),
                             child: Text(
                               note,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: _fontFamily,
                                 fontFamilyFallback: _fontFamilyFallback,
                                 fontSize: 13,
@@ -1389,7 +1391,7 @@ class _ConsentSection extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Divider(height: 1, color: _hair),
+                Divider(height: 1, color: _hair),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                   child: SizedBox(
@@ -1454,7 +1456,7 @@ class _ConsentSection extends StatelessWidget {
             children: [
               Text(
                 sectionTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: _fontFamily,
                   fontFamilyFallback: _fontFamilyFallback,
                   fontSize: 13,
@@ -1465,7 +1467,7 @@ class _ConsentSection extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 sectionSubtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: _fontFamily,
                   fontFamilyFallback: _fontFamilyFallback,
                   fontSize: 12,
@@ -1477,12 +1479,12 @@ class _ConsentSection extends StatelessWidget {
               if (termsRead) ...[
                 Row(
                   children: [
-                    const Icon(Icons.check_circle, size: 18, color: _tealHero),
+                    Icon(Icons.check_circle, size: 18, color: _tealHero),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         reviewedLabel,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: _fontFamily,
                           fontFamilyFallback: _fontFamilyFallback,
                           fontSize: 13,
@@ -1519,7 +1521,7 @@ class _ConsentSection extends StatelessWidget {
                     onPressed: () => _openTerms(context),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: _tealHero,
-                      side: const BorderSide(color: _tealHero, width: 1.5),
+                      side: BorderSide(color: _tealHero, width: 1.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -1545,7 +1547,7 @@ class _ConsentSection extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   readFirstHint,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: _fontFamily,
                     fontFamilyFallback: _fontFamilyFallback,
                     fontSize: 12,
@@ -1555,7 +1557,7 @@ class _ConsentSection extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 10),
-              const Divider(height: 1, color: _hair),
+              Divider(height: 1, color: _hair),
               CheckboxListTile(
                 value: accepted,
                 focusNode: checkboxFocusNode,
@@ -1584,7 +1586,7 @@ class _ConsentSection extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             errorText!,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: _fontFamily,
               fontFamilyFallback: _fontFamilyFallback,
               fontSize: 11,
@@ -1614,7 +1616,7 @@ class _NoPasswordCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 1),
             child: Icon(Icons.info_outline, size: 16, color: _tealHero),
           ),
@@ -1622,7 +1624,7 @@ class _NoPasswordCard extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: _fontFamily,
                 fontFamilyFallback: _fontFamilyFallback,
                 fontSize: 12,
@@ -1657,7 +1659,7 @@ class _StickyCta extends StatelessWidget {
     final showHelper =
         !enabled && !busy && helperText != null && helperText!.isNotEmpty;
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: _hair, width: 1)),
       ),
@@ -1675,7 +1677,7 @@ class _StickyCta extends StatelessWidget {
             Text(
               helperText!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: _fontFamily,
                 fontFamilyFallback: _fontFamilyFallback,
                 fontSize: 12,
