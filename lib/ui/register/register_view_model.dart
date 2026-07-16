@@ -43,6 +43,9 @@ class RegisterViewModel extends BaseViewModel {
   int? age;
   bool consentAccepted = false;
 
+  /// User must open and confirm the terms sheet before checking consent.
+  bool consentTermsRead = false;
+
   /// Tenant config: missing key → optional (safe for non-FAO tenants).
   bool genderRequired = false;
   bool ageRequired = false;
@@ -54,9 +57,18 @@ class RegisterViewModel extends BaseViewModel {
 
   bool get showConsent => consentContent.trim().isNotEmpty;
 
-  String get consentCheckboxLabel => consentAcceptText.trim().isNotEmpty
-      ? consentAcceptText.trim()
-      : localize.registerConsentLabel;
+  bool get canAcceptConsent => !showConsent || consentTermsRead;
+
+  /// When consent is configured, submit stays disabled until the box is checked.
+  bool get canSubmitRegistration =>
+      !isBusy && (!showConsent || consentAccepted);
+
+  /// Consent is the only reason submit is blocked (besides busy).
+  bool get isSubmitBlockedByConsent =>
+      showConsent && !consentAccepted && !isBusy;
+
+  /// Short checkbox label from app locale — not the long legal config sentence.
+  String get consentCheckboxLabel => localize.registerConsentLabel;
 
   setInvitationCode(value) {
     invitationCode = value;
@@ -92,6 +104,7 @@ class RegisterViewModel extends BaseViewModel {
     consentContent = '';
     consentAcceptText = '';
     consentAccepted = false;
+    consentTermsRead = false;
 
     try {
       final result = await configurationApi.getConfigurations();
@@ -171,8 +184,21 @@ class RegisterViewModel extends BaseViewModel {
     _clearErrorForKey('age');
   }
 
+  void markConsentTermsRead() {
+    consentTermsRead = true;
+    _clearErrorForKey('consent');
+    notifyListeners();
+  }
+
   void setConsentAccepted(bool? value) {
-    consentAccepted = value ?? false;
+    final next = value ?? false;
+    // Block accepting until terms have been opened and confirmed as read.
+    if (next && showConsent && !consentTermsRead) {
+      setErrorForObject('consent', localize.registerConsentReadFirst);
+      notifyListeners();
+      return;
+    }
+    consentAccepted = next;
     _clearErrorForKey('consent');
     notifyListeners();
   }
@@ -212,7 +238,10 @@ class RegisterViewModel extends BaseViewModel {
       setErrorForObject("age", localize.registerAgeInvalid);
       isValidData = false;
     }
-    if (showConsent && !consentAccepted) {
+    if (showConsent && !consentTermsRead) {
+      setErrorForObject("consent", localize.registerConsentReadFirst);
+      isValidData = false;
+    } else if (showConsent && !consentAccepted) {
       setErrorForObject("consent", localize.registerConsentRequired);
       isValidData = false;
     }
@@ -243,9 +272,19 @@ class RegisterViewModel extends BaseViewModel {
 
     if (result is RegisterFailure) {
       setErrorForObject("submit", result.messages.join(','));
+      setBusy(false);
+      return result;
     }
 
-    setBusy(false);
+    // Keep busy briefly on success while UI navigates home, but always clear
+    // after a short delay so a failed navigation cannot freeze the form.
+    if (result is RegisterSuccess) {
+      Future<void>.delayed(const Duration(seconds: 8), () {
+        if (isBusy) setBusy(false);
+      });
+    } else {
+      setBusy(false);
+    }
     return result;
   }
 }
