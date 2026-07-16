@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:podd_app/components/brand_logo.dart';
@@ -22,6 +24,15 @@ Color get _placeholder => OhtkColor.ink300;
 const _fontFamily = OhtkType.family;
 const _fontFamilyFallback = OhtkType.fallback;
 
+/// Overflow-safe login across phone sizes, large text, and keyboard.
+///
+/// ```
+/// LayoutBuilder
+/// └── Column
+///     ├── Expanded(_Hero)   // logo scales to remaining height (FittedBox)
+///     └── ConstrainedBox    // sheet ≤ remaining, hug content; ListView shrinkWrap
+///         └── sheet form    // scrolls only when content exceeds cap
+/// ```
 class LoginView extends StackedView<LoginViewModel> {
   const LoginView({Key? key}) : super(key: key);
 
@@ -31,33 +42,55 @@ class LoginView extends StackedView<LoginViewModel> {
   @override
   Widget builder(
       BuildContext context, LoginViewModel viewModel, Widget? child) {
-    return Scaffold(
-      backgroundColor: _sand,
-      resizeToAvoidBottomInset: true,
-      body: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: Column(
-          children: [
-            _Hero(viewModel: viewModel),
-            Expanded(
-              child: Stack(
-                clipBehavior: Clip.none,
+    final media = MediaQuery.of(context);
+    final clamped = media.copyWith(
+      textScaler: media.textScaler.clamp(
+        minScaleFactor: 1.0,
+        maxScaleFactor: 1.35,
+      ),
+    );
+
+    return MediaQuery(
+      data: clamped,
+      child: Scaffold(
+        backgroundColor: _tealDeep,
+        resizeToAvoidBottomInset: true,
+        body: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final totalH = constraints.maxHeight;
+              // Always leave a usable hero band; sheet may scroll under the cap.
+              final sheetMax = math.max(
+                200.0,
+                math.min(totalH * 0.58, totalH - 168.0),
+              );
+
+              return Column(
                 children: [
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                  Expanded(child: _Hero(viewModel: viewModel)),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: sheetMax),
                     child: _ReturningSheet(),
                   ),
                 ],
-              ),
-            ),
-          ],
+              );
+            },
+          ),
         ),
       ),
     );
   }
+}
+
+double _logoTileForHeight(double heroHeight) {
+  const chrome = 120.0;
+  final budget = math.max(0.0, heroHeight - chrome);
+  if (budget >= 200) return 136;
+  if (budget >= 170) return 120;
+  if (budget >= 140) return 100;
+  if (budget >= 110) return 84;
+  return 72;
 }
 
 class _Hero extends StatelessWidget {
@@ -70,31 +103,53 @@ class _Hero extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: RadialGradient(
-          center: Alignment(0.6, -1),
-          radius: 1.4,
+          center: const Alignment(0.55, -0.9),
+          radius: 1.35,
           colors: [_tealHero, _tealMid, _tealDeep],
-          stops: [0.0, 0.4, 1.0],
+          stops: const [0.0, 0.45, 1.0],
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       child: SafeArea(
         bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _LanguagePill(viewModel: viewModel),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Center(
-              child: BrandLogo(),
-            ),
-            const SizedBox(height: 20),
-            _RegisterCta(),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final tile = _logoTileForHeight(constraints.maxHeight);
+            final framePad = tile >= 120 ? 11.0 : 8.0;
+            final outerR = tile >= 120 ? 38.0 : (tile >= 100 ? 32.0 : 26.0);
+            final innerR = tile >= 120 ? 24.0 : (tile >= 100 ? 20.0 : 16.0);
+            final compact = constraints.maxHeight < 280;
+
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                24,
+                compact ? 2 : 4,
+                24,
+                compact ? 12 : 16,
+              ),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: _LanguagePill(viewModel: viewModel),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: BrandLogo(
+                          outerRadius: outerR,
+                          innerRadius: innerR,
+                          tileSize: tile,
+                          framePadding: framePad,
+                        ),
+                      ),
+                    ),
+                  ),
+                  _RegisterCta(compact: compact),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -154,9 +209,9 @@ class _LanguagePill extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.15),
+            color: Colors.white.withValues(alpha: 0.14),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withValues(alpha: 0.22),
               width: 1,
             ),
             borderRadius: BorderRadius.circular(100),
@@ -185,40 +240,57 @@ class _LanguagePill extends StatelessWidget {
 }
 
 class _RegisterCta extends StatelessWidget {
+  final bool compact;
+  const _RegisterCta({this.compact = false});
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final vPad = compact ? 12.0 : 15.0;
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      elevation: 6,
-      shadowColor: Colors.black.withValues(alpha: 0.18),
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const RegisterView(),
-            ),
+            MaterialPageRoute(builder: (context) => const RegisterView()),
           );
         },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 18, vertical: vPad),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.16),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                l10n.signInRegisterCta,
-                style: TextStyle(
-                  fontFamily: _fontFamily,
-                  fontFamilyFallback: _fontFamilyFallback,
-                  color: _tealDeep,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
+              Flexible(
+                child: Text(
+                  l10n.signInRegisterCta,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: _fontFamily,
+                    fontFamilyFallback: _fontFamilyFallback,
+                    color: _tealDeep,
+                    fontSize: compact ? 14 : 15,
+                    fontWeight: FontWeight.w700,
+                    height: 1.25,
+                  ),
                 ),
               ),
-              const SizedBox(width: 10),
-              Icon(Icons.arrow_forward, color: _tealDeep, size: 18),
+              const SizedBox(width: 8),
+              Icon(Icons.arrow_forward_rounded, color: _tealDeep, size: 18),
             ],
           ),
         ),
@@ -234,111 +306,98 @@ class _ReturningSheet extends StackedHookView<LoginViewModel> {
     final username = useTextEditingController();
     final password = useTextEditingController();
 
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: _sand,
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0F000000), // ~6% black
-            blurRadius: 24,
-            offset: Offset(0, -8),
-          ),
-        ],
-      ),
+    // shrinkWrap ListView: height = content, up to parent maxHeight; then scrolls.
+    return Material(
+      color: _sand,
+      elevation: 6,
+      shadowColor: Colors.black.withValues(alpha: 0.12),
       child: SafeArea(
         top: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: ListView(
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
           children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: _hair,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      l10n.signInReturningEyebrow.toUpperCase(),
-                      style: TextStyle(
-                        fontFamily: _fontFamily,
-                        fontFamilyFallback: _fontFamilyFallback,
-                        color: _muted,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _TextFieldShell(
-                      icon: Icons.person_outline,
-                      controller: username,
-                      hint: l10n.usernameLabel,
-                      errorText: viewModel.error('username'),
-                      obscure: false,
-                      onChanged: viewModel.setUsername,
-                      textInputAction: TextInputAction.next,
-                    ),
-                    const SizedBox(height: 8),
-                    _TextFieldShell(
-                      icon: Icons.lock_outline,
-                      controller: password,
-                      hint: l10n.passwordLabel,
-                      errorText: viewModel.error('password'),
-                      obscure: viewModel.obscureText,
-                      onChanged: viewModel.setPassword,
-                      onSubmitted: (value) {
-                        viewModel.setPassword(value);
-                        viewModel.authenticate();
-                      },
-                      textInputAction: TextInputAction.done,
-                      trailing: IconButton(
-                        tooltip: 'Toggle password visibility',
-                        icon: Icon(
-                          viewModel.obscureText
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                          color: _muted,
-                          size: 20,
-                        ),
-                        onPressed: () =>
-                            viewModel.setObscureText(!viewModel.obscureText),
-                      ),
-                    ),
-                    if (viewModel.hasErrorForKey('general')) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        viewModel.error('general'),
-                        style: const TextStyle(
-                          fontFamily: _fontFamily,
-                          fontFamilyFallback: _fontFamilyFallback,
-                          color: Colors.red,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 12),
-                    _SignInButton(viewModel: viewModel, l10n: l10n),
-                    const SizedBox(height: 8),
-                    _QrSignInButton(),
-                  ],
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: _hair,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-              child: _ServerFooter(viewModel: viewModel),
+            const SizedBox(height: 14),
+            Text(
+              l10n.signInReturningEyebrow.toUpperCase(),
+              style: TextStyle(
+                fontFamily: _fontFamily,
+                fontFamilyFallback: _fontFamilyFallback,
+                color: _muted,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2,
+              ),
             ),
+            const SizedBox(height: 12),
+            _TextFieldShell(
+              icon: Icons.person_outline_rounded,
+              controller: username,
+              hint: l10n.usernameLabel,
+              errorText: viewModel.error('username'),
+              obscure: false,
+              onChanged: viewModel.setUsername,
+              textInputAction: TextInputAction.next,
+            ),
+            const SizedBox(height: 10),
+            _TextFieldShell(
+              icon: Icons.lock_outline_rounded,
+              controller: password,
+              hint: l10n.passwordLabel,
+              errorText: viewModel.error('password'),
+              obscure: viewModel.obscureText,
+              onChanged: viewModel.setPassword,
+              onSubmitted: (value) {
+                viewModel.setPassword(value);
+                viewModel.authenticate();
+              },
+              textInputAction: TextInputAction.done,
+              trailing: IconButton(
+                tooltip: 'Toggle password visibility',
+                visualDensity: VisualDensity.compact,
+                icon: Icon(
+                  viewModel.obscureText
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: _muted,
+                  size: 20,
+                ),
+                onPressed: () =>
+                    viewModel.setObscureText(!viewModel.obscureText),
+              ),
+            ),
+            if (viewModel.hasErrorForKey('general')) ...[
+              const SizedBox(height: 8),
+              Text(
+                viewModel.error('general'),
+                style: const TextStyle(
+                  fontFamily: _fontFamily,
+                  fontFamilyFallback: _fontFamilyFallback,
+                  color: Colors.red,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+            const SizedBox(height: 14),
+            _SignInButton(viewModel: viewModel, l10n: l10n),
+            const SizedBox(height: 4),
+            _QrSignInButton(),
+            const SizedBox(height: 8),
+            const Divider(height: 1),
+            const SizedBox(height: 8),
+            _ServerFooter(viewModel: viewModel),
           ],
         ),
       ),
@@ -379,12 +438,12 @@ class _TextFieldShell extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(
-              color: hasError ? Colors.red : _hair,
-              width: 1.5,
+              color: hasError ? Colors.red.shade300 : _hair,
+              width: 1,
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
           child: Row(
             children: [
               Icon(icon, color: _muted, size: 20),
@@ -400,7 +459,7 @@ class _TextFieldShell extends StatelessWidget {
                     fontFamily: _fontFamily,
                     fontFamilyFallback: _fontFamilyFallback,
                     color: _ink,
-                    fontSize: 14,
+                    fontSize: 15,
                   ),
                   decoration: InputDecoration(
                     isCollapsed: true,
@@ -414,7 +473,7 @@ class _TextFieldShell extends StatelessWidget {
                       fontFamily: _fontFamily,
                       fontFamilyFallback: _fontFamilyFallback,
                       color: _placeholder,
-                      fontSize: 14,
+                      fontSize: 15,
                     ),
                   ),
                 ),
@@ -452,22 +511,18 @@ class _SignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
+      height: 50,
       child: ElevatedButton(
         onPressed: viewModel.isBusy ? null : viewModel.authenticate,
         style: ButtonStyle(
           elevation: WidgetStateProperty.all(0),
           backgroundColor: WidgetStateProperty.resolveWith((states) =>
               states.contains(WidgetState.disabled)
-                  ? _tealHero.withValues(alpha: 0.6)
+                  ? _tealHero.withValues(alpha: 0.55)
                   : _tealHero),
           foregroundColor: WidgetStateProperty.all(Colors.white),
-          padding: WidgetStateProperty.all(
-            const EdgeInsets.symmetric(vertical: 14),
-          ),
           shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
         ),
         child: viewModel.isBusy
@@ -481,6 +536,8 @@ class _SignInButton extends StatelessWidget {
               )
             : Text(
                 l10n.signInButton,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontFamily: _fontFamily,
                   fontFamilyFallback: _fontFamilyFallback,
@@ -494,64 +551,49 @@ class _SignInButton extends StatelessWidget {
 }
 
 class _QrSignInButton extends StatelessWidget {
+  Future<void> _openQr(BuildContext context) async {
+    final error = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const QrLoginView()),
+    );
+    if (error != null && context.mounted) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Scan Error'),
+          content: Text(error),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: _tealHero),
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      width: double.infinity,
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () async {
-            final error = await Navigator.push<String>(
-              context,
-              MaterialPageRoute(builder: (context) => const QrLoginView()),
-            );
-            if (error != null && context.mounted) {
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: const Text('Scan Error'),
-                  content: Text(error),
-                  actions: [
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        foregroundColor: _tealHero,
-                      ),
-                      child: const Text('OK'),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              );
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: _hair, width: 1.5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.qr_code_scanner, color: _tealHero, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.signInQrCodeButton,
-                  style: TextStyle(
-                    fontFamily: _fontFamily,
-                    fontFamilyFallback: _fontFamilyFallback,
-                    color: _ink,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
+    return TextButton.icon(
+      onPressed: () => _openQr(context),
+      style: TextButton.styleFrom(
+        foregroundColor: _tealHero,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+      ),
+      icon: const Icon(Icons.qr_code_2_rounded, size: 18),
+      label: Text(
+        l10n.signInQrCodeButton,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontFamily: _fontFamily,
+          fontFamilyFallback: _fontFamilyFallback,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -591,62 +633,56 @@ class _ServerFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.only(top: 8),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: _hair, width: 1)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: RichText(
-              overflow: TextOverflow.ellipsis,
-              text: TextSpan(
-                style: TextStyle(
-                  fontFamily: _fontFamily,
-                  fontFamilyFallback: _fontFamilyFallback,
-                  color: _muted,
-                  fontSize: 11,
-                ),
-                children: [
-                  TextSpan(text: '${l10n.signInServerLabel}: '),
-                  TextSpan(
-                    text: _serverLabel(),
-                    style: TextStyle(
-                      fontFamily: _fontFamily,
-                      fontFamilyFallback: _fontFamilyFallback,
-                      color: _ink,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+    return Row(
+      children: [
+        Icon(Icons.cloud_outlined, size: 15, color: _muted),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text.rich(
+            TextSpan(
+              style: TextStyle(
+                fontFamily: _fontFamily,
+                fontFamilyFallback: _fontFamilyFallback,
+                color: _muted,
+                fontSize: 12,
               ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(4),
-              onTap: () => _openServerSheet(context),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                child: Text(
-                  '${l10n.signInChangeServerButton} ›',
+              children: [
+                TextSpan(text: '${l10n.signInServerLabel}: '),
+                TextSpan(
+                  text: _serverLabel(),
                   style: TextStyle(
                     fontFamily: _fontFamily,
                     fontFamilyFallback: _fontFamilyFallback,
-                    color: _tealHero,
-                    fontSize: 11,
+                    color: _ink,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
+              ],
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        TextButton(
+          onPressed: () => _openServerSheet(context),
+          style: TextButton.styleFrom(
+            foregroundColor: _tealHero,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          ),
+          child: Text(
+            l10n.signInChangeServerButton,
+            style: const TextStyle(
+              fontFamily: _fontFamily,
+              fontFamilyFallback: _fontFamilyFallback,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
