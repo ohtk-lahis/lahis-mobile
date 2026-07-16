@@ -876,6 +876,90 @@ abstract class AppLocalizations {
   /// **'Use current location'**
   String get fieldUseCurrentLocation;
 
+  /// No description provided for @fieldGettingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting location…'**
+  String get fieldGettingLocation;
+
+  /// No description provided for @fieldGettingLocationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This can take a few seconds'**
+  String get fieldGettingLocationHint;
+
+  /// No description provided for @locationRationaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow location access?'**
+  String get locationRationaleTitle;
+
+  /// No description provided for @locationRationaleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is used only when you choose to attach it to a report or center the map, so responders can find the site. We do not track you in the background.'**
+  String get locationRationaleBody;
+
+  /// No description provided for @locationRationaleContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get locationRationaleContinue;
+
+  /// No description provided for @locationRationaleNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get locationRationaleNotNow;
+
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission was denied'**
+  String get locationPermissionDenied;
+
+  /// No description provided for @locationPermissionDeniedForeverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission blocked'**
+  String get locationPermissionDeniedForeverTitle;
+
+  /// No description provided for @locationPermissionDeniedForeverBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Location access is blocked for this app. Open Settings and allow location, then try again.'**
+  String get locationPermissionDeniedForeverBody;
+
+  /// No description provided for @locationOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get locationOpenSettings;
+
+  /// No description provided for @locationServiceDisabledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is turned off'**
+  String get locationServiceDisabledTitle;
+
+  /// No description provided for @locationTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not get a GPS fix in time. Try again outdoors or check that location is enabled.'**
+  String get locationTimeout;
+
+  /// No description provided for @locationCouldNotGet.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not get current location'**
+  String get locationCouldNotGet;
+
+  /// No description provided for @locationCenterOnMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Center on my location'**
+  String get locationCenterOnMe;
+
   /// No description provided for @authorityLabel.
   ///
   /// In en, this message translates to:
@@ -1547,6 +1631,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You must accept the terms and agreement to register'**
   String get registerConsentRequired;
+
+  /// No description provided for @registerConsentReadFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please open and read the terms before accepting'**
+  String get registerConsentReadFirst;
+
+  /// No description provided for @registerConsentConfirmRead.
+  ///
+  /// In en, this message translates to:
+  /// **'I have read the terms'**
+  String get registerConsentConfirmRead;
+
+  /// No description provided for @registerConsentSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & terms'**
+  String get registerConsentSectionTitle;
+
+  /// No description provided for @registerConsentSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Required before you can register'**
+  String get registerConsentSectionSubtitle;
+
+  /// No description provided for @registerConsentReadButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Read privacy notice'**
+  String get registerConsentReadButton;
+
+  /// No description provided for @registerConsentViewAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'View again'**
+  String get registerConsentViewAgain;
+
+  /// No description provided for @registerConsentReviewed.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy notice reviewed'**
+  String get registerConsentReviewed;
+
+  /// No description provided for @registerConsentSubmitBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept the terms to continue'**
+  String get registerConsentSubmitBlocked;
 
   /// No description provided for @registerViewTerms.
   ///

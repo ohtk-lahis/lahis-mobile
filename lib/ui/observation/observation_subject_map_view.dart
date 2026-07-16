@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:podd_app/components/progress_indicator.dart';
+import 'package:podd_app/l10n/app_localizations.dart';
 import 'package:podd_app/models/entities/observation_definition.dart';
 import 'package:podd_app/ui/observation/subject/observation_subject_view.dart';
 import 'package:stacked/stacked.dart';
@@ -20,7 +20,7 @@ class ObservationSubjectMapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder.nonReactive(
+    return ViewModelBuilder.reactive(
       viewModelBuilder: () => ObservationSubjectMapViewModel(definition),
       builder: (context, model, child) => _SubjectMap(),
     );
@@ -33,11 +33,7 @@ class _SubjectMap extends StackedHookView<ObservationSubjectMapViewModel> {
   @override
   Widget builder(
       BuildContext context, ObservationSubjectMapViewModel viewModel) {
-    if (viewModel.isBusy || viewModel.currentPosition == null) {
-      return const Center(
-        child: OhtkProgressIndicator(size: 100),
-      );
-    }
+    final l10n = AppLocalizations.of(context)!;
 
     var markers = viewModel.subjects
         .where((subject) => subject.gpsLocation != null)
@@ -83,30 +79,60 @@ class _SubjectMap extends StackedHookView<ObservationSubjectMapViewModel> {
         minHeight: double.infinity,
       ),
       padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: GoogleMap(
-            key: _mapKey,
-            mapType: MapType.normal,
-            initialCameraPosition: CameraPosition(
-                zoom: 14,
-                target: LatLng(viewModel.currentPosition!.latitude,
-                    viewModel.currentPosition!.longitude)),
-            myLocationEnabled: false,
-            myLocationButtonEnabled: false,
-            scrollGesturesEnabled: true,
-            gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-              Factory<OneSequenceGestureRecognizer>(
-                () => EagerGestureRecognizer(),
+      child: Stack(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: GoogleMap(
+              key: _mapKey,
+              mapType: MapType.normal,
+              initialCameraPosition: CameraPosition(
+                zoom: viewModel.currentPosition != null ? 14 : 6,
+                target: viewModel.cameraTarget,
               ),
-            },
-            markers: markers.toSet(),
-            onMapCreated: (GoogleMapController controller) {
-              viewModel.controller = controller;
-            },
-            onCameraIdle: onCameraIdle,
-          )),
+              myLocationEnabled: false,
+              myLocationButtonEnabled: false,
+              scrollGesturesEnabled: true,
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
+              markers: markers.toSet(),
+              onMapCreated: (GoogleMapController controller) {
+                viewModel.controller = controller;
+              },
+              onCameraIdle: onCameraIdle,
+            ),
+          ),
+          Positioned(
+            right: 12,
+            bottom: 24,
+            child: FloatingActionButton.extended(
+              heroTag: 'observation_center_on_me',
+              onPressed: viewModel.locating
+                  ? null
+                  : () => viewModel.centerOnUser(context),
+              icon: viewModel.locating
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.my_location),
+              label: Text(
+                viewModel.locating
+                    ? l10n.fieldGettingLocation
+                    : l10n.locationCenterOnMe,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

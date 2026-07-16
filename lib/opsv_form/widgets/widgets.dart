@@ -16,10 +16,8 @@ import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:uuid/uuid.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
-import 'package:app_settings/app_settings.dart';
 
 import 'package:podd_app/app_theme.dart';
 import 'package:podd_app/components/qr_scanner_parts.dart';
@@ -28,6 +26,7 @@ import 'package:podd_app/models/entities/report_file.dart';
 import 'package:podd_app/services/file_service.dart';
 import 'package:podd_app/locator.dart';
 import 'package:podd_app/models/entities/report_image.dart';
+import 'package:podd_app/services/device_location_service.dart';
 import 'package:podd_app/services/image_service.dart';
 import 'package:podd_app/theme/ohtk_style_system.dart';
 import 'package:podd_app/ui/home/incidents_theme.dart';

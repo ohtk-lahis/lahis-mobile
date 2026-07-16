@@ -64,7 +64,9 @@ class RegisterService extends IRegisterService {
     );
 
     if (result is RegisterSuccess) {
-      _authService.saveTokenAndFetchProfile(result.loginSuccess);
+      // Await full session setup before the UI leaves this screen so GoRouter
+      // can redirect to home without flashing the login page underneath.
+      await _authService.saveTokenAndFetchProfile(result.loginSuccess);
     }
     return result;
   }

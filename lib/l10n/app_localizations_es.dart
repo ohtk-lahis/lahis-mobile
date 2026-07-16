@@ -425,6 +425,52 @@ class AppLocalizationsEs extends AppLocalizations {
   String get fieldUseCurrentLocation => 'Usar ubicación actual';
 
   @override
+  String get fieldGettingLocation => 'Getting location…';
+
+  @override
+  String get fieldGettingLocationHint => 'This can take a few seconds';
+
+  @override
+  String get locationRationaleTitle => 'Allow location access?';
+
+  @override
+  String get locationRationaleBody =>
+      'Location is used only when you choose to attach it to a report or center the map, so responders can find the site. We do not track you in the background.';
+
+  @override
+  String get locationRationaleContinue => 'Continue';
+
+  @override
+  String get locationRationaleNotNow => 'Not now';
+
+  @override
+  String get locationPermissionDenied => 'Location permission was denied';
+
+  @override
+  String get locationPermissionDeniedForeverTitle =>
+      'Location permission blocked';
+
+  @override
+  String get locationPermissionDeniedForeverBody =>
+      'Location access is blocked for this app. Open Settings and allow location, then try again.';
+
+  @override
+  String get locationOpenSettings => 'Open settings';
+
+  @override
+  String get locationServiceDisabledTitle => 'Location is turned off';
+
+  @override
+  String get locationTimeout =>
+      'Could not get a GPS fix in time. Try again outdoors or check that location is enabled.';
+
+  @override
+  String get locationCouldNotGet => 'Could not get current location';
+
+  @override
+  String get locationCenterOnMe => 'Center on my location';
+
+  @override
   String get authorityLabel => 'Autoridad';
 
   @override
@@ -806,6 +852,32 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get registerConsentRequired =>
       'You must accept the terms and agreement to register';
+
+  @override
+  String get registerConsentReadFirst =>
+      'Please open and read the terms before accepting';
+
+  @override
+  String get registerConsentConfirmRead => 'I have read the terms';
+
+  @override
+  String get registerConsentSectionTitle => 'Privacy & terms';
+
+  @override
+  String get registerConsentSectionSubtitle =>
+      'Required before you can register';
+
+  @override
+  String get registerConsentReadButton => 'Read privacy notice';
+
+  @override
+  String get registerConsentViewAgain => 'View again';
+
+  @override
+  String get registerConsentReviewed => 'Privacy notice reviewed';
+
+  @override
+  String get registerConsentSubmitBlocked => 'Accept the terms to continue';
 
   @override
   String get registerViewTerms => 'View terms';
