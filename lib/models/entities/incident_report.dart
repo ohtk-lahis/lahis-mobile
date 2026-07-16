@@ -33,6 +33,8 @@ class IncidentReport {
   int? threadId;
   String? authorityName;
   bool testFlag;
+  /// Derived report + follow-up totals from ReportType.metric_accumulation.
+  List<AccumulatedMetric>? accumulatedMetrics;
 
   IncidentReport({
     required this.id,
@@ -51,6 +53,7 @@ class IncidentReport {
     this.authorityName,
     this.testFlag = false,
     this.reportTypeFollowable = false,
+    this.accumulatedMetrics,
   });
 
   factory IncidentReport.fromJson(Map<String, dynamic> json) {
@@ -60,6 +63,16 @@ class IncidentReport {
       if (reportTypeMap["isFollowable"] != null) {
         reportTypeFollowable = reportTypeMap["isFollowable"] as bool;
       }
+    }
+    List<AccumulatedMetric>? metrics;
+    final acc = json["accumulatedMetrics"];
+    if (acc is Map && acc["metrics"] is List) {
+      metrics = (acc["metrics"] as List)
+          .whereType<Map>()
+          .map((m) => AccumulatedMetric.fromJson(
+                Map<String, dynamic>.from(m),
+              ))
+          .toList();
     }
     return IncidentReport(
       id: json["id"],
@@ -90,11 +103,53 @@ class IncidentReport {
               .join(",")
           : "",
       reportTypeFollowable: reportTypeFollowable,
+      accumulatedMetrics: metrics,
     );
   }
 
   String get trimWhitespaceDescription {
     // replace multiple consecutive whitespace or newline with single whitespace
     return description.replaceAll(RegExp(r"\s+"), " ");
+  }
+
+  bool get hasAccumulatedMetrics =>
+      accumulatedMetrics != null && accumulatedMetrics!.isNotEmpty;
+}
+
+class AccumulatedMetric {
+  final String id;
+  final String label;
+  final String op;
+  final int value;
+  final int reportValue;
+  final List<int> followupValues;
+
+  AccumulatedMetric({
+    required this.id,
+    required this.label,
+    required this.op,
+    required this.value,
+    required this.reportValue,
+    required this.followupValues,
+  });
+
+  factory AccumulatedMetric.fromJson(Map<String, dynamic> json) {
+    final followups = json["followupValues"];
+    return AccumulatedMetric(
+      id: json["id"]?.toString() ?? "",
+      label: json["label"]?.toString() ?? json["id"]?.toString() ?? "",
+      op: json["op"]?.toString() ?? "sum",
+      value: _asInt(json["value"]),
+      reportValue: _asInt(json["reportValue"]),
+      followupValues: followups is List
+          ? followups.map((e) => _asInt(e)).toList()
+          : const [],
+    );
+  }
+
+  static int _asInt(dynamic v) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v?.toString() ?? "") ?? 0;
   }
 }
