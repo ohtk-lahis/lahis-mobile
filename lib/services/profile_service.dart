@@ -11,6 +11,8 @@ abstract class IProfileService {
     required String lastName,
     String? telephone,
     String? address,
+    String? gender,
+    int? age,
   });
 
   Future<ProfileResult> changePassword(String newPassword);
@@ -32,12 +34,16 @@ class ProfileService extends IProfileService {
     required String lastName,
     String? telephone,
     String? address,
+    String? gender,
+    int? age,
   }) async {
     var result = await _profileApi.updateProfile(
       firstName: firstName,
       lastName: lastName,
       telephone: telephone,
       address: address,
+      gender: gender,
+      age: age,
     );
 
     if (result is ProfileSuccess && result.success) {
