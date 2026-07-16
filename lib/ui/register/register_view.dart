@@ -842,51 +842,56 @@ class _ContextCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    // Match OhtkCard paper tone used on profile / observation info cards:
+    // solid paper surface + hairline, not a washed teal gradient on cream.
+    return OhtkCard(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            _tealHero.withValues(alpha: 0.08),
-            _tealHero.withValues(alpha: 0.03),
-          ],
-        ),
-        border: Border.all(color: _tealHero.withValues(alpha: 0.25)),
-        borderRadius: BorderRadius.circular(14),
-      ),
+      tone: OhtkCardTone.paper,
+      borderColor: OhtkColor.line,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Same family as profile village rows / OhtkIconTile soft brand chip.
           Container(
-            width: 32,
-            height: 32,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: _tealHero,
-              borderRadius: BorderRadius.circular(8),
+              color: OhtkTheme.palette.teal100,
+              borderRadius: OhtkRadius.tile,
             ),
             alignment: Alignment.center,
-            child: const Icon(Icons.check, size: 18, color: Colors.white),
+            child: Icon(
+              Icons.location_city_outlined,
+              size: 20,
+              color: _tealHero,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.registerCodeAccepted.toUpperCase(),
-                  style: TextStyle(
-                    fontFamily: _fontFamily,
-                    fontFamilyFallback: _fontFamilyFallback,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                    color: _tealHero,
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.check_circle, size: 14, color: _tealHero),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        l10n.registerCodeAccepted.toUpperCase(),
+                        style: TextStyle(
+                          fontFamily: _fontFamily,
+                          fontFamilyFallback: _fontFamilyFallback,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                          color: _tealHero,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 _ContextRow(
                   label: l10n.authorityLabel,
                   value: authority,
