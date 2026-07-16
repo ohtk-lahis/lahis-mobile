@@ -757,6 +757,40 @@ class AppLocalizationsLo extends AppLocalizations {
   String get registerCreating => 'ກຳລັງສ້າງບັນຊີ…';
 
   @override
+  String get genderLabel => 'Gender';
+
+  @override
+  String get ageLabel => 'Age';
+
+  @override
+  String get registerAgePlaceholder => 'Years';
+
+  @override
+  String get registerAgeInvalid => 'Enter an age between 1 and 120';
+
+  @override
+  String get registerGenderMale => 'Male';
+
+  @override
+  String get registerGenderFemale => 'Female';
+
+  @override
+  String get registerGenderOther => 'Other';
+
+  @override
+  String get registerGenderPlaceholder => 'Select gender';
+
+  @override
+  String get registerConsentLabel => 'I accept the terms and agreement';
+
+  @override
+  String get registerConsentRequired =>
+      'You must accept the terms and agreement to register';
+
+  @override
+  String get registerViewTerms => 'View terms';
+
+  @override
   String get profileSectionContactInfo => 'ຂໍ້ມູນຕິດຕໍ່';
 
   @override

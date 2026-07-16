@@ -1482,6 +1482,72 @@ abstract class AppLocalizations {
   /// **'Creating account…'**
   String get registerCreating;
 
+  /// No description provided for @genderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get genderLabel;
+
+  /// No description provided for @ageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get ageLabel;
+
+  /// No description provided for @registerAgePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Years'**
+  String get registerAgePlaceholder;
+
+  /// No description provided for @registerAgeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an age between 1 and 120'**
+  String get registerAgeInvalid;
+
+  /// No description provided for @registerGenderMale.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get registerGenderMale;
+
+  /// No description provided for @registerGenderFemale.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get registerGenderFemale;
+
+  /// No description provided for @registerGenderOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get registerGenderOther;
+
+  /// No description provided for @registerGenderPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select gender'**
+  String get registerGenderPlaceholder;
+
+  /// No description provided for @registerConsentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'I accept the terms and agreement'**
+  String get registerConsentLabel;
+
+  /// No description provided for @registerConsentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'You must accept the terms and agreement to register'**
+  String get registerConsentRequired;
+
+  /// No description provided for @registerViewTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'View terms'**
+  String get registerViewTerms;
+
   /// No description provided for @profileSectionContactInfo.
   ///
   /// In en, this message translates to:
