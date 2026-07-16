@@ -17,6 +17,9 @@ abstract class IRegisterService {
     String? email,
     String? phone,
     String? address,
+    String? gender,
+    int? age,
+    bool consent = false,
   });
 }
 
@@ -43,6 +46,9 @@ class RegisterService extends IRegisterService {
     String? email,
     String? phone,
     String? address,
+    String? gender,
+    int? age,
+    bool consent = false,
   }) async {
     var result = await _registerApi.registerUser(
       invitationCode: invitationCode,
@@ -52,10 +58,15 @@ class RegisterService extends IRegisterService {
       email: email,
       phone: phone,
       address: address,
+      gender: gender,
+      age: age,
+      consent: consent,
     );
 
     if (result is RegisterSuccess) {
-      _authService.saveTokenAndFetchProfile(result.loginSuccess);
+      // Await full session setup before the UI leaves this screen so GoRouter
+      // can redirect to home without flashing the login page underneath.
+      await _authService.saveTokenAndFetchProfile(result.loginSuccess);
     }
     return result;
   }

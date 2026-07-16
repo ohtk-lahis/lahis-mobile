@@ -163,6 +163,7 @@ class ReportApi extends GraphQlBaseApi {
           incidentDate
           gpsLocation
           rendererData
+          accumulatedMetrics
           createdAt
           updatedAt
           authorities {
@@ -171,6 +172,7 @@ class ReportApi extends GraphQlBaseApi {
           reportType {
             id
             name
+            isFollowable
           }
           reportedBy {
             id

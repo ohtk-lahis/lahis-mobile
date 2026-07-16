@@ -16,83 +16,49 @@ class FormLocationField extends StatefulWidget {
 class _FormLocationFieldState extends State<FormLocationField> {
   final Completer<GoogleMapController> _controller = Completer();
   final _logger = locator<Logger>();
+  final _locationService = const DeviceLocationService();
+  bool _locating = false;
 
-  Future<void> getCurrentPosition({required bool timeoutRetry}) async {
-    widget.field.clearError();
-    try {
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 7),
-        ),
-      );
-      widget.field.value = "${position.longitude},${position.latitude}";
-    } on TimeoutException catch (e) {
-      _logger.e(e);
-      if (timeoutRetry) {
-        getCurrentPosition(timeoutRetry: false);
-      } else {
-        widget.field.markError(
-            "Timeout! No location is received within specific duration");
-      }
-    } on LocationServiceDisabledException catch (e) {
-      _logger.e(e);
-      if (mounted) {
-        _showLocationServiceAlert(context);
-      }
-    } on PermissionDeniedException catch (e) {
-      _logger.e(e);
-      final permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        widget.field
-            .markError("You have denied a permission to access location");
-      } else {
-        getCurrentPosition(timeoutRetry: timeoutRetry);
-      }
-    }
+  void _setLocating(bool value) {
+    if (!mounted || _locating == value) return;
+    setState(() => _locating = value);
   }
 
-  void _showLocationServiceAlert(BuildContext context) {
-    final localize = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        content: Text(localize.locationServiceIsDisabled),
-        contentTextStyle: const TextStyle(
-          fontFamily: incidentsFontFamily,
-          fontFamilyFallback: incidentsFontFamilyFallback,
-          fontSize: 14,
-          color: incidentsInk,
-          height: 1.4,
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: _ohtkFormBrand,
-            ),
-            child: Text(
-              localize.ok,
-              style: const TextStyle(
-                fontFamily: incidentsFontFamily,
-                fontFamilyFallback: incidentsFontFamilyFallback,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-              AppSettings.openAppSettings(type: AppSettingsType.location);
-            },
-          ),
-        ],
-      ),
-    );
+  /// Google-aligned, user-initiated foreground location.
+  Future<void> _useCurrentLocation() async {
+    if (_locating) return;
+    _setLocating(true);
+    widget.field.clearError();
+    try {
+      final result = await _locationService.obtainCurrentPosition(context);
+      if (!mounted) return;
+      if (result.isSuccess) {
+        final p = result.position!;
+        widget.field.value = "${p.longitude},${p.latitude}";
+      } else if (result.failure != null &&
+          result.failure != DeviceLocationFailure.rationaleDeclined &&
+          result.failure != DeviceLocationFailure.serviceDisabled &&
+          result.failure !=
+              DeviceLocationFailure.permissionDeniedForever) {
+        // Dialogs already covered service / permanent deny; surface the rest.
+        final l10n = AppLocalizations.of(context)!;
+        widget.field
+            .markError(_locationService.messageFor(result.failure!, l10n));
+      }
+    } catch (e, st) {
+      _logger.e('useCurrentLocation failed: $e\n$st');
+      if (mounted) {
+        widget.field.markError(
+            AppLocalizations.of(context)!.locationCouldNotGet);
+      }
+    } finally {
+      _setLocating(false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final localize = AppLocalizations.of(context)!;
     return Observer(builder: (BuildContext context) {
       final lat = widget.field.latitude;
       final lng = widget.field.longitude;
@@ -100,31 +66,59 @@ class _FormLocationFieldState extends State<FormLocationField> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (!hasValue) _LocationEmptyPanel(onUseCurrent: _onUseCurrent),
+          if (!hasValue)
+            _LocationEmptyPanel(
+              locating: _locating,
+              locatingLabel: localize.fieldGettingLocation,
+              onUseCurrent: _locating ? null : _useCurrentLocation,
+            ),
           if (hasValue) ...[
-            _LocationMapPreview(
-              latitude: lat,
-              longitude: lng,
-              controller: _controller,
-              onCameraMove: (CameraPosition pos) {
-                widget.field.value =
-                    "${pos.target.longitude},${pos.target.latitude}";
-              },
+            Stack(
+              children: [
+                _LocationMapPreview(
+                  latitude: lat,
+                  longitude: lng,
+                  controller: _controller,
+                  onCameraMove: (CameraPosition pos) {
+                    if (_locating) return;
+                    widget.field.value =
+                        "${pos.target.longitude},${pos.target.latitude}";
+                  },
+                ),
+                if (_locating)
+                  Positioned.fill(
+                    child: _LocationBusyOverlay(
+                      label: localize.fieldGettingLocation,
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
-                onPressed: _onUseCurrent,
+                onPressed: _locating ? null : _useCurrentLocation,
                 style: TextButton.styleFrom(
                   foregroundColor: _ohtkFormBrand,
+                  disabledForegroundColor: incidentsMuted,
                   padding: EdgeInsets.zero,
                   minimumSize: const Size(0, 32),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                icon: const Icon(Icons.my_location, size: 16),
+                icon: _locating
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: _ohtkFormBrand,
+                        ),
+                      )
+                    : const Icon(Icons.my_location, size: 16),
                 label: Text(
-                  AppLocalizations.of(context)!.fieldUseCurrentLocation,
+                  _locating
+                      ? localize.fieldGettingLocation
+                      : localize.fieldUseCurrentLocation,
                   style: const TextStyle(
                     fontFamily: incidentsFontFamily,
                     fontFamilyFallback: incidentsFontFamilyFallback,
@@ -139,13 +133,18 @@ class _FormLocationFieldState extends State<FormLocationField> {
       );
     });
   }
-
-  void _onUseCurrent() => getCurrentPosition(timeoutRetry: true);
 }
 
 class _LocationEmptyPanel extends StatelessWidget {
-  final VoidCallback onUseCurrent;
-  const _LocationEmptyPanel({required this.onUseCurrent});
+  final bool locating;
+  final String locatingLabel;
+  final VoidCallback? onUseCurrent;
+
+  const _LocationEmptyPanel({
+    required this.locating,
+    required this.locatingLabel,
+    required this.onUseCurrent,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -160,45 +159,124 @@ class _LocationEmptyPanel extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.location_on_outlined,
-            size: 36,
-            color: incidentsMuted,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            localize.fieldUndefinedLocation,
-            style: const TextStyle(
-              fontFamily: incidentsFontFamily,
-              fontFamilyFallback: incidentsFontFamilyFallback,
-              fontSize: 13,
-              color: incidentsMuted,
-              fontWeight: FontWeight.w500,
+          if (locating) ...[
+            SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: _ohtkFormBrand,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextButton.icon(
-            onPressed: onUseCurrent,
-            style: TextButton.styleFrom(
-              backgroundColor: _ohtkFormBrand,
-              foregroundColor: Colors.white,
-              shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              minimumSize: const Size(0, 36),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            icon: const Icon(Icons.my_location, size: 14),
-            label: Text(
-              localize.fieldUseCurrentLocation,
+            const SizedBox(height: 10),
+            Text(
+              locatingLabel,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: incidentsFontFamily,
                 fontFamilyFallback: incidentsFontFamilyFallback,
                 fontSize: 13,
-                fontWeight: FontWeight.w700,
+                color: incidentsInk,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ),
+            const SizedBox(height: 4),
+            Text(
+              localize.fieldGettingLocationHint,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 12,
+                color: incidentsMuted,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ] else ...[
+            const Icon(
+              Icons.location_on_outlined,
+              size: 36,
+              color: incidentsMuted,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              localize.fieldUndefinedLocation,
+              style: const TextStyle(
+                fontFamily: incidentsFontFamily,
+                fontFamilyFallback: incidentsFontFamilyFallback,
+                fontSize: 13,
+                color: incidentsMuted,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextButton.icon(
+              onPressed: onUseCurrent,
+              style: TextButton.styleFrom(
+                backgroundColor: _ohtkFormBrand,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: incidentsHair,
+                disabledForegroundColor: incidentsMuted,
+                shape: const StadiumBorder(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                minimumSize: const Size(0, 36),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              icon: const Icon(Icons.my_location, size: 14),
+              label: Text(
+                localize.fieldUseCurrentLocation,
+                style: const TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _LocationBusyOverlay extends StatelessWidget {
+  final String label;
+  const _LocationBusyOverlay({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: ColoredBox(
+        color: Colors.white.withValues(alpha: 0.72),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 26,
+                height: 26,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: _ohtkFormBrand,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: incidentsFontFamily,
+                  fontFamilyFallback: incidentsFontFamilyFallback,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: incidentsInk,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

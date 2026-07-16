@@ -255,6 +255,8 @@ class _DetailTab extends StatelessWidget {
     final blocks = <Widget>[
       _HeaderBlock(incident: incident),
       _DescriptionBlock(incident: incident),
+      if (incident.hasAccumulatedMetrics)
+        _AccumulatedMetricsBlock(incident: incident),
       _MetaBlock(incident: incident),
       if ((incident.images ?? []).isNotEmpty) _PhotosBlock(incident: incident),
       if ((incident.files ?? []).isNotEmpty)
@@ -442,6 +444,51 @@ class _DescriptionBlock extends StatelessWidget {
           height: 1.55,
           color: hasBody ? incidentsBody : incidentsMuted,
         ),
+      ),
+    );
+  }
+}
+
+class _AccumulatedMetricsBlock extends StatelessWidget {
+  final IncidentReport incident;
+
+  const _AccumulatedMetricsBlock({required this.incident});
+
+  @override
+  Widget build(BuildContext context) {
+    final metrics = incident.accumulatedMetrics ?? const [];
+    return _DetailBlock(
+      eyebrow: 'Totals (report + follow-ups)',
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
+      child: Column(
+        children: [
+          for (final metric in metrics) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    metric.label,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      color: incidentsBody,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${metric.value}',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: incidentsInk,
+                  ),
+                ),
+              ],
+            ),
+            if (metric != metrics.last)
+              const Divider(height: 16, color: incidentsHair),
+          ],
+        ],
       ),
     );
   }
