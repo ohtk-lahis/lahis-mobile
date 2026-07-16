@@ -325,6 +325,10 @@ class AppLocalizationsMy extends AppLocalizations {
       'ပေးပို့ပြီးပါက ဤအစီရင်ခံစာကို ပြန်တည်းဖြတ်၍ မရတော့ပါ။ မပို့ခင် အကျဉ်းချုပ်ကို သေချာစစ်ပါ။';
 
   @override
+  String get reviewAccuracyConfirmLabel =>
+      'I confirm that the information provided is accurate';
+
+  @override
   String get reviewBackToFormButton => 'ဖောင်သို့ ပြန်';
 
   @override

@@ -9,7 +9,7 @@ Color get _brandPrimary => OhtkTheme.palette.teal700;
 Color _brandTint(double alpha) =>
     OhtkTheme.palette.teal700.withValues(alpha: alpha);
 
-class FormConfirmSubmit extends StatelessWidget {
+class FormConfirmSubmit extends StatefulWidget {
   final OnSubmit onSubmit;
   final VoidCallback onBack;
 
@@ -37,6 +37,13 @@ class FormConfirmSubmit extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<FormConfirmSubmit> createState() => _FormConfirmSubmitState();
+}
+
+class _FormConfirmSubmitState extends State<FormConfirmSubmit> {
+  bool _accuracyConfirmed = false;
+
+  @override
   Widget build(BuildContext context) {
     final localize = AppLocalizations.of(context)!;
     return Column(
@@ -49,28 +56,40 @@ class FormConfirmSubmit extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
             children: [
-              if (authority != null) ...[
-                _AuthorityCard(child: authority!),
+              if (widget.authority != null) ...[
+                _AuthorityCard(child: widget.authority!),
                 const SizedBox(height: 12),
               ],
-              if (showDataSummary) ...[
+              if (widget.showDataSummary) ...[
                 _DataSummaryCard(
-                  dataSummary: dataSummary,
-                  onEdit: onBack,
+                  dataSummary: widget.dataSummary,
+                  onEdit: widget.onBack,
                 ),
                 const SizedBox(height: 12),
               ],
               _ReminderStrip(message: localize.reviewReminderBody),
+              const SizedBox(height: 12),
+              _AccuracyConfirmCheckbox(
+                value: _accuracyConfirmed,
+                label: localize.reviewAccuracyConfirmLabel,
+                enabled: !widget.busy,
+                onChanged: (value) {
+                  setState(() {
+                    _accuracyConfirmed = value ?? false;
+                  });
+                },
+              ),
               const SizedBox(height: 8),
             ],
           ),
         ),
         _ReviewFooter(
-          busy: busy,
-          submitText: submitText ?? localize.formChromeSubmitReportLabel,
+          busy: widget.busy,
+          canSubmit: _accuracyConfirmed && !widget.busy,
+          submitText: widget.submitText ?? localize.formChromeSubmitReportLabel,
           backText: localize.reviewBackToFormButton,
-          onSubmit: onSubmit,
-          onBack: onBack,
+          onSubmit: widget.onSubmit,
+          onBack: widget.onBack,
         ),
       ],
     );
@@ -307,8 +326,55 @@ class _ReminderStrip extends StatelessWidget {
   }
 }
 
+class _AccuracyConfirmCheckbox extends StatelessWidget {
+  final bool value;
+  final String label;
+  final bool enabled;
+  final ValueChanged<bool?> onChanged;
+
+  const _AccuracyConfirmCheckbox({
+    required this.value,
+    required this.label,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: value ? _brandTint(0.35) : incidentsHair,
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: CheckboxListTile(
+        value: value,
+        onChanged: enabled ? onChanged : null,
+        controlAffinity: ListTileControlAffinity.leading,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        activeColor: _brandPrimary,
+        title: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: incidentsFontFamily,
+            fontFamilyFallback: incidentsFontFamilyFallback,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w600,
+            color: incidentsInk,
+            height: 1.35,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ReviewFooter extends StatelessWidget {
   final bool busy;
+  final bool canSubmit;
   final String submitText;
   final String backText;
   final OnSubmit onSubmit;
@@ -316,6 +382,7 @@ class _ReviewFooter extends StatelessWidget {
 
   const _ReviewFooter({
     required this.busy,
+    required this.canSubmit,
     required this.submitText,
     required this.backText,
     required this.onSubmit,
@@ -344,7 +411,7 @@ class _ReviewFooter extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: TextButton(
-              onPressed: busy ? null : () => onSubmit(),
+              onPressed: canSubmit ? () => onSubmit() : null,
               style: TextButton.styleFrom(
                 backgroundColor: _brandPrimary,
                 foregroundColor: Colors.white,

@@ -326,6 +326,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Une fois envoyé, ce rapport ne peut plus être modifié. Vérifiez le résumé ci-dessus avant l\'envoi.';
 
   @override
+  String get reviewAccuracyConfirmLabel =>
+      'I confirm that the information provided is accurate';
+
+  @override
   String get reviewBackToFormButton => 'Retour au formulaire';
 
   @override

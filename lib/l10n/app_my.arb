@@ -120,6 +120,7 @@
   "authorityHelper": "တာဝန်ရှိ အဖွဲ့ထံ အစီရင်ခံစာ ပို့ရန် အသုံးပြုပါသည်။",
   "reviewEditButton": "တည်းဖြတ်",
   "reviewReminderBody": "ပေးပို့ပြီးပါက ဤအစီရင်ခံစာကို ပြန်တည်းဖြတ်၍ မရတော့ပါ။ မပို့ခင် အကျဉ်းချုပ်ကို သေချာစစ်ပါ။",
+  "reviewAccuracyConfirmLabel": "I confirm that the information provided is accurate",
   "reviewBackToFormButton": "ဖောင်သို့ ပြန်",
   "recentSectionLabel": "မကြာသေးမီ",
   "earlierSectionLabel": "ယခင်က",

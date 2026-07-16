@@ -120,6 +120,7 @@
   "authorityHelper": "Lo usamos para enrutar el informe al equipo responsable.",
   "reviewEditButton": "Editar",
   "reviewReminderBody": "Una vez enviado, este informe no se puede editar. Verifica el resumen anterior antes de enviar.",
+  "reviewAccuracyConfirmLabel": "I confirm that the information provided is accurate",
   "reviewBackToFormButton": "Volver al formulario",
   "recentSectionLabel": "Reciente",
   "earlierSectionLabel": "Antes",

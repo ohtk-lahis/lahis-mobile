@@ -325,6 +325,10 @@ class AppLocalizationsKm extends AppLocalizations {
       'នៅពេលផ្ញើរួច របាយការណ៍នេះមិនអាចកែបានទេ។ សូមពិនិត្យសេចក្តីសង្ខេបខាងលើមុនពេលផ្ញើ។';
 
   @override
+  String get reviewAccuracyConfirmLabel =>
+      'I confirm that the information provided is accurate';
+
+  @override
   String get reviewBackToFormButton => 'ត្រឡប់ទៅទម្រង់';
 
   @override

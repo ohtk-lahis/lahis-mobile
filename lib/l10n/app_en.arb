@@ -121,6 +121,7 @@
   "authorityHelper": "We use this to route the report to the right responding team.",
   "reviewEditButton": "Edit",
   "reviewReminderBody": "Once submitted, this report can't be edited. Double-check the summary above before sending.",
+  "reviewAccuracyConfirmLabel": "I confirm that the information provided is accurate",
   "reviewBackToFormButton": "Back to form",
   "recentSectionLabel": "Recent",
   "earlierSectionLabel": "Earlier",

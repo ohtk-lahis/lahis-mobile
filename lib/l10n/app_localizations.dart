@@ -708,6 +708,12 @@ abstract class AppLocalizations {
   /// **'Once submitted, this report can\'t be edited. Double-check the summary above before sending.'**
   String get reviewReminderBody;
 
+  /// No description provided for @reviewAccuracyConfirmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'I confirm that the information provided is accurate'**
+  String get reviewAccuracyConfirmLabel;
+
   /// No description provided for @reviewBackToFormButton.
   ///
   /// In en, this message translates to:
